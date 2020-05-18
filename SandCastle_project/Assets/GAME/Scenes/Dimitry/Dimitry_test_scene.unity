@@ -288,7 +288,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speedPlayer: 5
   skin: {fileID: 78045562}
-  dontMove: 1
+  dontMove: 0
 --- !u!1 &821125812
 GameObject:
   m_ObjectHideFlags: 0
@@ -417,7 +417,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 270906288}
-  tacticalEnable: 1
+  tacticalEnable: 0
   defaultAngleFree: 20
   sensibilityRotateValue: 360
   distToTarget: 20
@@ -426,7 +426,7 @@ MonoBehaviour:
   TargetFollowing: 0
   targetToFollow: {fileID: 0}
   offsetRotate: {fileID: 821125813}
-  rotateVersion: 0
+  rotateVersion: 1
   moveUpCam: 122
   moveDownCam: 115
   moveRightCam: 100

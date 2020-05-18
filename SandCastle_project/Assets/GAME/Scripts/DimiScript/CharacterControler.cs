@@ -26,6 +26,20 @@ public class CharacterControler : MonoBehaviour
             SimpleMove();
             FinalMove();
         }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (dontMove)
+            {
+                dontMove = false;
+                //StartCoroutine(changeCamMode(1f, false));
+            }
+            else
+            {
+                dontMove = true;
+                //sStartCoroutine(changeCamMode(1f, true));
+            }
+        }
     }
     #region Movement Methode 
     private void Move()
