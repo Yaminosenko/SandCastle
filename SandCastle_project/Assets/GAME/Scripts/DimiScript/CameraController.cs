@@ -48,6 +48,9 @@ public class CameraController : MonoBehaviour
     private float angleRotate;
     private bool changeModeCD;
     private float angleMode;
+    private float[] angleTarget = new float[4];
+    private int indexAngleTarget;
+    private float angleToReach;
    
     #endregion
 
@@ -55,6 +58,10 @@ public class CameraController : MonoBehaviour
 
     private void OnEnable()
     {
+        angleTarget[0] = 45;
+        angleTarget[1] = 135;
+        angleTarget[2] = 225;
+        angleTarget[3] = 315;
         target = player;
         offsetRotate.position = player.position;
     }
@@ -131,11 +138,11 @@ public class CameraController : MonoBehaviour
 
 
 
-        // pos.y = Mathf.Clamp(pos.y, minY, maxY);
-        //pos.x = Mathf.Clamp(pos.x, -LimiteX, LimiteX);
-        // pos.z = Mathf.Clamp(pos.x, -LimiteZ, LimiteZ);
+        pos.x = Mathf.Clamp(pos.x, -LimiteX, LimiteX);
+        pos.z = Mathf.Clamp(pos.z, -LimiteZ, LimiteZ);
 
         pos.y = y;
+        pos.y = Mathf.Clamp(pos.y, minY, maxY);
         transform.position = pos;
     }
 
@@ -157,8 +164,34 @@ public class CameraController : MonoBehaviour
             if (Input.GetKey(rotateLeft) && !rotateCD)
                 StartCoroutine(RotateSmooth(0.5f, false));
 
-            if(rotateCD)
-                transform.RotateAround(offsetRotate.position, Vector3.up, 180 * Time.deltaTime);
+            if (rotateCD)
+            {
+                //left
+                if (transform.eulerAngles.y >= angleToReach && angleRotate == -180)
+                {
+                    transform.RotateAround(offsetRotate.position, Vector3.up, angleRotate * Time.deltaTime);
+                }
+                else if(angleToReach == angleTarget[3] && angleRotate == -180)
+                {
+                    if(transform.eulerAngles.y <= angleToReach)
+                        transform.RotateAround(offsetRotate.position, Vector3.up, angleRotate * Time.deltaTime);
+
+                }
+                //right
+                if (transform.eulerAngles.y <= angleToReach && angleRotate == 180)
+                {
+                    transform.RotateAround(offsetRotate.position, Vector3.up, angleRotate * Time.deltaTime);
+                }
+                else if (angleToReach == angleTarget[0] && angleRotate == 180)
+                {
+                    if (transform.eulerAngles.y >= angleToReach)
+                        transform.RotateAround(offsetRotate.position, Vector3.up, angleRotate * Time.deltaTime);
+
+                }
+
+
+            }
+
         }
      
     }
@@ -187,7 +220,7 @@ public class CameraController : MonoBehaviour
 
         if (changeModeCD)
         {
-           Debug.Log(transform.eulerAngles.x + " " + angleMode);
+           //Debug.Log(transform.eulerAngles.x + " " + angleMode);
            float rot =  Mathf.Lerp(transform.eulerAngles.x, angleMode, 5 * Time.deltaTime);
            transform.rotation = Quaternion.Euler(rot, transform.eulerAngles.y, transform.eulerAngles.z);
         }
@@ -201,13 +234,27 @@ public class CameraController : MonoBehaviour
         if (right)
         {
             angleRotate = 180;
+            indexAngleTarget++;
+            if (indexAngleTarget > 3)
+            {
+                indexAngleTarget = 0;
+            }
         }
         else
         {
             angleRotate = -180;
+            indexAngleTarget--;
+            if(indexAngleTarget < 0)
+            {
+                indexAngleTarget = 3;
+            }
         }
+
+        angleToReach = angleTarget[indexAngleTarget];
+        //Debug.Log(indexAngleTarget + " " + angleToReach);
         yield return new WaitForSeconds(time);
         rotateCD = false;
+
     }
 
     IEnumerator changeCamMode(float time, bool mode)

@@ -137,15 +137,15 @@ MonoBehaviour:
   TargetFollowing: 0
   targetToFollow: {fileID: 0}
   offsetRotate: {fileID: 5303829630860461707}
-  rotateVersion: 1
+  rotateVersion: 0
   moveUpCam: 122
   moveDownCam: 115
   moveRightCam: 100
   moveLeftCam: 113
   movementSpeed: 25
   ScreenEdgeBorderSize: 25
-  LimiteX: 100
-  LimiteZ: 100
+  LimiteX: 25
+  LimiteZ: 25
   rotateLeft: 97
   rotateRight: 101
   keyBoardRotateSpeed: 100
