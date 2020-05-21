@@ -11,7 +11,7 @@ public class GridSpawner : MonoBehaviour
     public float multiply = 1f;
     public float angleSlop = 20;
     public LayerMask layerMask;
-    private List<GameObject> allBlock = new List<GameObject>();
+    public List<GameObject> allBlock = new List<GameObject>();
 
     //public float spawnSpeed = 0.2f;
 
@@ -42,12 +42,12 @@ public class GridSpawner : MonoBehaviour
                     Destroy(block);
                 }
             }
-            foreach (GameObject block in allBlock)
-            {
-                block.GetComponent<Block>().GetAdjacentBlock();
-            }
+            //foreach (GameObject block in allBlock)
+            //{
+            //    block.GetComponent<Block>().GetAdjacentBlock();
+            //}
 
-            allBlock.Clear();
+            //allBlock.Clear();
             
         }
     }

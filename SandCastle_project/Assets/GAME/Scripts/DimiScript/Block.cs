@@ -5,15 +5,16 @@ using UnityEngine;
 public class Block : MonoBehaviour
 {
     public Transform[] offset = new Transform[4];
-    public GameObject[] blockAdjacent = new GameObject[8];
+    public GameObject[] blockAdjacent = new GameObject[10];
     public LayerMask layerMask;
     public LayerMask blockMask;
+    public bool leTest;
 
     public float angleSloap;
     public float positionY;
     public int test;
 
-
+    public int one;
     public float[] offsetDistance = new float[4]; 
 
     private void Awake()
@@ -26,9 +27,29 @@ public class Block : MonoBehaviour
        
     }
 
+    private void LateUpdate()
+    {
+        if(one < 2)
+        {
+            GetAdjacentBlock();
+            one++;
+        }
+    }
+
     private void Update()
     {
-        GetAdjacentBlock();
+        if (leTest)
+        {
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                for (int i = 0; i < blockAdjacent.Length; i++)
+                {
+                    if (blockAdjacent[i] != null) 
+                        Destroy(blockAdjacent[i]);
+                }
+                Destroy(this);
+            }
+        }
     }
 
 
@@ -91,7 +112,8 @@ public class Block : MonoBehaviour
 
         for (int i = 0; i < AdjacentBlock.Length; i++)
         {
-            blockAdjacent[i] = AdjacentBlock[i].gameObject; 
+            if(AdjacentBlock[i] != this.gameObject)
+                blockAdjacent[i] = AdjacentBlock[i].gameObject; 
         }
     }
 }

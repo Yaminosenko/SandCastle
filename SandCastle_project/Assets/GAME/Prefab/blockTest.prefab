@@ -214,6 +214,8 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   layerMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -223,6 +225,7 @@ MonoBehaviour:
   angleSloap: 0
   positionY: 0
   test: 0
+  one: 0
   offsetDistance:
   - 0
   - 0
