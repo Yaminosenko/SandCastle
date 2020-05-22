@@ -150,7 +150,7 @@ public class CharacterControler : MonoBehaviour
                 Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * hit.distance, Color.yellow, Mathf.Infinity);
                 Block block = hit.collider.GetComponent<Block>();
                 block.pathIndex++;
-                block.GetComponent<MeshRenderer>().material = testMat;
+               // block.GetComponent<MeshRenderer>().material = testMat;
                 List<Block> tabBlock = new List<Block>();
                 tabBlock.Add(block);
                 Block[] blockOrigins = tabBlock.ToArray();
@@ -166,11 +166,11 @@ public class CharacterControler : MonoBehaviour
                             if(blockOrigins[o].blockAdjacent[a] != null)
                             {
                                 Block blockAdj = blockOrigins[o].blockAdjacent[a].GetComponent<Block>();
-                                tabBlock.Add(blockAdj);
                                 if (blockAdj.pathIndex == 0)
                                 {
+                                    tabBlock.Add(blockAdj);
                                     blockAdj.pathIndex += indexRangeMovement;
-                                   blockAdj.GetComponent<MeshRenderer>().material = testMat;
+                                    blockAdj.GetComponent<MeshRenderer>().material = testMat;
                                 }
                             }
                         }
