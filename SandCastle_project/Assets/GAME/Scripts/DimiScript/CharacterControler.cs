@@ -1,47 +1,70 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class CharacterControler : MonoBehaviour
 {
     [Header("Reference")]
-    public float speedPlayer = 4;
     public Transform skin;
-    public bool dontMove = false;
+    public bool Mode = false;
+    public Camera cam;
+
+    [Header("FreeMode")]
+    public float speedPlayer = 4;
+
+
+    [Header("TacticalMode")]
+    public Vector3 pos;
+    public int unitsRangeMovement = 3;
+    public LayerMask blockMask = 8;
+    public Material testMat;
+
 
     //private
     private Vector3 move;
     private Vector3 vel;
     private Rigidbody rb;
     private Vector3 velocity;
+    private NavMeshAgent nav;
+    private bool SettingPathBool;
+    private int indexRangeMovement;
 
     private void OnEnable()
     {
         rb = GetComponent<Rigidbody>();
+        nav = GetComponent<NavMeshAgent>();
+
     }
     private void Update()
     {
-        if (!dontMove)
+        if (!Mode)
         {
             SimpleMove();
             FinalMove();
         }
+        else
+        {
+            Movement();
+            if(!SettingPathBool)
+                StartCoroutine(LateUp(0.1f));
+        }
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (dontMove)
+            if (Mode)
             {
-                dontMove = false;
+                Mode = false;
                 //StartCoroutine(changeCamMode(1f, false));
             }
             else
             {
-                dontMove = true;
+                Mode = true;
                 //sStartCoroutine(changeCamMode(1f, true));
             }
         }
     }
-    #region Movement Methode 
+    #region Free Movement Methode 
     private void Move()
     {
         float mH = Input.GetAxis("Horizontal");
@@ -79,7 +102,6 @@ public class CharacterControler : MonoBehaviour
         }
     }
 
-
     private void FinalMove()
     {
 
@@ -94,6 +116,83 @@ public class CharacterControler : MonoBehaviour
 
 
         velocity = Vector3.zero;
+    }
+    #endregion
+
+    #region Tactical Movement Methode
+
+    private void Movement()
+    {
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if(Physics.Raycast(ray, out hit))
+        {
+            if(hit.transform.gameObject.layer == 8)
+            {
+
+                if (Input.GetMouseButtonDown(1))
+                {
+                    pos = new Vector3(hit.collider.transform.position.x, transform.position.y, hit.collider.transform.position.z);
+                    nav.SetDestination(pos);
+                }
+            }
+        }
+    }
+
+    private void SetPath()
+    {
+        if (!SettingPathBool)
+        {
+            RaycastHit hit;
+            if(Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, Mathf.Infinity, blockMask))
+            {
+                Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * hit.distance, Color.yellow, Mathf.Infinity);
+                Block block = hit.collider.GetComponent<Block>();
+                block.pathIndex++;
+                block.GetComponent<MeshRenderer>().material = testMat;
+                List<Block> tabBlock = new List<Block>();
+                tabBlock.Add(block);
+                Block[] blockOrigins = tabBlock.ToArray();
+                tabBlock.Clear();
+
+                for (int u = 0; u < unitsRangeMovement; u++)
+                {
+                    indexRangeMovement++;
+                    for (int o = 0; o < blockOrigins.Length; o++)
+                    {
+                        for (int a = 0; a < blockOrigins[o].blockAdjacent.Length; a++)
+                        {
+                            if(blockOrigins[o].blockAdjacent[a] != null)
+                            {
+                                Block blockAdj = blockOrigins[o].blockAdjacent[a].GetComponent<Block>();
+                                tabBlock.Add(blockAdj);
+                                if (blockAdj.pathIndex == 0)
+                                {
+                                    blockAdj.pathIndex += indexRangeMovement;
+                                   blockAdj.GetComponent<MeshRenderer>().material = testMat;
+                                }
+                            }
+                        }
+                    }
+                    blockOrigins = tabBlock.ToArray();
+                    Debug.Log(blockOrigins.Length);
+                    tabBlock.Clear();
+                }
+            }
+            else
+                Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * 1000, Color.white, Mathf.Infinity);
+
+            SettingPathBool = true;
+        }
+    }
+    #endregion
+
+    #region Coroutine
+    IEnumerator LateUp(float time)
+    {
+        yield return new WaitForSeconds(time);
+        SetPath();
     }
     #endregion
 }

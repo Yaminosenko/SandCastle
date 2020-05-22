@@ -4,27 +4,32 @@ using UnityEngine;
 
 public class Block : MonoBehaviour
 {
-    public Transform[] offset = new Transform[4];
-    public GameObject[] blockAdjacent = new GameObject[10];
+    [Header("SetUp")]
     public LayerMask layerMask;
     public LayerMask blockMask;
     public bool leTest;
+    public Material mouseNotOver;
+    public Material mouseOver;
 
+
+    [Header("Reference")]
+    public Transform[] offset = new Transform[4];
+    public GameObject[] blockAdjacent = new GameObject[10];
+    public CharacterControler player;
+    public bool inside;
     public float angleSloap;
     public float positionY;
     public int test;
-
     public int one;
-    public float[] offsetDistance = new float[4]; 
+    public float[] offsetDistance = new float[4];
+    public int pathIndex;
+    private MeshRenderer mesh;
 
-    private void Awake()
-    {
-    }
 
     private void Start()
     {
         SetRotationBlock();
-       
+        mesh = GetComponent<MeshRenderer>();
     }
 
     private void LateUpdate()
@@ -34,6 +39,14 @@ public class Block : MonoBehaviour
             GetAdjacentBlock();
             one++;
         }
+
+        if (player.Mode)
+            mesh.enabled = true;
+        else
+            mesh.enabled = false;
+
+
+        
     }
 
     private void Update()
@@ -50,6 +63,8 @@ public class Block : MonoBehaviour
                 Destroy(this);
             }
         }
+
+        ChangeColor();
     }
 
 
@@ -115,6 +130,25 @@ public class Block : MonoBehaviour
             if(AdjacentBlock[i] != this.gameObject)
                 blockAdjacent[i] = AdjacentBlock[i].gameObject; 
         }
+    }
+
+    public void ChangeColor()
+    {
+    //    if (inside)
+    //        mesh.material = mouseOver;
+    //    else
+    //        mesh.material = mouseNotOver;
+        
+    }
+
+    private void OnMouseOver()
+    {
+        //inside = true;
+    }
+
+    private void OnMouseExit()
+    {
+        //inside = false;
     }
 }
 

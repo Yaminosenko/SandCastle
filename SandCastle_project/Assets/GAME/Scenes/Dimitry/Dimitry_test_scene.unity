@@ -127,6 +127,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 5146668735634207965}
   m_PrefabAsset: {fileID: 0}
+--- !u!20 &405137868 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 5303829630895051578, guid: 58311c82b2c518d448c706ad3ee9c49b,
+    type: 3}
+  m_PrefabInstance: {fileID: 5303829631660483646}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &492068458
 GameObject:
   m_ObjectHideFlags: 0
@@ -158,13 +164,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blockPrefab: {fileID: 4463290443691307897, guid: fc389865403fb8745a8bff4b6772f981,
     type: 3}
-  worldWidth: 20
+  worldWidth: 40
   worldHeight: 20
   multiply: 1
   angleSlop: 20
   layerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1536
+  chara: {fileID: 1134453153}
 --- !u!4 &492068460
 Transform:
   m_ObjectHideFlags: 0
@@ -217,6 +224,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1134453153 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5146668735904368488, guid: 16bcdbce376427947acfa08e48bdb523,
+    type: 3}
+  m_PrefabInstance: {fileID: 5146668735634207965}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d6442fb483e94840a7085a05568aada, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1162295615
 GameObject:
   m_ObjectHideFlags: 0
@@ -321,7 +340,7 @@ GameObject:
   - component: {fileID: 1164864329}
   - component: {fileID: 1164864328}
   - component: {fileID: 1164864327}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cube (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -414,7 +433,7 @@ GameObject:
   - component: {fileID: 1286800229}
   - component: {fileID: 1286800228}
   - component: {fileID: 1286800227}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cube (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -507,7 +526,7 @@ GameObject:
   - component: {fileID: 1439787698}
   - component: {fileID: 1439787697}
   - component: {fileID: 1439787696}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cube (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -600,7 +619,7 @@ GameObject:
   - component: {fileID: 1602180478}
   - component: {fileID: 1602180477}
   - component: {fileID: 1602180476}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -694,7 +713,7 @@ GameObject:
   - component: {fileID: 1842605300}
   - component: {fileID: 1842605299}
   - component: {fileID: 1842605298}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -787,7 +806,7 @@ GameObject:
   - component: {fileID: 1905033292}
   - component: {fileID: 1905033291}
   - component: {fileID: 1905033290}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -880,7 +899,7 @@ GameObject:
   - component: {fileID: 2073699115}
   - component: {fileID: 2073699114}
   - component: {fileID: 2073699113}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -973,7 +992,7 @@ GameObject:
   - component: {fileID: 2086066205}
   - component: {fileID: 2086066204}
   - component: {fileID: 2086066203}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1061,6 +1080,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5146668735904368488, guid: 16bcdbce376427947acfa08e48bdb523,
+        type: 3}
+      propertyPath: testMat
+      value: 
+      objectReference: {fileID: 2100000, guid: 7d17831640e0d81478a596df1080ca2d, type: 2}
+    - target: {fileID: 5146668735904368488, guid: 16bcdbce376427947acfa08e48bdb523,
+        type: 3}
+      propertyPath: cam
+      value: 
+      objectReference: {fileID: 405137868}
+    - target: {fileID: 5146668735904368488, guid: 16bcdbce376427947acfa08e48bdb523,
+        type: 3}
+      propertyPath: blockMask.m_Bits
+      value: 256
+      objectReference: {fileID: 0}
     - target: {fileID: 5146668735904368493, guid: 16bcdbce376427947acfa08e48bdb523,
         type: 3}
       propertyPath: m_LocalPosition.x
