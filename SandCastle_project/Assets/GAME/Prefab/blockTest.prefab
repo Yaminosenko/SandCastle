@@ -206,9 +206,12 @@ MonoBehaviour:
   blockMask:
     serializedVersion: 2
     m_Bits: 256
-  leTest: 0
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 1024
   mouseNotOver: {fileID: 2100000, guid: 848d37d55475f7541ae2ed18a2a75327, type: 2}
   mouseOver: {fileID: 2100000, guid: e7867370e0a47854aa42a208a751535f, type: 2}
+  cover: {fileID: 1053576793832414374, guid: a598f466443937846991150e636ad1a6, type: 3}
   offset:
   - {fileID: 1613977013515738151}
   - {fileID: 6600654917687607995}
@@ -237,6 +240,9 @@ MonoBehaviour:
   - 0
   - 0
   pathIndex: 0
+  mesh: {fileID: 0}
+  isStair: 0
+  stairScript: {fileID: 0}
 --- !u!1 &6513232413804090232
 GameObject:
   m_ObjectHideFlags: 0

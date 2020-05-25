@@ -1,15 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Block : MonoBehaviour
 {
     [Header("SetUp")]
     public LayerMask layerMask;
     public LayerMask blockMask;
-    public bool leTest;
+    public LayerMask obstacleMask;
     public Material mouseNotOver;
     public Material mouseOver;
+    public GameObject cover;
 
 
     [Header("Reference")]
@@ -23,12 +25,15 @@ public class Block : MonoBehaviour
     public int one;
     public float[] offsetDistance = new float[4];
     public int pathIndex;
-    private MeshRenderer mesh;
+    public MeshRenderer mesh;
+    public bool isStair;
+    public NavMeshLink stairScript;
 
 
     private void Start()
     {
         SetRotationBlock();
+        SetCover();
         mesh = GetComponent<MeshRenderer>();
     }
 
@@ -37,34 +42,23 @@ public class Block : MonoBehaviour
         if(one < 2)
         {
             GetAdjacentBlock();
+            StairSetUp();
             one++;
         }
 
-        if (player.Mode)
+        if (player.FreeMode)
             mesh.enabled = true;
         else
             mesh.enabled = false;
 
+        //if (player.isMoving)
+        //    ResetIndex();
 
-        
     }
 
     private void Update()
     {
-        if (leTest)
-        {
-            if (Input.GetKeyDown(KeyCode.P))
-            {
-                for (int i = 0; i < blockAdjacent.Length; i++)
-                {
-                    if (blockAdjacent[i] != null) 
-                        Destroy(blockAdjacent[i]);
-                }
-                Destroy(this);
-            }
-        }
-
-        ChangeColor();
+        //ChangeColor();
     }
 
 
@@ -76,7 +70,7 @@ public class Block : MonoBehaviour
             if (Physics.Raycast(offset[i].transform.position, offset[i].transform.TransformDirection(Vector3.down), out hit, Mathf.Infinity, layerMask))
             {
                 // Debug.DrawRay(offset[i].transform.position, transform.TransformDirection(Vector3.down) * hit.distance, Color.yellow, Mathf.Infinity);
-                Debug.Log("Did Hit");
+
 
                 offsetDistance[i] = hit.distance;
 
@@ -121,6 +115,57 @@ public class Block : MonoBehaviour
         transform.position = new Vector3(transform.position.x, positionY, transform.position.z);
     }
 
+    private void SetCover()
+    {
+        RaycastHit hitForward;
+        RaycastHit hitBack;
+        RaycastHit hitRight;
+        RaycastHit hitLeft;
+        Vector3 pos = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z);
+        if (Physics.Raycast(pos, Vector3.forward,out hitForward, 0.6f, obstacleMask))
+        {
+            if(hitForward.collider.gameObject.tag == "Obs1")
+            {
+                
+                Vector3 instPos = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z - 0.1f);  
+                GameObject coverInst = Instantiate(cover, instPos, cover.transform.rotation);
+                cover.transform.parent = transform;
+            }
+        }
+        else if (Physics.Raycast(pos, Vector3.back, out hitBack, 0.6f, obstacleMask))
+        {
+            if (hitBack.collider.gameObject.tag == "Obs1")
+            {
+                Vector3 instPos = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z + 0.1f);
+                GameObject coverInst = Instantiate(cover, instPos, Quaternion.Euler(0,180,0));
+                cover.transform.parent = transform;
+            }
+        }
+        else if (Physics.Raycast(pos, Vector3.right, out hitRight, 0.6f, obstacleMask))
+        {
+            if (hitRight.collider.gameObject.tag == "Obs1")
+            {
+                Vector3 instPos = new Vector3(transform.position.x - 0.1f, transform.position.y + 0.5f, transform.position.z);
+                GameObject coverInst = Instantiate(cover, instPos, Quaternion.Euler(0, 90, 0));
+                cover.transform.parent = transform;
+            }
+        }
+        else if (Physics.Raycast(pos, Vector3.left, out hitLeft, 0.6f, obstacleMask))
+        {
+            if (hitLeft.collider.gameObject.tag == "Obs1")
+            {
+                Vector3 instPos = new Vector3(transform.position.x + 0.1f, transform.position.y + 0.5f, transform.position.z);
+                GameObject coverInst = Instantiate(cover, instPos, Quaternion.Euler(0, -90, 0));
+                cover.transform.parent = transform;
+            }
+        }
+        //else
+        //{
+        //    Debug.DrawRay(pos, Vector3.forward * 1.5f, Color.blue, Mathf.Infinity);
+        //}
+
+    }
+
     public void GetAdjacentBlock()
     {
         Collider[] AdjacentBlock = Physics.OverlapSphere(transform.position, 1, blockMask);
@@ -130,6 +175,28 @@ public class Block : MonoBehaviour
             if(AdjacentBlock[i] != this.gameObject)
                 blockAdjacent[i] = AdjacentBlock[i].gameObject; 
         }
+    }
+
+    public void StairSetUp()
+    {
+        if (isStair)
+        {
+            Vector3 pos = transform.TransformPoint(stairScript.endPoint);
+            pos.y = 10;
+            RaycastHit hit;
+            if(Physics.Raycast(pos, Vector3.down, out hit, 100, blockMask))
+            {
+                blockAdjacent[9] = hit.collider.gameObject;
+                hit.collider.GetComponent<Block>().blockAdjacent[9] = this.gameObject;
+            }
+        }
+    }
+
+    private void ResetIndex()
+    {
+
+        if(mesh.material != mouseNotOver)
+            mesh.material = mouseNotOver;
     }
 
     public void ChangeColor()

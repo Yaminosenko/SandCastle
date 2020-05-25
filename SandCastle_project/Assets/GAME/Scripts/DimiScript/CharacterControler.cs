@@ -7,11 +7,12 @@ public class CharacterControler : MonoBehaviour
 {
     [Header("Reference")]
     public Transform skin;
-    public bool Mode = false;
+    public bool FreeMode = false;
     public Camera cam;
 
     [Header("FreeMode")]
     public float speedPlayer = 4;
+    public bool isOnCombat;
 
 
     [Header("TacticalMode")]
@@ -19,7 +20,11 @@ public class CharacterControler : MonoBehaviour
     public int unitsRangeMovement = 3;
     public LayerMask blockMask = 8;
     public Material testMat;
-
+    public Material defaultMat;
+    public int actionPoint = 2;
+    public bool turnPlayer = true;
+    public bool cantMove = false;
+    public bool isMoving;
 
     //private
     private Vector3 move;
@@ -29,6 +34,8 @@ public class CharacterControler : MonoBehaviour
     private NavMeshAgent nav;
     private bool SettingPathBool;
     private int indexRangeMovement;
+    private int actionPointIndex;
+    private List<Block> blockList = new List<Block>();
 
     private void OnEnable()
     {
@@ -38,28 +45,33 @@ public class CharacterControler : MonoBehaviour
     }
     private void Update()
     {
-        if (!Mode)
+        if (!FreeMode)
         {
             SimpleMove();
             FinalMove();
         }
         else
         {
-            Movement();
-            if(!SettingPathBool)
-                StartCoroutine(LateUp(0.1f));
+            if (turnPlayer)
+            {
+                Movement();
+                if (!SettingPathBool)
+                    StartCoroutine(LateUp(0.1f));
+                if(isMoving)
+                    ReachPointDestination();
+            }
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && !isOnCombat)
         {
-            if (Mode)
+            if (FreeMode)
             {
-                Mode = false;
+                FreeMode = false;
                 //StartCoroutine(changeCamMode(1f, false));
             }
             else
             {
-                Mode = true;
+                FreeMode = true;
                 //sStartCoroutine(changeCamMode(1f, true));
             }
         }
@@ -123,19 +135,45 @@ public class CharacterControler : MonoBehaviour
 
     private void Movement()
     {
-        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-
-        if(Physics.Raycast(ray, out hit))
+        if (!cantMove)
         {
-            if(hit.transform.gameObject.layer == 8)
-            {
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
 
-                if (Input.GetMouseButtonDown(1))
+            if (Physics.Raycast(ray, out hit))
+            {
+                if (hit.transform.gameObject.layer == 8)
                 {
-                    pos = new Vector3(hit.collider.transform.position.x, transform.position.y, hit.collider.transform.position.z);
-                    nav.SetDestination(pos);
+                    if (Input.GetMouseButtonDown(1) /*&& hit.transform.GetComponent<Block>().pathIndex != 0*/)
+                    {
+                        pos = new Vector3(hit.collider.transform.position.x, hit.collider.transform.position.y + transform.position.y, hit.collider.transform.position.z);
+                        nav.SetDestination(pos);
+                        cantMove = true;
+                        isMoving = true;
+                        actionPointIndex++;
+                        foreach (Block blockAll in blockList)
+                        {
+                            blockAll.GetComponent<MeshRenderer>().material = defaultMat;
+                            blockAll.pathIndex = 0;
+                        }
+                    }
                 }
+            }
+        }
+    }
+
+    private void ReachPointDestination()
+    {
+        float dist = Vector3.Distance(transform.position, pos);
+
+           // Debug.Log(dist);
+        if (dist <= 0.5f)
+        {
+            isMoving = false;
+            if (StillYourTurn())
+            {
+                cantMove = false;
+                SettingPathBool = false;
             }
         }
     }
@@ -150,9 +188,10 @@ public class CharacterControler : MonoBehaviour
                 Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * hit.distance, Color.yellow, Mathf.Infinity);
                 Block block = hit.collider.GetComponent<Block>();
                 block.pathIndex++;
-               // block.GetComponent<MeshRenderer>().material = testMat;
+                block.GetComponent<MeshRenderer>().material = testMat;
                 List<Block> tabBlock = new List<Block>();
                 tabBlock.Add(block);
+                blockList.Add(block);
                 Block[] blockOrigins = tabBlock.ToArray();
                 tabBlock.Clear();
 
@@ -169,6 +208,7 @@ public class CharacterControler : MonoBehaviour
                                 if (blockAdj.pathIndex == 0)
                                 {
                                     tabBlock.Add(blockAdj);
+                                    blockList.Add(blockAdj);
                                     blockAdj.pathIndex += indexRangeMovement;
                                     blockAdj.GetComponent<MeshRenderer>().material = testMat;
                                 }
@@ -176,7 +216,7 @@ public class CharacterControler : MonoBehaviour
                         }
                     }
                     blockOrigins = tabBlock.ToArray();
-                    Debug.Log(blockOrigins.Length);
+                    //Debug.Log(blockOrigins.Length);
                     tabBlock.Clear();
                 }
             }
@@ -188,11 +228,36 @@ public class CharacterControler : MonoBehaviour
     }
     #endregion
 
+
+    #region ActionTacticalMode
+
+    private bool StillYourTurn()
+    {
+        if (actionPointIndex == actionPoint)
+        {
+            turnPlayer = false;
+            actionPointIndex = 0;
+            StartCoroutine(ChangeTurn());
+            return false;
+        }
+        return true;
+    }
+
+    #endregion
+
     #region Coroutine
     IEnumerator LateUp(float time)
     {
         yield return new WaitForSeconds(time);
         SetPath();
+    }
+
+    IEnumerator ChangeTurn()
+    {
+        yield return new WaitForSeconds(2);
+        turnPlayer = true;
+        cantMove = false;
+        SettingPathBool = false;
     }
     #endregion
 }

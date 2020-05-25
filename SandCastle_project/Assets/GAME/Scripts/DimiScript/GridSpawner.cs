@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class GridSpawner : MonoBehaviour
 {
@@ -38,6 +39,12 @@ public class GridSpawner : MonoBehaviour
                         block.GetComponent<Block>().positionY = hit.point.y;
                     else
                         Destroy(block);
+                    if (hit.collider.gameObject.tag == "Stair")
+                    {
+                        block.GetComponent<Block>().isStair = true;
+                        block.GetComponent<Block>().stairScript = hit.collider.GetComponentInChildren<NavMeshLink>();
+
+                    }
                 }
                 else
                 {
