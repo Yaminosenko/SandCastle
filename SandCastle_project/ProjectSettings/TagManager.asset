@@ -19,9 +19,9 @@ TagManager:
   - block
   - 'ground '
   - obstacle
-  - 
-  - 
-  - 
+  - player
+  - npc
+  - cover
   - 
   - 
   - 

@@ -17,6 +17,7 @@ public class Block : MonoBehaviour
     [Header("Reference")]
     public Transform[] offset = new Transform[4];
     public GameObject[] blockAdjacent = new GameObject[10];
+    public GameObject[] limitsLine = new GameObject[4]; 
     public CharacterControler player;
     public bool inside;
     public float angleSloap;
@@ -124,39 +125,66 @@ public class Block : MonoBehaviour
         Vector3 pos = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z);
         if (Physics.Raycast(pos, Vector3.forward,out hitForward, 0.6f, obstacleMask))
         {
-            if(hitForward.collider.gameObject.tag == "Obs1")
+            Vector3 instPos = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z - 0.1f);
+            GameObject coverInst = Instantiate(cover, instPos, cover.transform.rotation);
+            coverInst.transform.parent = transform;
+            coverInst.GetComponent<Cover>().player = player;
+
+            if (hitForward.collider.gameObject.tag == "Obs1")
             {
-                
-                Vector3 instPos = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z - 0.1f);  
-                GameObject coverInst = Instantiate(cover, instPos, cover.transform.rotation);
-                cover.transform.parent = transform;
+                coverInst.GetComponent<Cover>().little = true;
+            }
+            else if(hitForward.collider.gameObject.tag == "Obs2")
+            {
+                coverInst.GetComponent<Cover>().little = false;
             }
         }
         else if (Physics.Raycast(pos, Vector3.back, out hitBack, 0.6f, obstacleMask))
         {
+            Vector3 instPos = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z + 0.1f);
+            GameObject coverInst = Instantiate(cover, instPos, Quaternion.Euler(0, 180, 0));
+            coverInst.transform.parent = transform;
+            coverInst.GetComponent<Cover>().player = player;
+
             if (hitBack.collider.gameObject.tag == "Obs1")
             {
-                Vector3 instPos = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z + 0.1f);
-                GameObject coverInst = Instantiate(cover, instPos, Quaternion.Euler(0,180,0));
-                cover.transform.parent = transform;
+                coverInst.GetComponent<Cover>().little = true;
+            }
+            else if (hitBack.collider.gameObject.tag == "Obs2")
+            {
+                coverInst.GetComponent<Cover>().little = false;
             }
         }
         else if (Physics.Raycast(pos, Vector3.right, out hitRight, 0.6f, obstacleMask))
         {
+            Vector3 instPos = new Vector3(transform.position.x - 0.1f, transform.position.y + 0.5f, transform.position.z);
+            GameObject coverInst = Instantiate(cover, instPos, Quaternion.Euler(0, 90, 0));
+            coverInst.transform.parent = transform;
+            coverInst.GetComponent<Cover>().player = player;
+
             if (hitRight.collider.gameObject.tag == "Obs1")
             {
-                Vector3 instPos = new Vector3(transform.position.x - 0.1f, transform.position.y + 0.5f, transform.position.z);
-                GameObject coverInst = Instantiate(cover, instPos, Quaternion.Euler(0, 90, 0));
-                cover.transform.parent = transform;
+                coverInst.GetComponent<Cover>().little = true;
+            }
+            else if (hitRight.collider.gameObject.tag == "Obs2")
+            {
+                coverInst.GetComponent<Cover>().little = false;
             }
         }
         else if (Physics.Raycast(pos, Vector3.left, out hitLeft, 0.6f, obstacleMask))
         {
+            Vector3 instPos = new Vector3(transform.position.x + 0.1f, transform.position.y + 0.5f, transform.position.z);
+            GameObject coverInst = Instantiate(cover, instPos, Quaternion.Euler(0, -90, 0));
+            coverInst.transform.parent = transform;
+            coverInst.GetComponent<Cover>().player = player;
+
             if (hitLeft.collider.gameObject.tag == "Obs1")
             {
-                Vector3 instPos = new Vector3(transform.position.x + 0.1f, transform.position.y + 0.5f, transform.position.z);
-                GameObject coverInst = Instantiate(cover, instPos, Quaternion.Euler(0, -90, 0));
-                cover.transform.parent = transform;
+                coverInst.GetComponent<Cover>().little = true;
+            }
+            else if (hitLeft.collider.gameObject.tag == "Obs2")
+            {
+                coverInst.GetComponent<Cover>().little = false;
             }
         }
         //else
@@ -174,6 +202,19 @@ public class Block : MonoBehaviour
         {
             if(AdjacentBlock[i] != this.gameObject)
                 blockAdjacent[i] = AdjacentBlock[i].gameObject; 
+        }
+    }
+
+    public void PathLimits()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            Collider[] limitsBlocks = Physics.OverlapSphere(offset[i].position, 0.6f, blockMask);
+
+            if (limitsBlocks.Length != 0)
+                limitsLine[i].SetActive(false);
+            else
+                limitsLine[i].SetActive(true);
         }
     }
 

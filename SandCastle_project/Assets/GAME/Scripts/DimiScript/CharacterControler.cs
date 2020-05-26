@@ -10,6 +10,7 @@ public class CharacterControler : MonoBehaviour
     public bool FreeMode = false;
     public Camera cam;
 
+
     [Header("FreeMode")]
     public float speedPlayer = 4;
     public bool isOnCombat;
@@ -25,6 +26,7 @@ public class CharacterControler : MonoBehaviour
     public bool turnPlayer = true;
     public bool cantMove = false;
     public bool isMoving;
+    public int isCover;
 
     //private
     private Vector3 move;
@@ -144,7 +146,7 @@ public class CharacterControler : MonoBehaviour
             {
                 if (hit.transform.gameObject.layer == 8)
                 {
-                    if (Input.GetMouseButtonDown(1) /*&& hit.transform.GetComponent<Block>().pathIndex != 0*/)
+                    if (Input.GetMouseButtonDown(1) && hit.transform.GetComponent<Block>().pathIndex != 0)
                     {
                         pos = new Vector3(hit.collider.transform.position.x, hit.collider.transform.position.y + transform.position.y, hit.collider.transform.position.z);
                         nav.SetDestination(pos);
@@ -155,6 +157,31 @@ public class CharacterControler : MonoBehaviour
                         {
                             blockAll.GetComponent<MeshRenderer>().material = defaultMat;
                             blockAll.pathIndex = 0;
+                        }
+                    }
+                }
+                else if(hit.transform.gameObject.layer == 13)
+                {
+                    RaycastHit[] hits;
+                    hits = Physics.RaycastAll(ray, Mathf.Infinity);
+                    for (int i = 0; i < hits.Length; i++)
+                    {
+                        RaycastHit hitAll = hits[i];
+                        if (hitAll.transform.gameObject.layer == 8)
+                        {
+                            if (Input.GetMouseButtonDown(1) && hitAll.transform.GetComponent<Block>().pathIndex != 0)
+                            {
+                                pos = new Vector3(hitAll.collider.transform.position.x, hitAll.collider.transform.position.y + transform.position.y, hitAll.collider.transform.position.z);
+                                nav.SetDestination(pos);
+                                cantMove = true;
+                                isMoving = true;
+                                actionPointIndex++;
+                                foreach (Block blockAll in blockList)
+                                {
+                                    blockAll.GetComponent<MeshRenderer>().material = defaultMat;
+                                    blockAll.pathIndex = 0;
+                                }
+                            }
                         }
                     }
                 }
@@ -216,7 +243,6 @@ public class CharacterControler : MonoBehaviour
                         }
                     }
                     blockOrigins = tabBlock.ToArray();
-                    //Debug.Log(blockOrigins.Length);
                     tabBlock.Clear();
                 }
             }
@@ -224,6 +250,17 @@ public class CharacterControler : MonoBehaviour
                 Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * 1000, Color.white, Mathf.Infinity);
 
             SettingPathBool = true;
+        }
+    }
+
+    private void SetLimitsSign()
+    {
+        foreach (Block block in blockList)
+        {
+            if(block.blockAdjacent.Length < 9)
+            {
+
+            }
         }
     }
     #endregion
@@ -250,6 +287,7 @@ public class CharacterControler : MonoBehaviour
     {
         yield return new WaitForSeconds(time);
         SetPath();
+        Debug.Log(blockList.ToArray().Length);
     }
 
     IEnumerator ChangeTurn()

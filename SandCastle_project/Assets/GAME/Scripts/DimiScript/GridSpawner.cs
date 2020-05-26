@@ -13,6 +13,7 @@ public class GridSpawner : MonoBehaviour
     public float angleSlop = 20;
     public LayerMask layerMask;
     public CharacterControler chara;
+    public int nbrOfBlocks;
 
     //public float spawnSpeed = 0.2f;
 
@@ -36,7 +37,10 @@ public class GridSpawner : MonoBehaviour
                 if (Physics.Raycast(block.transform.position, block.transform.TransformDirection(Vector3.down), out hit, Mathf.Infinity, layerMask))
                 {
                     if (hit.collider.gameObject.layer == 9)
+                    {
                         block.GetComponent<Block>().positionY = hit.point.y;
+                        nbrOfBlocks++;
+                    }
                     else
                         Destroy(block);
                     if (hit.collider.gameObject.tag == "Stair")

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1431074190110373143}
   - component: {fileID: 4206310488726189595}
   - component: {fileID: 194416055947307810}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Cover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1053576793832414374}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
@@ -61,6 +61,7 @@ MonoBehaviour:
   little: 0
   littleCover: {fileID: 6669689347372112790}
   bigCover: {fileID: 4911970827144245347}
+  player: {fileID: 0}
 --- !u!1 &1273165415656423853
 GameObject:
   m_ObjectHideFlags: 0
@@ -72,7 +73,7 @@ GameObject:
   - component: {fileID: 6609327150988879374}
   - component: {fileID: 7450071393481622493}
   - component: {fileID: 6669689347372112790}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Little
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -146,7 +147,7 @@ GameObject:
   - component: {fileID: 2345858098185145674}
   - component: {fileID: 3020815179424807549}
   - component: {fileID: 4911970827144245347}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Big
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -221,7 +222,7 @@ GameObject:
   - component: {fileID: 8840223014804869288}
   - component: {fileID: 7994186927614645539}
   - component: {fileID: 6095456050771745489}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
