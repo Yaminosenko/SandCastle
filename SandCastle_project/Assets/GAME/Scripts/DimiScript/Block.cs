@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class Block : MonoBehaviour
 {
@@ -12,7 +15,9 @@ public class Block : MonoBehaviour
     public Material mouseNotOver;
     public Material mouseOver;
     public GameObject cover;
-
+    public bool isIndexer;
+    public List<GameObject> testList = new List<GameObject>();
+    public int testIndex;
 
     [Header("Reference")]
     public Transform[] offset = new Transform[4];
@@ -31,8 +36,11 @@ public class Block : MonoBehaviour
     public NavMeshLink stairScript;
 
 
+    private Vector3[] lineOffset = new Vector3[4];
+
     private void Start()
     {
+
         SetRotationBlock();
         SetCover();
         mesh = GetComponent<MeshRenderer>();
@@ -48,13 +56,24 @@ public class Block : MonoBehaviour
         }
 
         if (player.FreeMode)
+        {
             mesh.enabled = true;
+
+        }
         else
+        {
             mesh.enabled = false;
+        }
 
         //if (player.isMoving)
         //    ResetIndex();
 
+
+        if(Input.GetKeyDown(KeyCode.P))
+        {
+            if (isIndexer)
+                Destroy(gameObject);
+        }
     }
 
     private void Update()
@@ -209,9 +228,29 @@ public class Block : MonoBehaviour
     {
         for (int i = 0; i < 4; i++)
         {
-            Collider[] limitsBlocks = Physics.OverlapSphere(offset[i].position, 0.6f, blockMask);
+            int index = 0;
 
-            if (limitsBlocks.Length != 0)
+            Collider[] limitsBlocks = Physics.OverlapSphere(offset[i].position, 0.4f, blockMask);
+
+
+            for (int e = 0; e < limitsBlocks.Length; e++)
+            {
+                
+                if (limitsBlocks[e].GetComponent<Block>().pathIndex != 0 && limitsBlocks[e].gameObject != gameObject)
+                {
+                    index++;
+                    //for (int o = 0; o < testList.ToArray().Length; o++)
+                    //{
+                    //    if(limitsBlocks[e].transform.gameObject != testList.ToArray()[o])
+                    //        testList.Add(limitsBlocks[e].transform.gameObject);
+                    //}
+                }
+            }
+
+
+            //Debug.Log(index);
+            testIndex = index;
+            if (index > 0)
                 limitsLine[i].SetActive(false);
             else
                 limitsLine[i].SetActive(true);
@@ -242,21 +281,40 @@ public class Block : MonoBehaviour
 
     public void ChangeColor()
     {
-    //    if (inside)
-    //        mesh.material = mouseOver;
-    //    else
-    //        mesh.material = mouseNotOver;
-        
+        if (inside)
+            mesh.enabled = true;
+        else
+            mesh.enabled = false;
+
     }
 
     private void OnMouseOver()
     {
-        //inside = true;
+        inside = true;
     }
 
     private void OnMouseExit()
     {
-        //inside = false;
+        inside = false;
     }
+
+    #region Handles
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        if (isIndexer && inside)
+        {
+            //Handles.color = Color.black;
+            //Handles.RadiusHandle(Quaternion.identity, offset[1].position, 0.6f);
+            //Handles.RadiusHandle(Quaternion.identity, offset[2].position, 0.6f);
+            //Handles.RadiusHandle(Quaternion.identity, offset[3].position, 0.6f);
+            //Handles.RadiusHandle(Quaternion.identity, offset[0].position, 0.4f);
+        }
+        //Handles.RadiusHandle(Quaternion.identity, radiusKillCenter.position, radiusKillSphere);
+
+        //Handles.SphereHandleCap(-1, crosshair.transform.position, Quaternion.identity, 0.5f, EventType.Repaint);
+    }
+#endif
+    #endregion
 }
 

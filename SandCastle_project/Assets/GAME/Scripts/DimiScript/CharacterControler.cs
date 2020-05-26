@@ -9,6 +9,7 @@ public class CharacterControler : MonoBehaviour
     public Transform skin;
     public bool FreeMode = false;
     public Camera cam;
+    public int testInt;
 
 
     [Header("FreeMode")]
@@ -153,11 +154,17 @@ public class CharacterControler : MonoBehaviour
                         cantMove = true;
                         isMoving = true;
                         actionPointIndex++;
+                        indexRangeMovement = 0;
                         foreach (Block blockAll in blockList)
                         {
                             blockAll.GetComponent<MeshRenderer>().material = defaultMat;
                             blockAll.pathIndex = 0;
+                            for (int i = 0; i < blockAll.limitsLine.Length; i++)
+                            {
+                                blockAll.limitsLine[i].SetActive(false);
+                            }
                         }
+                        blockList.Clear();
                     }
                 }
                 else if(hit.transform.gameObject.layer == 13)
@@ -176,11 +183,18 @@ public class CharacterControler : MonoBehaviour
                                 cantMove = true;
                                 isMoving = true;
                                 actionPointIndex++;
+                                indexRangeMovement = 0;
                                 foreach (Block blockAll in blockList)
                                 {
                                     blockAll.GetComponent<MeshRenderer>().material = defaultMat;
                                     blockAll.pathIndex = 0;
+
+                                    for (int l = 0; l < blockAll.limitsLine.Length; l++)
+                                    {
+                                        blockAll.limitsLine[l].SetActive(false);
+                                    }
                                 }
+                                blockList.Clear();
                             }
                         }
                     }
@@ -249,19 +263,35 @@ public class CharacterControler : MonoBehaviour
             else
                 Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * 1000, Color.white, Mathf.Infinity);
 
-            SettingPathBool = true;
+            
         }
     }
 
     private void SetLimitsSign()
     {
-        foreach (Block block in blockList)
+        if (!SettingPathBool)
         {
-            if(block.blockAdjacent.Length < 9)
+            //Debug.Log(blockList.ToArray().Length);
+            testInt++;
+            foreach (Block block in blockList)
             {
+                int index = 0;
 
+                for (int i = 0; i < block.blockAdjacent.Length; i++)
+                {
+                    if (block.blockAdjacent[i] != null)
+                        index++;
+                }
+
+                if (index < 9 || block.pathIndex == unitsRangeMovement)
+                {
+                    block.isIndexer = true;
+                    block.PathLimits();
+                }
             }
+            SettingPathBool = true;
         }
+            
     }
     #endregion
 
@@ -287,7 +317,7 @@ public class CharacterControler : MonoBehaviour
     {
         yield return new WaitForSeconds(time);
         SetPath();
-        Debug.Log(blockList.ToArray().Length);
+        SetLimitsSign();
     }
 
     IEnumerator ChangeTurn()
