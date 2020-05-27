@@ -251,9 +251,14 @@ public class Block : MonoBehaviour
             //Debug.Log(index);
             testIndex = index;
             if (index > 0)
+            {
                 limitsLine[i].SetActive(false);
+            }
             else
+            {
                 limitsLine[i].SetActive(true);
+                player.limits.Add(limitsLine[i]);
+            }
         }
     }
 

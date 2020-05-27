@@ -13,6 +13,8 @@ public class CharacterControler : MonoBehaviour
     public Camera cam;
     public int testInt;
     public LineRenderer pathPreviewLine;
+    public Material mRenderClassic;
+    public Material mRenderCant;
 
 
     [Header("FreeMode")]
@@ -32,6 +34,7 @@ public class CharacterControler : MonoBehaviour
     public bool cantMove = false;
     public bool isMoving;
     public int isCover;
+    public List<GameObject> limits = new List<GameObject>();
 
     //private
     private Vector3 move;
@@ -79,6 +82,7 @@ public class CharacterControler : MonoBehaviour
                 TacticalMode = false;
                 ResetAllPreview();
                 SettingPathBool = false;
+                nav.ResetPath();
                 //StartCoroutine(changeCamMode(1f, false));
             }
             else
@@ -213,10 +217,38 @@ public class CharacterControler : MonoBehaviour
                 RaycastHit wayHit;
                 if (Physics.Raycast(corners, Vector3.down, out wayHit, blockMask))
                 {
-
                     pathWaypoint.Add(new Vector3(wayHit.transform.position.x, wayHit.transform.position.y + 0.5f, wayHit.transform.position.z));
                 }
             }
+
+
+            if(hit.transform.gameObject.GetComponent<Block>() != null)
+            {
+                if (hit.transform.gameObject.GetComponent<Block>().pathIndex == 0)
+                {
+                    pathPreviewLine.material = mRenderCant;
+                    if (limits.ToArray().Length != 0)
+                    {
+                        for (int i = 0; i < limits.ToArray().Length; i++)
+                        {
+                            limits.ToArray()[i].GetComponent<MeshRenderer>().material = mRenderCant;
+                        }
+                    }
+                }
+                else
+                {
+                    pathPreviewLine.material = mRenderClassic;
+                    if (limits.ToArray().Length != 0)
+                    {
+                        for (int i = 0; i < limits.ToArray().Length; i++)
+                        {
+                            limits.ToArray()[i].GetComponent<MeshRenderer>().material = mRenderClassic;
+                        }
+                    }
+                }
+            }
+          
+
             Vector3[] waypoints = pathWaypoint.ToArray();
             pathPreviewLine.positionCount = waypoints.Length;
             pathPreviewLine.SetPositions(waypoints);
@@ -233,6 +265,7 @@ public class CharacterControler : MonoBehaviour
         if (dist <= 0.5f)
         {
             isMoving = false;
+           
             if (StillYourTurn())
             {
                 cantMove = false;
@@ -347,6 +380,7 @@ public class CharacterControler : MonoBehaviour
         blockList.Clear();
         pathPreviewLine.positionCount = 0;
         pathWaypoint.Clear();
+        limits.Clear();
     }
     #endregion
 
