@@ -35,6 +35,7 @@ public class CharacterControler : MonoBehaviour
     public bool isMoving;
     public int isCover;
     public List<GameObject> limits = new List<GameObject>();
+    public bool notInArea;
 
     //private
     private Vector3 move;
@@ -232,6 +233,7 @@ public class CharacterControler : MonoBehaviour
                         for (int i = 0; i < limits.ToArray().Length; i++)
                         {
                             limits.ToArray()[i].GetComponent<MeshRenderer>().material = mRenderCant;
+                            notInArea = true;
                         }
                     }
                 }
@@ -243,6 +245,7 @@ public class CharacterControler : MonoBehaviour
                         for (int i = 0; i < limits.ToArray().Length; i++)
                         {
                             limits.ToArray()[i].GetComponent<MeshRenderer>().material = mRenderClassic;
+                            notInArea = false;
                         }
                     }
                 }
@@ -284,7 +287,7 @@ public class CharacterControler : MonoBehaviour
                 Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * hit.distance, Color.yellow, Mathf.Infinity);
                 Block block = hit.collider.GetComponent<Block>();
                 block.pathIndex++;
-                block.GetComponent<MeshRenderer>().material = testMat;
+                //block.GetComponent<MeshRenderer>().material = testMat;
                 List<Block> tabBlock = new List<Block>();
                 tabBlock.Add(block);
                 blockList.Add(block);
@@ -306,7 +309,7 @@ public class CharacterControler : MonoBehaviour
                                     tabBlock.Add(blockAdj);
                                     blockList.Add(blockAdj);
                                     blockAdj.pathIndex += indexRangeMovement;
-                                    blockAdj.GetComponent<MeshRenderer>().material = testMat;
+                                   // blockAdj.GetComponent<MeshRenderer>().material = testMat;
                                 }
                             }
                         }
@@ -370,7 +373,7 @@ public class CharacterControler : MonoBehaviour
         indexRangeMovement = 0;
         foreach (Block blockAll in blockList)
         {
-            blockAll.GetComponent<MeshRenderer>().material = defaultMat;
+            //blockAll.GetComponent<MeshRenderer>().material = defaultMat;
             blockAll.pathIndex = 0;
             for (int i = 0; i < blockAll.limitsLine.Length; i++)
             {
@@ -401,6 +404,7 @@ public class CharacterControler : MonoBehaviour
     }
     #endregion
 
+    #region Handles
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
@@ -416,4 +420,5 @@ public class CharacterControler : MonoBehaviour
         }
     }
 #endif
+    #endregion
 }
