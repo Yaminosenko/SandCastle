@@ -28,7 +28,7 @@ public class Cover : MonoBehaviour
     }
     private void OnMouseOver()
     {
-        if(player.FreeMode)
+        if(player.TacticalMode)
             defaultCover.gameObject.SetActive(true);
     }
 

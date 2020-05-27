@@ -55,7 +55,7 @@ public class Block : MonoBehaviour
             one++;
         }
 
-        if (player.FreeMode)
+        if (player.TacticalMode)
         {
             mesh.enabled = true;
 

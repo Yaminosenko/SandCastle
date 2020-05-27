@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class CharacterControler : MonoBehaviour
 {
     [Header("Reference")]
     public Transform skin;
-    public bool FreeMode = false;
     public Camera cam;
     public int testInt;
+    public LineRenderer pathPreviewLine;
 
 
     [Header("FreeMode")]
@@ -18,6 +21,7 @@ public class CharacterControler : MonoBehaviour
 
 
     [Header("TacticalMode")]
+    public bool TacticalMode = false;
     public Vector3 pos;
     public int unitsRangeMovement = 3;
     public LayerMask blockMask = 8;
@@ -38,7 +42,10 @@ public class CharacterControler : MonoBehaviour
     private bool SettingPathBool;
     private int indexRangeMovement;
     private int actionPointIndex;
+    private Vector3 secuPathPreview;
     private List<Block> blockList = new List<Block>();
+    private List<Vector3> pathWaypoint = new List<Vector3>();
+   
 
     private void OnEnable()
     {
@@ -48,7 +55,7 @@ public class CharacterControler : MonoBehaviour
     }
     private void Update()
     {
-        if (!FreeMode)
+        if (!TacticalMode)
         {
             SimpleMove();
             FinalMove();
@@ -67,14 +74,16 @@ public class CharacterControler : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && !isOnCombat)
         {
-            if (FreeMode)
+            if (TacticalMode)
             {
-                FreeMode = false;
+                TacticalMode = false;
+                ResetAllPreview();
+                SettingPathBool = false;
                 //StartCoroutine(changeCamMode(1f, false));
             }
             else
             {
-                FreeMode = true;
+                TacticalMode = true;
                 //sStartCoroutine(changeCamMode(1f, true));
             }
         }
@@ -147,6 +156,10 @@ public class CharacterControler : MonoBehaviour
             {
                 if (hit.transform.gameObject.layer == 8)
                 {
+
+                    PreviewPath(hit);
+
+
                     if (Input.GetMouseButtonDown(1) && hit.transform.GetComponent<Block>().pathIndex != 0)
                     {
                         pos = new Vector3(hit.collider.transform.position.x, hit.collider.transform.position.y + transform.position.y, hit.collider.transform.position.z);
@@ -154,17 +167,7 @@ public class CharacterControler : MonoBehaviour
                         cantMove = true;
                         isMoving = true;
                         actionPointIndex++;
-                        indexRangeMovement = 0;
-                        foreach (Block blockAll in blockList)
-                        {
-                            blockAll.GetComponent<MeshRenderer>().material = defaultMat;
-                            blockAll.pathIndex = 0;
-                            for (int i = 0; i < blockAll.limitsLine.Length; i++)
-                            {
-                                blockAll.limitsLine[i].SetActive(false);
-                            }
-                        }
-                        blockList.Clear();
+                        ResetAllPreview();
                     }
                 }
                 else if(hit.transform.gameObject.layer == 13)
@@ -176,6 +179,9 @@ public class CharacterControler : MonoBehaviour
                         RaycastHit hitAll = hits[i];
                         if (hitAll.transform.gameObject.layer == 8)
                         {
+                            PreviewPath(hit);
+
+
                             if (Input.GetMouseButtonDown(1) && hitAll.transform.GetComponent<Block>().pathIndex != 0)
                             {
                                 pos = new Vector3(hitAll.collider.transform.position.x, hitAll.collider.transform.position.y + transform.position.y, hitAll.collider.transform.position.z);
@@ -183,23 +189,39 @@ public class CharacterControler : MonoBehaviour
                                 cantMove = true;
                                 isMoving = true;
                                 actionPointIndex++;
-                                indexRangeMovement = 0;
-                                foreach (Block blockAll in blockList)
-                                {
-                                    blockAll.GetComponent<MeshRenderer>().material = defaultMat;
-                                    blockAll.pathIndex = 0;
-
-                                    for (int l = 0; l < blockAll.limitsLine.Length; l++)
-                                    {
-                                        blockAll.limitsLine[l].SetActive(false);
-                                    }
-                                }
-                                blockList.Clear();
+                                ResetAllPreview();
                             }
                         }
                     }
                 }
             }
+        }
+    }
+
+
+    private void PreviewPath(RaycastHit hit)
+    {
+        if (secuPathPreview != hit.transform.position)
+        {
+            pathWaypoint.Clear();
+            NavMeshPath path = new NavMeshPath();
+            nav.CalculatePath(hit.transform.position , path);
+
+            for (int i = 0; i < path.corners.Length; i++)
+            {
+                Vector3 corners = new Vector3(path.corners[i].x, path.corners[i].y + 0.5f, path.corners[i].z);
+                RaycastHit wayHit;
+                if (Physics.Raycast(corners, Vector3.down, out wayHit, blockMask))
+                {
+
+                    pathWaypoint.Add(new Vector3(wayHit.transform.position.x, wayHit.transform.position.y + 0.5f, wayHit.transform.position.z));
+                }
+            }
+            Vector3[] waypoints = pathWaypoint.ToArray();
+            pathPreviewLine.positionCount = waypoints.Length;
+            pathPreviewLine.SetPositions(waypoints);
+
+            secuPathPreview = hit.transform.position;
         }
     }
 
@@ -310,6 +332,22 @@ public class CharacterControler : MonoBehaviour
         return true;
     }
 
+    public void ResetAllPreview()
+    {
+        indexRangeMovement = 0;
+        foreach (Block blockAll in blockList)
+        {
+            blockAll.GetComponent<MeshRenderer>().material = defaultMat;
+            blockAll.pathIndex = 0;
+            for (int i = 0; i < blockAll.limitsLine.Length; i++)
+            {
+                blockAll.limitsLine[i].SetActive(false);
+            }
+        }
+        blockList.Clear();
+        pathPreviewLine.positionCount = 0;
+        pathWaypoint.Clear();
+    }
     #endregion
 
     #region Coroutine
@@ -328,4 +366,20 @@ public class CharacterControler : MonoBehaviour
         SettingPathBool = false;
     }
     #endregion
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+
+        if (TacticalMode && pathWaypoint.ToArray().Length != 0)
+        {
+            Vector3[] pw = pathWaypoint.ToArray();
+            for (int i = 0; i < pathWaypoint.ToArray().Length; i++)
+            {
+                Handles.SphereHandleCap(-1, pw[i], Quaternion.identity, 0.25f, EventType.Repaint);
+            }
+            
+        }
+    }
+#endif
 }

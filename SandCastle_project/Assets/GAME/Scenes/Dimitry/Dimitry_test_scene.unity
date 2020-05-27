@@ -330,12 +330,12 @@ GameObject:
   - component: {fileID: 1024402651}
   - component: {fileID: 1024402650}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: LineRendererTest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!120 &1024402650
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -1444,8 +1444,7 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 5146668734470785784, guid: 16bcdbce376427947acfa08e48bdb523, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 16bcdbce376427947acfa08e48bdb523, type: 3}
 --- !u!1001 &5303829631660483646
 PrefabInstance:
