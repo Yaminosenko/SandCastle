@@ -51,6 +51,7 @@ public class CameraController : MonoBehaviour
     private float[] angleTarget = new float[4];
     private int indexAngleTarget;
     private float angleToReach;
+    private CharacterControler playerScript;
    
     #endregion
 
@@ -64,6 +65,7 @@ public class CameraController : MonoBehaviour
         angleTarget[3] = 315;
         target = player;
         offsetRotate.position = player.position;
+        playerScript = player.GetComponent<CharacterControler>();
     }
     void LateUpdate()
     {
@@ -71,6 +73,7 @@ public class CameraController : MonoBehaviour
         {
             RotateWithMouseAxis();
             FollowTarget();
+            offsetRotate.position = player.position;
         }
         else
         {
@@ -111,8 +114,15 @@ public class CameraController : MonoBehaviour
 
     private void UpdateCam()
     {
-        MoveCam();
-        RotateCam();
+        if(playerScript.isMoving)
+        {
+            FollowTargetTactical();
+        }
+        else
+        {
+            MoveCam();
+            RotateCam();
+        }
     }
 
     private void MoveCam()
