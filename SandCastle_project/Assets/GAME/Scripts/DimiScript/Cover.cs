@@ -28,13 +28,31 @@ public class Cover : MonoBehaviour
     }
     private void OnMouseOver()
     {
-        if(player.TacticalMode)
+        if (player.TacticalMode)
+        {
             defaultCover.gameObject.SetActive(true);
+            RaycastHit hit;
+            if(Physics.Raycast(transform.position,Vector3.down,out hit))
+            {
+                if(hit.transform.gameObject.layer == 8)
+                {
+                    hit.transform.gameObject.GetComponent<Block>().Over();
+                }
+            }
+        }
     }
 
     private void OnMouseExit()
     {
         defaultCover.gameObject.SetActive(false);
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit))
+        {
+            if (hit.transform.gameObject.layer == 8)
+            {
+                hit.transform.gameObject.GetComponent<Block>().Exit();
+            }
+        }
     }
 
     private void OnTriggerEnter(Collider col)

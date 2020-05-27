@@ -22,18 +22,22 @@ public class Block : MonoBehaviour
     [Header("Reference")]
     public Transform[] offset = new Transform[4];
     public GameObject[] blockAdjacent = new GameObject[10];
-    public GameObject[] limitsLine = new GameObject[4]; 
+    public GameObject[] limitsLine = new GameObject[4];
     public CharacterControler player;
-    public bool inside;
+    public bool mainCell;
+    public bool adjCell;
     public float angleSloap;
     public float positionY;
-    public int test;
     public int one;
     public float[] offsetDistance = new float[4];
     public int pathIndex;
     public MeshRenderer mesh;
     public bool isStair;
     public NavMeshLink stairScript;
+    public Color colorBaseInArea;
+    public Color colorMainInArea;
+    public Color colorBaseOutArea;
+    public Color colorMainOutArea;
 
 
     private Vector3[] lineOffset = new Vector3[4];
@@ -44,11 +48,12 @@ public class Block : MonoBehaviour
         SetRotationBlock();
         SetCover();
         mesh = GetComponent<MeshRenderer>();
+        // mesh.material.SetColor("_TintColor", colorBase);
     }
 
     private void LateUpdate()
     {
-        if(one < 2)
+        if (one < 2)
         {
             GetAdjacentBlock();
             StairSetUp();
@@ -57,19 +62,19 @@ public class Block : MonoBehaviour
 
         if (player.TacticalMode)
         {
-            mesh.enabled = true;
+            //mesh.enabled = true;
 
         }
         else
         {
-            mesh.enabled = false;
+            //mesh.enabled = false;
         }
 
         //if (player.isMoving)
         //    ResetIndex();
 
 
-        if(Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.P))
         {
             if (isIndexer)
                 Destroy(gameObject);
@@ -108,25 +113,21 @@ public class Block : MonoBehaviour
         else if (offsetDistance[0] > offsetDistance[3])
         {
             transform.rotation = Quaternion.Euler(angleSloap, transform.rotation.y, transform.rotation.z);
-            test = 1;
         }
 
         else if (offsetDistance[3] > offsetDistance[0])
         {
             transform.rotation = Quaternion.Euler(-angleSloap, transform.rotation.y, transform.rotation.z);
-            test = 2;
         }
 
         else if (offsetDistance[1] > offsetDistance[2])
         {
             transform.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, angleSloap);
-            test = 3;
         }
 
         else if (offsetDistance[2] > offsetDistance[1])
         {
             transform.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, -angleSloap);
-            test = 4;
         }
 
         //else if (offsetDistance[1] >= offsetDistance[2])
@@ -142,7 +143,7 @@ public class Block : MonoBehaviour
         RaycastHit hitRight;
         RaycastHit hitLeft;
         Vector3 pos = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z);
-        if (Physics.Raycast(pos, Vector3.forward,out hitForward, 0.6f, obstacleMask))
+        if (Physics.Raycast(pos, Vector3.forward, out hitForward, 0.6f, obstacleMask))
         {
             Vector3 instPos = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z - 0.1f);
             GameObject coverInst = Instantiate(cover, instPos, cover.transform.rotation);
@@ -153,7 +154,7 @@ public class Block : MonoBehaviour
             {
                 coverInst.GetComponent<Cover>().little = true;
             }
-            else if(hitForward.collider.gameObject.tag == "Obs2")
+            else if (hitForward.collider.gameObject.tag == "Obs2")
             {
                 coverInst.GetComponent<Cover>().little = false;
             }
@@ -219,8 +220,8 @@ public class Block : MonoBehaviour
 
         for (int i = 0; i < AdjacentBlock.Length; i++)
         {
-            if(AdjacentBlock[i] != this.gameObject)
-                blockAdjacent[i] = AdjacentBlock[i].gameObject; 
+            if (AdjacentBlock[i] != gameObject)
+                blockAdjacent[i] = AdjacentBlock[i].gameObject;
         }
     }
 
@@ -235,7 +236,7 @@ public class Block : MonoBehaviour
 
             for (int e = 0; e < limitsBlocks.Length; e++)
             {
-                
+
                 if (limitsBlocks[e].GetComponent<Block>().pathIndex != 0 && limitsBlocks[e].gameObject != gameObject)
                 {
                     index++;
@@ -251,9 +252,14 @@ public class Block : MonoBehaviour
             //Debug.Log(index);
             testIndex = index;
             if (index > 0)
+            {
                 limitsLine[i].SetActive(false);
+            }
             else
+            {
                 limitsLine[i].SetActive(true);
+                player.limits.Add(limitsLine[i]);
+            }
         }
     }
 
@@ -264,7 +270,7 @@ public class Block : MonoBehaviour
             Vector3 pos = transform.TransformPoint(stairScript.endPoint);
             pos.y = 10;
             RaycastHit hit;
-            if(Physics.Raycast(pos, Vector3.down, out hit, 100, blockMask))
+            if (Physics.Raycast(pos, Vector3.down, out hit, 100, blockMask))
             {
                 blockAdjacent[9] = hit.collider.gameObject;
                 hit.collider.GetComponent<Block>().blockAdjacent[9] = this.gameObject;
@@ -275,34 +281,91 @@ public class Block : MonoBehaviour
     private void ResetIndex()
     {
 
-        if(mesh.material != mouseNotOver)
+        if (mesh.material != mouseNotOver)
             mesh.material = mouseNotOver;
     }
 
     public void ChangeColor()
     {
-        if (inside)
+        //if (mainCell)
+        //{
+        //    mesh.enabled = true;
+        //    mesh.material.SetColor("_TintColor", colorMain);
+        //}
+        //else if (adjCell)
+        //{
+        //    mesh.enabled = true;
+        //    mesh.material.SetColor("_TintColor", colorMain);
+        //}
+        //else
+        //    mesh.enabled = false;
+    }
+
+    public void Over()
+    {
+        if (player.TacticalMode)
+        {
             mesh.enabled = true;
-        else
+            if(pathIndex != 0)
+                mesh.material.SetColor("_TintColor", colorMainInArea);
+            else
+                mesh.material.SetColor("_TintColor", colorMainOutArea);
+            for (int i = 0; i < blockAdjacent.Length; i++)
+            {
+                if(blockAdjacent[i] != null)
+                {
+                    if(blockAdjacent[i] != gameObject)
+                    {
+                        Block b = blockAdjacent[i].GetComponent<Block>();
+                        b.mesh.enabled = true;
+                        if(pathIndex != 0)
+                            b.mesh.material.SetColor("_TintColor", colorBaseInArea);
+                        else
+                            b.mesh.material.SetColor("_TintColor", colorBaseOutArea);
+                    }
+                }
+            }
+        }
+    }
+
+    public void Exit()
+    {
+        if (player.TacticalMode)
+        {
             mesh.enabled = false;
-
+            for (int i = 0; i < blockAdjacent.Length; i++)
+            {
+                if (blockAdjacent[i] != null)
+                {
+                    if (blockAdjacent[i] != gameObject)
+                    {
+                        Block b = blockAdjacent[i].GetComponent<Block>();
+                        b.mesh.enabled = false;
+                        mesh.material.SetColor("_TintColor", new Color32(0,0,0,0));
+                    }
+                }
+            }
+        }
     }
 
-    private void OnMouseOver()
+
+    public void OnMouseOver()
     {
-        inside = true;
+        Over();
     }
 
-    private void OnMouseExit()
+    public void OnMouseExit()
     {
-        inside = false;
+        Exit();
     }
+
+   
 
     #region Handles
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        if (isIndexer && inside)
+        if (isIndexer && mainCell)
         {
             //Handles.color = Color.black;
             //Handles.RadiusHandle(Quaternion.identity, offset[1].position, 0.6f);
