@@ -8,6 +8,8 @@ using UnityEditor;
 
 public class CharacterControler : MonoBehaviour
 {
+    #region Variables 
+
     [Header("Reference")]
     public Transform skin;
     public Camera cam;
@@ -15,7 +17,7 @@ public class CharacterControler : MonoBehaviour
     public LineRenderer pathPreviewLine;
     public Material mRenderClassic;
     public Material mRenderCant;
-
+    public Animator anim;
 
     [Header("FreeMode")]
     public float speedPlayer = 4;
@@ -51,6 +53,8 @@ public class CharacterControler : MonoBehaviour
     private List<Vector3> pathWaypoint = new List<Vector3>();
     private bool statick;
     private FieldOfView fov;
+
+    #endregion 
 
     #region UnityMethods
 
@@ -139,9 +143,13 @@ public class CharacterControler : MonoBehaviour
             move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
             velocity += move;
             statick = false;
+            Run(true);
         }
         else
+        {
             statick = true;
+            Run(false);
+        }
     }
 
     private void FinalMove()
@@ -187,6 +195,7 @@ public class CharacterControler : MonoBehaviour
                         isMoving = true;
                         actionPointIndex++;
                         ResetAllPreview();
+                        Run(true);
                     }
                 }
                 else if(hit.transform.gameObject.layer == 13)
@@ -209,6 +218,7 @@ public class CharacterControler : MonoBehaviour
                                 isMoving = true;
                                 actionPointIndex++;
                                 ResetAllPreview();
+                                Run(true);
                             }
                         }
                     }
@@ -282,7 +292,7 @@ public class CharacterControler : MonoBehaviour
         if (dist <= 0.5f)
         {
             isMoving = false;
-           
+            Run(false);
             if (StillYourTurn())
             {
                 cantMove = false;
@@ -400,6 +410,35 @@ public class CharacterControler : MonoBehaviour
     }
     #endregion
 
+
+    #region Animations
+
+    public float AnimationLength(string name)
+    {
+        float time = 0;
+        RuntimeAnimatorController ac = anim.runtimeAnimatorController;
+
+        for (int i = 0; i < ac.animationClips.Length; i++)
+            if (ac.animationClips[i].name == name)
+                time = ac.animationClips[i].length;
+
+        //Debug.Log(time);
+        return time;
+    }
+
+    public void Run(bool b)
+    {
+        anim.SetBool("Run", b);
+    }
+
+
+    public void CrouchIdle(bool b)
+    {
+        anim.SetBool("CrouchIdle", b);
+    }
+
+
+    #endregion
     #region Coroutine
     IEnumerator LateUp(float time)
     {

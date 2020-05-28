@@ -55,7 +55,7 @@ public class CameraController : MonoBehaviour
    
     #endregion
 
-    #region Start & Update 
+    #region UnityMethods
 
     private void OnEnable()
     {
@@ -83,7 +83,6 @@ public class CameraController : MonoBehaviour
         ChangeMode();
     }
     #endregion
-
 
     #region Free Mode
 

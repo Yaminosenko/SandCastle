@@ -26,6 +26,7 @@ public class Cover : MonoBehaviour
     {
         
     }
+
     private void OnMouseOver()
     {
         if (player.TacticalMode)
@@ -63,6 +64,8 @@ public class Cover : MonoBehaviour
                 col.GetComponent<CharacterControler>().isCover = 1;
             else
                 col.GetComponent<CharacterControler>().isCover = 2;
+
+            col.GetComponent<CharacterControler>().CrouchIdle(true);
         }
     }
 
@@ -71,6 +74,7 @@ public class Cover : MonoBehaviour
         if (col.gameObject.layer == 11 && col.GetComponent<CharacterControler>() != null)
         {
             col.GetComponent<CharacterControler>().isCover = 0;
+            col.GetComponent<CharacterControler>().CrouchIdle(false);
         }
     }
 }
