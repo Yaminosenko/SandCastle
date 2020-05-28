@@ -49,16 +49,20 @@ public class CharacterControler : MonoBehaviour
     private Vector3 secuPathPreview;
     private List<Block> blockList = new List<Block>();
     private List<Vector3> pathWaypoint = new List<Vector3>();
-   
+    private bool statick;
+    private FieldOfView fov;
+
+    #region UnityMethods
 
     private void OnEnable()
     {
         rb = GetComponent<Rigidbody>();
         nav = GetComponent<NavMeshAgent>();
-
+        fov = GetComponent<FieldOfView>();
     }
     private void Update()
     {
+        skin.position = transform.position;
         if (!TacticalMode)
         {
             SimpleMove();
@@ -68,6 +72,7 @@ public class CharacterControler : MonoBehaviour
         {
             if (turnPlayer)
             {
+                skin.rotation = transform.rotation;
                 Movement();
                 if (!SettingPathBool)
                     StartCoroutine(LateUp(0.1f));
@@ -83,16 +88,21 @@ public class CharacterControler : MonoBehaviour
                 TacticalMode = false;
                 ResetAllPreview();
                 SettingPathBool = false;
+                fov._isActive = false;
                 nav.ResetPath();
                 //StartCoroutine(changeCamMode(1f, false));
             }
             else
             {
+                fov._isActive = true;
                 TacticalMode = true;
                 //sStartCoroutine(changeCamMode(1f, true));
             }
         }
     }
+
+    #endregion
+
     #region Free Movement Methode 
     private void Move()
     {
@@ -128,7 +138,10 @@ public class CharacterControler : MonoBehaviour
         {
             move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
             velocity += move;
+            statick = false;
         }
+        else
+            statick = true;
     }
 
     private void FinalMove()
@@ -141,8 +154,9 @@ public class CharacterControler : MonoBehaviour
 
         Quaternion _rotation = Quaternion.LookRotation(move);
 
-        skin.rotation = _rotation * transform.rotation;
-
+        if(!statick)
+            skin.rotation = _rotation * transform.rotation;
+       
 
         velocity = Vector3.zero;
     }
@@ -352,7 +366,6 @@ public class CharacterControler : MonoBehaviour
             
     }
     #endregion
-
 
     #region ActionTacticalMode
 

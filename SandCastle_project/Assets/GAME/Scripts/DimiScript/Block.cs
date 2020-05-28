@@ -67,7 +67,7 @@ public class Block : MonoBehaviour
         }
         else
         {
-            //mesh.enabled = false;
+            mesh.enabled = false;
         }
 
         //if (player.isMoving)
@@ -303,7 +303,7 @@ public class Block : MonoBehaviour
 
     public void Over()
     {
-        if (player.TacticalMode)
+        if (player.TacticalMode && !player.isMoving && player.turnPlayer)
         {
             mesh.enabled = true;
             if(pathIndex != 0)
