@@ -3,68 +3,70 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class FieldOfView : MonoBehaviour { 
+
+    [Header("SetUp")]
     public float viewRadius;
     [Range(0, 360)]
     public float viewAngle;
-
     public LayerMask playerMask;
     public LayerMask NPCmask;
     public LayerMask targetMask;
     public LayerMask obstacleMask;
-   // [SerializeField] private BaseComp _competanceScript;
     public bool _isActive = false;
     public List<Transform> visibleTargets = new List<Transform>();
-    [SerializeField]private Material _red;
-    [SerializeField]private Material _targetMaterial;
-    [SerializeField] private Transform[] _currentTargets;
-    [SerializeField] private Transform _gd;
-     public Transform _lestestdufov;
-
-    //public BaseComp _baseComp;
-    public CharacterControler player;
-    private bool _aimTrue = false;
-
     public bool playerFOV = false;
     public Transform _CamPos;
-    public Transform focused;
-
-    [HideInInspector]
-
- 
-    public LineRenderer lr;
-    public bool acted = false;
-    Vector3 myPos;
-    Vector3 aimPos;
-
-    //public CameraMouv _camMouvScript;
-    public bool _swap = false;
-    public bool _isAimaing = false;
-    public Transform _actualTarget;
-    private int _nbOfTarget = 0;
-    private int _targetSelect = 1;
-    public float _distanceTarget;
     public float meshResolution;
     public int edgeResolveIterations;
     public float edgeDstThreshold;
+    public bool FreeMode;
+    public MeshFilter viewMeshFilter;
+    Mesh viewMesh;
+
+
+    [Header("NPC")]
+    public bool shootMode;
+    public NPCcontroller npc;
+    public bool iSeeYou;
+
+    [Header("Player")]
+    public CharacterControler player;
+    private bool _aimTrue = false;
+    public Transform focused;
+    [SerializeField] private Transform[] _currentTargets;
+    public Transform _actualTarget;
+    public bool _swap = false;
+    public bool _isAimaing = false;
+    public float _distanceTarget;
     public int _listNb;
     public Vector3 direction;
     public int _actuaTargetCover;
     public bool _isFlank = false;
     public bool _isOverwatched = false;
-    public MeshFilter viewMeshFilter;
-    Mesh viewMesh;
+
+
+
+    [HideInInspector]
+    public bool acted = false;
+    Vector3 myPos;
+    Vector3 aimPos;
+
+    //public CameraMouv _camMouvScript;
+    private int _nbOfTarget = 0;
+    private int _targetSelect = 1;
 
 
     private void Awake()
     {
-        
         if(playerFOV == false)
         {
             targetMask = playerMask;
+            npc = GetComponent<NPCcontroller>();
         }
         else
         {
             targetMask = NPCmask;
+            player = GetComponent<CharacterControler>();
         }
     }
 
@@ -73,7 +75,6 @@ public class FieldOfView : MonoBehaviour {
         viewMesh = new Mesh();
         viewMesh.name = "View Mesh";
         viewMeshFilter.mesh = viewMesh;
-        player = GetComponent<CharacterControler>();
 
         StartCoroutine("FindTargetsWithDelay", .2f);
     }
@@ -84,16 +85,16 @@ public class FieldOfView : MonoBehaviour {
         while (true)
         {
             yield return new WaitForSeconds(delay);
-            //if(_isActive == true)
-            //{
+            if (_isActive == true)
+            {
                 FindVisibleTargets();
-            //}
-
+            }
         }
     }
 
     void LateUpdate()
     {
+        FreeMode = !player.TacticalMode;
 
         if (_isActive == true)
         {
@@ -105,16 +106,11 @@ public class FieldOfView : MonoBehaviour {
             {
                 SelectTarget();
             }
-
         }
         else
         {
             viewMeshFilter.GetComponent<MeshRenderer>().enabled = false;
         }
-            //if(_isOverwatched == true)
-            //{
-            //    OverwatchActivate();
-            //}
     }
 
     void FindVisibleTargets() //mise en place des targets dans une list 
@@ -137,16 +133,31 @@ public class FieldOfView : MonoBehaviour {
                 float dstToTarget = Vector3.Distance(t.position, target.position);
                 if (!Physics.Raycast(t.position, dirToTarget, out hit, dstToTarget, obstacleMask))
                 {
-                    
-                        visibleTargets.Add(target);
-                    
+                    AddTarget(target);
                 }
                 else if(Physics.Raycast(t.position, dirToTarget, out hit, dstToTarget, obstacleMask))
                 {
                     if (hit.transform.gameObject.tag == "Obs1")
-                        visibleTargets.Add(target);
+                    {
+                        AddTarget(target);
+                    }
                 }
             }
+        }
+    }
+
+    private void FreeNPCMode()
+    {
+        if(!playerFOV)
+            npc.KillPlayer();
+    }
+
+    private void AddTarget(Transform target)
+    {
+        if (FreeMode)
+        {
+            visibleTargets.Add(target);
+            FreeNPCMode();
         }
     }
 

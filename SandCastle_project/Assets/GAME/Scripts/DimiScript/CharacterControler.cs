@@ -18,6 +18,7 @@ public class CharacterControler : MonoBehaviour
     public Material mRenderClassic;
     public Material mRenderCant;
     public Animator anim;
+    public SytemTurn system;
 
     [Header("FreeMode")]
     public float speedPlayer = 4;
@@ -38,6 +39,7 @@ public class CharacterControler : MonoBehaviour
     public int isCover;
     public List<GameObject> limits = new List<GameObject>();
     public bool notInArea;
+    public bool SettingPathBool;
 
     //private
     private Vector3 move;
@@ -45,7 +47,6 @@ public class CharacterControler : MonoBehaviour
     private Rigidbody rb;
     private Vector3 velocity;
     private NavMeshAgent nav;
-    private bool SettingPathBool;
     private int indexRangeMovement;
     private int actionPointIndex;
     private Vector3 secuPathPreview;
@@ -63,6 +64,7 @@ public class CharacterControler : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         nav = GetComponent<NavMeshAgent>();
         fov = GetComponent<FieldOfView>();
+        system.player = gameObject.GetComponent<CharacterControler>();
     }
     private void Update()
     {
@@ -411,6 +413,7 @@ public class CharacterControler : MonoBehaviour
     #endregion
 
 
+
     #region Animations
 
     public float AnimationLength(string name)
@@ -439,6 +442,7 @@ public class CharacterControler : MonoBehaviour
 
 
     #endregion
+
     #region Coroutine
     IEnumerator LateUp(float time)
     {
@@ -450,9 +454,11 @@ public class CharacterControler : MonoBehaviour
     IEnumerator ChangeTurn()
     {
         yield return new WaitForSeconds(2);
-        turnPlayer = true;
-        cantMove = false;
-        SettingPathBool = false;
+        system.EndPlayerTurn();
+        //turnPlayer = true;
+        //cantMove = false;
+        //SettingPathBool = false;
+        //NextTurn();
     }
     #endregion
 
