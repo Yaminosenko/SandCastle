@@ -7,8 +7,7 @@ public class StairBlock : MonoBehaviour
 
     public Transform targetStair;
     public LayerMask layerMask;
-   // private NavMeshLink navLink;
-    // Start is called before the first frame update
+ 
     void Start()
     {
         //navLink = GetComponent<NavMeshLink>();

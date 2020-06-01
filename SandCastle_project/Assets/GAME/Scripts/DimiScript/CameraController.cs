@@ -8,8 +8,9 @@ public class CameraController : MonoBehaviour
 
     [Header("General")]
     public Transform player;
-    private Transform target;
+    public Transform target;
     public bool tacticalEnable = false;
+    public SytemTurn system;
 
     [Header("FreeMode")]
     public float defaultAngleFree = 20;
@@ -52,10 +53,11 @@ public class CameraController : MonoBehaviour
     private int indexAngleTarget;
     private float angleToReach;
     private CharacterControler playerScript;
+    public bool turnPlayer = true;
    
     #endregion
 
-    #region Start & Update 
+    #region UnityMethods
 
     private void OnEnable()
     {
@@ -64,6 +66,7 @@ public class CameraController : MonoBehaviour
         angleTarget[2] = 225;
         angleTarget[3] = 315;
         target = player;
+        system.cam = GetComponent<CameraController>();
         offsetRotate.position = player.position;
         playerScript = player.GetComponent<CharacterControler>();
     }
@@ -80,10 +83,10 @@ public class CameraController : MonoBehaviour
             UpdateCam();
         }
 
-        ChangeMode();
+        if(!playerScript.isOnCombat && turnPlayer)
+            ChangeMode();
     }
     #endregion
-
 
     #region Free Mode
 
@@ -114,14 +117,21 @@ public class CameraController : MonoBehaviour
 
     private void UpdateCam()
     {
-        if(playerScript.isMoving)
+        if (turnPlayer)
         {
-            FollowTargetTactical();
+            if (playerScript.isMoving)
+            {
+                FollowTargetTactical();
+            }
+            else
+            {
+                MoveCam();
+                RotateCam();
+            }
         }
         else
         {
-            MoveCam();
-            RotateCam();
+            FollowTargetTactical();
         }
     }
 
@@ -235,6 +245,7 @@ public class CameraController : MonoBehaviour
            transform.rotation = Quaternion.Euler(rot, transform.eulerAngles.y, transform.eulerAngles.z);
         }
     }
+
     #endregion
 
     #region Coroutine

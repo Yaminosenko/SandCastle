@@ -8,6 +8,8 @@ using UnityEditor;
 
 public class CharacterControler : MonoBehaviour
 {
+    #region Variables 
+
     [Header("Reference")]
     public Transform skin;
     public Camera cam;
@@ -15,7 +17,8 @@ public class CharacterControler : MonoBehaviour
     public LineRenderer pathPreviewLine;
     public Material mRenderClassic;
     public Material mRenderCant;
-
+    public Animator anim;
+    public SytemTurn system;
 
     [Header("FreeMode")]
     public float speedPlayer = 4;
@@ -36,6 +39,7 @@ public class CharacterControler : MonoBehaviour
     public int isCover;
     public List<GameObject> limits = new List<GameObject>();
     public bool notInArea;
+    public bool SettingPathBool;
 
     //private
     private Vector3 move;
@@ -43,22 +47,28 @@ public class CharacterControler : MonoBehaviour
     private Rigidbody rb;
     private Vector3 velocity;
     private NavMeshAgent nav;
-    private bool SettingPathBool;
     private int indexRangeMovement;
     private int actionPointIndex;
     private Vector3 secuPathPreview;
     private List<Block> blockList = new List<Block>();
     private List<Vector3> pathWaypoint = new List<Vector3>();
-   
+    private bool statick;
+    private FieldOfView fov;
+
+    #endregion 
+
+    #region UnityMethods
 
     private void OnEnable()
     {
         rb = GetComponent<Rigidbody>();
         nav = GetComponent<NavMeshAgent>();
-
+        fov = GetComponent<FieldOfView>();
+        system.player = gameObject.GetComponent<CharacterControler>();
     }
     private void Update()
     {
+        skin.position = transform.position;
         if (!TacticalMode)
         {
             SimpleMove();
@@ -68,6 +78,7 @@ public class CharacterControler : MonoBehaviour
         {
             if (turnPlayer)
             {
+                skin.rotation = transform.rotation;
                 Movement();
                 if (!SettingPathBool)
                     StartCoroutine(LateUp(0.1f));
@@ -83,16 +94,21 @@ public class CharacterControler : MonoBehaviour
                 TacticalMode = false;
                 ResetAllPreview();
                 SettingPathBool = false;
+                fov._isActive = false;
                 nav.ResetPath();
                 //StartCoroutine(changeCamMode(1f, false));
             }
             else
             {
+                fov._isActive = true;
                 TacticalMode = true;
                 //sStartCoroutine(changeCamMode(1f, true));
             }
         }
     }
+
+    #endregion
+
     #region Free Movement Methode 
     private void Move()
     {
@@ -128,6 +144,13 @@ public class CharacterControler : MonoBehaviour
         {
             move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
             velocity += move;
+            statick = false;
+            Run(true);
+        }
+        else
+        {
+            statick = true;
+            Run(false);
         }
     }
 
@@ -141,8 +164,9 @@ public class CharacterControler : MonoBehaviour
 
         Quaternion _rotation = Quaternion.LookRotation(move);
 
-        skin.rotation = _rotation * transform.rotation;
-
+        if(!statick)
+            skin.rotation = _rotation * transform.rotation;
+       
 
         velocity = Vector3.zero;
     }
@@ -173,6 +197,7 @@ public class CharacterControler : MonoBehaviour
                         isMoving = true;
                         actionPointIndex++;
                         ResetAllPreview();
+                        Run(true);
                     }
                 }
                 else if(hit.transform.gameObject.layer == 13)
@@ -195,6 +220,7 @@ public class CharacterControler : MonoBehaviour
                                 isMoving = true;
                                 actionPointIndex++;
                                 ResetAllPreview();
+                                Run(true);
                             }
                         }
                     }
@@ -268,7 +294,7 @@ public class CharacterControler : MonoBehaviour
         if (dist <= 0.5f)
         {
             isMoving = false;
-           
+            Run(false);
             if (StillYourTurn())
             {
                 cantMove = false;
@@ -353,7 +379,6 @@ public class CharacterControler : MonoBehaviour
     }
     #endregion
 
-
     #region ActionTacticalMode
 
     private bool StillYourTurn()
@@ -387,6 +412,37 @@ public class CharacterControler : MonoBehaviour
     }
     #endregion
 
+
+
+    #region Animations
+
+    public float AnimationLength(string name)
+    {
+        float time = 0;
+        RuntimeAnimatorController ac = anim.runtimeAnimatorController;
+
+        for (int i = 0; i < ac.animationClips.Length; i++)
+            if (ac.animationClips[i].name == name)
+                time = ac.animationClips[i].length;
+
+        //Debug.Log(time);
+        return time;
+    }
+
+    public void Run(bool b)
+    {
+        anim.SetBool("Run", b);
+    }
+
+
+    public void CrouchIdle(bool b)
+    {
+        anim.SetBool("CrouchIdle", b);
+    }
+
+
+    #endregion
+
     #region Coroutine
     IEnumerator LateUp(float time)
     {
@@ -398,9 +454,11 @@ public class CharacterControler : MonoBehaviour
     IEnumerator ChangeTurn()
     {
         yield return new WaitForSeconds(2);
-        turnPlayer = true;
-        cantMove = false;
-        SettingPathBool = false;
+        system.EndPlayerTurn();
+        //turnPlayer = true;
+        //cantMove = false;
+        //SettingPathBool = false;
+        //NextTurn();
     }
     #endregion
 

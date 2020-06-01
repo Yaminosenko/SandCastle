@@ -44,11 +44,9 @@ public class Block : MonoBehaviour
 
     private void Start()
     {
-
         SetRotationBlock();
         SetCover();
         mesh = GetComponent<MeshRenderer>();
-        // mesh.material.SetColor("_TintColor", colorBase);
     }
 
     private void LateUpdate()
@@ -60,32 +58,15 @@ public class Block : MonoBehaviour
             one++;
         }
 
-        if (player.TacticalMode)
-        {
-            //mesh.enabled = true;
-
-        }
-        else
-        {
-            //mesh.enabled = false;
-        }
-
-        //if (player.isMoving)
-        //    ResetIndex();
-
-
+        if (!player.TacticalMode)
+            mesh.enabled = false;
+            
         if (Input.GetKeyDown(KeyCode.P))
         {
             if (isIndexer)
                 Destroy(gameObject);
         }
     }
-
-    private void Update()
-    {
-        //ChangeColor();
-    }
-
 
     private void SetRotationBlock()
     {
@@ -278,13 +259,6 @@ public class Block : MonoBehaviour
         }
     }
 
-    private void ResetIndex()
-    {
-
-        if (mesh.material != mouseNotOver)
-            mesh.material = mouseNotOver;
-    }
-
     public void ChangeColor()
     {
         //if (mainCell)
@@ -303,7 +277,7 @@ public class Block : MonoBehaviour
 
     public void Over()
     {
-        if (player.TacticalMode)
+        if (player.TacticalMode && !player.isMoving && player.turnPlayer)
         {
             mesh.enabled = true;
             if(pathIndex != 0)
@@ -347,7 +321,6 @@ public class Block : MonoBehaviour
             }
         }
     }
-
 
     public void OnMouseOver()
     {
