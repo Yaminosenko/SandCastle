@@ -21,6 +21,8 @@ public class SytemTurn : MonoBehaviour
 
     public void NextTurn()
     {
+        NPCcontroller[] npcTab = actualEnnemy.ToArray();
+        npcTurn = null;
         indexNbrTurn++;
         if(indexNbrTurn == nbrTurnMax)
         {
@@ -28,16 +30,25 @@ public class SytemTurn : MonoBehaviour
             StartCoroutine(waitEndTurnNPC());
             indexNbrTurn = 0;
         }
+        else
+        {
+            for (int i = 0; i < npcTab.Length; i++)
+            {
+                //Debug.Log(i + " " + indexNbrTurn);
+                if (i == indexNbrTurn)
+                    npcTurn = npcTab[i];
+            }
+            npcTurn.system = GetComponent<SytemTurn>();
+            npcTurn.Walk(false);
+            cam.target = npcTurn.transform;
+            npcTurn.yourTurn = true;
+        }
     }
 
     public void EndPlayerTurn()
     {
         NPCcontroller[] npcTab = actualEnnemy.ToArray();
-        //for (int i = 0; i < npcTab.Length; i++)
-        //{
-        //    if (i == indexNbrTurn)
-        //        npcTurn = npcTab[i];
-        //}
+       
         npcTurn = npcTab[0];
         npcTurn.system = GetComponent<SytemTurn>();
         npcTurn.Walk(false);

@@ -107,7 +107,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2506836205439051253}
-  m_LocalRotation: {x: -0, y: 0.9659252, z: -0, w: 0.25882143}
+  m_LocalRotation: {x: 0, y: 0.9659258, z: 0, w: 0.2588191}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -180,10 +180,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 925073ba328b35b41b1c1e434f9c3d11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PatrolPath: []
+  PatrolPath:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   waitTime: 2
   loop: 0
-  isPatroling: 0
+  isPatroling: 1
   isTurningHead: 1
   walkSpeed: 1.5
   runSpeed: 3
@@ -193,6 +197,8 @@ MonoBehaviour:
   damage: 25
   pos: {x: 0, y: 0, z: 0}
   unitsRangeMovement: 5
+  yourTurn: 0
+  alerted: 0
   cooldownShootMax: 0.2
   anim: {fileID: 4256069713951752743}
   position: {x: 0, y: 0, z: 0}
@@ -213,6 +219,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   IndexRandomPos: 0
+  system: {fileID: 0}
 --- !u!114 &5478412904192090675
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -225,11 +232,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 933f27ed8a5cf43359d7caf0a5f5e732, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  viewRadius: 20
+  viewRadius: 5
   viewAngle: 180
   playerMask:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 6144
   NPCmask:
     serializedVersion: 2
     m_Bits: 4096
@@ -239,17 +246,18 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 1536
-  _isActive: 0
+  _isActive: 1
   visibleTargets: []
   playerFOV: 0
   _CamPos: {fileID: 0}
-  meshResolution: 5
+  meshResolution: 1
   edgeResolveIterations: 0
   edgeDstThreshold: 0
   FreeMode: 0
   viewMeshFilter: {fileID: 3742344095032063946}
   shootMode: 0
   npc: {fileID: 0}
+  iSeeYou: 0
   player: {fileID: 0}
   focused: {fileID: 0}
   _currentTargets: []

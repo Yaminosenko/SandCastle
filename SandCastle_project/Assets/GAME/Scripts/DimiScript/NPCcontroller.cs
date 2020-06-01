@@ -17,7 +17,6 @@ public class NPCcontroller : MonoBehaviour
     [Header("Movement")]
     public float walkSpeed;
     public float runSpeed;
-    public float walkRadius;
     public int numberOfRandomPosition;
     public float cooldownSeekModeMax;
 
@@ -26,12 +25,14 @@ public class NPCcontroller : MonoBehaviour
 
     [Header("combat")]
     public float damage = 25;
+    public List<NPCcontroller> deadAlly = new List<NPCcontroller>();
 
 
     [Header("Tactical")]
     public Vector3 pos;
     public int unitsRangeMovement = 5;
     public bool yourTurn;
+    public bool alerted;
     //public int indexTurn;
 
     [Header("Other")]
@@ -71,11 +72,14 @@ public class NPCcontroller : MonoBehaviour
     private bool isMoving;
     private bool SettingPathBool;
     private List<Block> blockList = new List<Block>();
+    private List<GameObject> coverList = new List<GameObject>();
     private int indexRangeMovement;
     private bool oneAction;
     private int indexAction;
 
     #endregion
+
+    #region UnityMethods
 
     private void OnEnable()
     {
@@ -102,6 +106,8 @@ public class NPCcontroller : MonoBehaviour
                 UpdateTacticalMode();
         }
     }
+
+    #endregion
 
     #region IA Free Mode 
 
@@ -250,10 +256,10 @@ public class NPCcontroller : MonoBehaviour
     //Looking for a random position in the NavaMesh
     private void RandomPosition()
     {
-        Vector3 randomDirection = Random.insideUnitSphere * walkRadius;
+        Vector3 randomDirection = Random.insideUnitSphere * unitsRangeMovement;
         randomDirection += lastKnowPosition;
         NavMeshHit hit;
-        NavMesh.SamplePosition(randomDirection, out hit, walkRadius, 1);
+        NavMesh.SamplePosition(randomDirection, out hit, unitsRangeMovement, 1);
         Vector3 finalPosition = hit.position;
         targetPosition = finalPosition;
     }
@@ -320,9 +326,14 @@ public class NPCcontroller : MonoBehaviour
             if (isMoving)
                 ReachPointDestination();
 
-            if(isPatroling)
+            if (isPatroling)
+            {
                 if (!oneAction)
                     PatrolTactial();
+            }
+            else if(!oneAction)
+                StartCoroutine(waitBeforeChangeTurn(2));
+            
         }
         else
         {
@@ -424,9 +435,10 @@ public class NPCcontroller : MonoBehaviour
         if (!SettingPathBool)
         {
             RaycastHit hit;
-            if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, Mathf.Infinity, blockMask))
+            Vector3 transPos = new Vector3(transform.position.x, 1, transform.position.z);
+            if (Physics.Raycast(transPos, transform.TransformDirection(Vector3.down), out hit, Mathf.Infinity, blockMask))
             {
-                Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * hit.distance, Color.yellow, Mathf.Infinity);
+                Debug.DrawRay(transPos, transform.TransformDirection(Vector3.down) * hit.distance, Color.yellow, Mathf.Infinity);
                 Block block = hit.collider.GetComponent<Block>();
                 block.pathIndex++;
                 //block.GetComponent<MeshRenderer>().material = testMat;
@@ -451,6 +463,8 @@ public class NPCcontroller : MonoBehaviour
                                     tabBlock.Add(blockAdj);
                                     blockList.Add(blockAdj);
                                     blockAdj.pathIndex += indexRangeMovement;
+                                    if (blockAdj.isCover)
+                                        coverList.Add(blockAdj.gameObject);
                                     // blockAdj.GetComponent<MeshRenderer>().material = testMat;
                                 }
                             }
@@ -459,9 +473,14 @@ public class NPCcontroller : MonoBehaviour
                     blockOrigins = tabBlock.ToArray();
                     tabBlock.Clear();
                 }
+                    Debug.Log(coverList.ToArray().Length);
+                    SettingPathBool = true;
             }
             else
+            {
                 Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * 1000, Color.white, Mathf.Infinity);
+                SettingPathBool = true;
+            }
 
 
         }
@@ -472,6 +491,12 @@ public class NPCcontroller : MonoBehaviour
         yourTurn = false;
         indexAction = 0;
         oneAction = false;
+        for (int i = 0; i < blockList.ToArray().Length; i++)
+        {
+            blockList.ToArray()[i].pathIndex = 0;
+        }
+        blockList.Clear();
+        coverList.Clear();
     }
     #endregion
 
@@ -556,6 +581,14 @@ public class NPCcontroller : MonoBehaviour
         //SetLimitsSign();
     }
 
+    IEnumerator waitBeforeChangeTurn(float time)
+    {
+        oneAction = true;
+        yield return new WaitForSeconds(time);
+        system.NextTurn();
+        ResetVariables();
+    }
+
     //public IEnumerator SetActiveWithCooldown(float time, Image image)
     //{
     //    image.gameObject.SetActive(true);
@@ -563,12 +596,6 @@ public class NPCcontroller : MonoBehaviour
     //    image.gameObject.SetActive(false);
     //}
 
-    //IEnumerator BulletTraceCD(float time)
-    //{
-    //    trace.laserLineRenderer.enabled = true;
-    //    yield return new WaitForSeconds(time);
-    //    trace.laserLineRenderer.enabled = false;
-    //}
 
 
     #endregion
