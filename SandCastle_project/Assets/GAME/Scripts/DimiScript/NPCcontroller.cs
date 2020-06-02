@@ -30,9 +30,11 @@ public class NPCcontroller : MonoBehaviour
 
     [Header("Tactical")]
     public Vector3 pos;
+    public Vector3 distractPos;
     public int unitsRangeMovement = 5;
     public bool yourTurn;
     public bool alerted;
+    public bool distracted;
     //public int indexTurn;
 
     [Header("Other")]
@@ -73,6 +75,7 @@ public class NPCcontroller : MonoBehaviour
     private bool SettingPathBool;
     private List<Block> blockList = new List<Block>();
     private List<GameObject> coverList = new List<GameObject>();
+    private List<GameObject> maxRangeBlockList = new List<GameObject>();
     private int indexRangeMovement;
     private bool oneAction;
     private int indexAction;
@@ -84,6 +87,12 @@ public class NPCcontroller : MonoBehaviour
     private void OnEnable()
     {
         playerScript = GameObject.Find("Character").GetComponentInChildren<CharacterControler>();
+        distractPos = playerScript.gameObject.transform.position;
+
+
+
+
+        Debug.Log(transform.position + playerScript.transform.position);
         FreeMode = !playerScript.TacticalMode;
         IndexPatrolMax = PatrolPath.Length;
         nav = GetComponent<NavMeshAgent>();
@@ -326,13 +335,20 @@ public class NPCcontroller : MonoBehaviour
             if (isMoving)
                 ReachPointDestination();
 
-            if (isPatroling)
+            if (!distracted)
             {
-                if (!oneAction)
-                    PatrolTactial();
+                if (isPatroling)
+                {
+                    if (!oneAction)
+                        PatrolTactial();
+                }
+                else if (!oneAction)
+                    StartCoroutine(waitBeforeChangeTurn(2));
             }
-            else if(!oneAction)
-                StartCoroutine(waitBeforeChangeTurn(2));
+            else if (!oneAction)
+            {
+                DistractTactical(distractPos);
+            }
             
         }
         else
@@ -465,7 +481,8 @@ public class NPCcontroller : MonoBehaviour
                                     blockAdj.pathIndex += indexRangeMovement;
                                     if (blockAdj.isCover)
                                         coverList.Add(blockAdj.gameObject);
-                                    // blockAdj.GetComponent<MeshRenderer>().material = testMat;
+                                    if (blockAdj.pathIndex == unitsRangeMovement)
+                                        maxRangeBlockList.Add(blockAdj.gameObject);
                                 }
                             }
                         }
@@ -473,7 +490,7 @@ public class NPCcontroller : MonoBehaviour
                     blockOrigins = tabBlock.ToArray();
                     tabBlock.Clear();
                 }
-                    Debug.Log(coverList.ToArray().Length);
+                    //Debug.Log(maxRangeBlockList.ToArray().Length);
                     SettingPathBool = true;
             }
             else
@@ -486,11 +503,75 @@ public class NPCcontroller : MonoBehaviour
         }
     }
 
+    private void DistractTactical(Vector3 destination)
+    {
+        if (SettingPathBool)
+        {
+            Vector3 finalPos = Vector3.zero;
+            Vector3 offset = destination;
+            float lastClosestDistance = Vector3.Distance(transform.position, destination);
+            int indexLength = 100;
+            NavMeshPath path = new NavMeshPath();
+            nav.CalculatePath(destination, path);
+
+            RaycastHit hitFirst;
+            if (Physics.Raycast(destination, Vector3.down, out hitFirst, blockMask))
+            {
+                if (hitFirst.transform.GetComponent<Block>().pathIndex != 0)
+                {
+                    pos = hitFirst.transform.position;
+                    MovementTactical();
+                    oneAction = true;
+                    Debug.Log("toShort");
+                    return;
+                }
+            }
+
+            for (int i = 0; i < path.corners.Length; i++)
+            {
+                Vector3 corners = new Vector3(path.corners[i].x, path.corners[i].y + 0.5f, path.corners[i].z);
+                RaycastHit hit;
+                if (Physics.Raycast(corners, Vector3.down, out hit, blockMask))
+                {
+                    if (hit.transform.GetComponent<Block>().pathIndex != 0)
+                    {
+                        indexLength = i;
+                    }
+                    if (i == indexLength + 1)
+                        offset = hit.transform.position;
+                }
+            }
+
+            GameObject[] maxBlock = maxRangeBlockList.ToArray();
+            for (int i = 0; i < maxBlock.Length; i++)
+            {
+                float testDistance = Vector3.Distance(maxBlock[i].transform.position, offset);
+                //Debug.Log(testDistance);
+
+                if (testDistance < lastClosestDistance)
+                {
+                    lastClosestDistance = testDistance;
+                    finalPos = maxBlock[i].transform.position;
+                }
+            }
+
+            pos = finalPos;
+            MovementTactical();
+            oneAction = true;
+        }
+    }
+
+    private void AlertTactical()
+    {
+    
+    }
+
     private void ResetVariables()
     {
         yourTurn = false;
         indexAction = 0;
         oneAction = false;
+        SettingPathBool = false;
         for (int i = 0; i < blockList.ToArray().Length; i++)
         {
             blockList.ToArray()[i].pathIndex = 0;
@@ -499,7 +580,6 @@ public class NPCcontroller : MonoBehaviour
         coverList.Clear();
     }
     #endregion
-
 
     #region Animation
 

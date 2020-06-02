@@ -1047,7 +1047,7 @@ PrefabInstance:
     - target: {fileID: 8294151680752949951, guid: 72e5342fe17fa2e4e9f8fd5a3c733654,
         type: 3}
       propertyPath: dead
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 72e5342fe17fa2e4e9f8fd5a3c733654, type: 3}
@@ -1702,6 +1702,16 @@ PrefabInstance:
       propertyPath: PatrolPath.Array.data[3]
       value: 
       objectReference: {fileID: 716288621}
+    - target: {fileID: 8294151680752949951, guid: 72e5342fe17fa2e4e9f8fd5a3c733654,
+        type: 3}
+      propertyPath: distracted
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8294151680752949951, guid: 72e5342fe17fa2e4e9f8fd5a3c733654,
+        type: 3}
+      propertyPath: unitsRangeMovement
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 72e5342fe17fa2e4e9f8fd5a3c733654, type: 3}
 --- !u!1001 &4271676426394382412
