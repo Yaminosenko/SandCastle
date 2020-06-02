@@ -9,6 +9,7 @@ public class Cover : MonoBehaviour
     public Image littleCover;
     public Image bigCover;
     public CharacterControler player;
+    public GameObject offsetLocalPos;
     private GameObject defaultCover;
 
 
@@ -67,6 +68,10 @@ public class Cover : MonoBehaviour
 
             col.GetComponent<CharacterControler>().CrouchIdle(true);
         }
+        //else if(col.gameObject.layer == 12 && col.GetComponent<NPCcontroller>() != null)
+        //{
+        //    col.GetComponent<NPCcontroller>().CrouchIdle(true);
+        //}
     }
 
     private void OnTriggerExit(Collider col)
@@ -76,5 +81,9 @@ public class Cover : MonoBehaviour
             col.GetComponent<CharacterControler>().isCover = 0;
             col.GetComponent<CharacterControler>().CrouchIdle(false);
         }
+        //else if (col.gameObject.layer == 12 && col.GetComponent<NPCcontroller>() != null)
+        //{
+        //    col.GetComponent<NPCcontroller>().CrouchIdle(false);
+        //}
     }
 }

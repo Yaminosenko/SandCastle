@@ -412,8 +412,6 @@ public class CharacterControler : MonoBehaviour
     }
     #endregion
 
-
-
     #region Animations
 
     public float AnimationLength(string name)
@@ -434,12 +432,10 @@ public class CharacterControler : MonoBehaviour
         anim.SetBool("Run", b);
     }
 
-
     public void CrouchIdle(bool b)
     {
         anim.SetBool("CrouchIdle", b);
     }
-
 
     #endregion
 

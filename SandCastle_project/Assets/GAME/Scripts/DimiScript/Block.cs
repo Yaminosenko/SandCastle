@@ -21,6 +21,7 @@ public class Block : MonoBehaviour
 
     [Header("Reference")]
     public bool isCover;
+    public Cover coverScript;
     public Transform[] offset = new Transform[4];
     public GameObject[] blockAdjacent = new GameObject[10];
     public GameObject[] limitsLine = new GameObject[4];
@@ -131,6 +132,7 @@ public class Block : MonoBehaviour
             GameObject coverInst = Instantiate(cover, instPos, cover.transform.rotation);
             coverInst.transform.parent = transform;
             coverInst.GetComponent<Cover>().player = player;
+            coverScript = coverInst.GetComponent<Cover>();
             isCover = true;
 
             if (hitForward.collider.gameObject.tag == "Obs1")
@@ -148,6 +150,7 @@ public class Block : MonoBehaviour
             GameObject coverInst = Instantiate(cover, instPos, Quaternion.Euler(0, 180, 0));
             coverInst.transform.parent = transform;
             coverInst.GetComponent<Cover>().player = player;
+            coverScript = coverInst.GetComponent<Cover>();
             isCover = true;
 
             if (hitBack.collider.gameObject.tag == "Obs1")
@@ -165,6 +168,7 @@ public class Block : MonoBehaviour
             GameObject coverInst = Instantiate(cover, instPos, Quaternion.Euler(0, 90, 0));
             coverInst.transform.parent = transform;
             coverInst.GetComponent<Cover>().player = player;
+            coverScript = coverInst.GetComponent<Cover>();
             isCover = true;
 
             if (hitRight.collider.gameObject.tag == "Obs1")
@@ -182,6 +186,7 @@ public class Block : MonoBehaviour
             GameObject coverInst = Instantiate(cover, instPos, Quaternion.Euler(0, -90, 0));
             coverInst.transform.parent = transform;
             coverInst.GetComponent<Cover>().player = player;
+            coverScript = coverInst.GetComponent<Cover>();
             isCover = true;
 
             if (hitLeft.collider.gameObject.tag == "Obs1")

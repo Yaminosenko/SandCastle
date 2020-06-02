@@ -74,7 +74,7 @@ public class NPCcontroller : MonoBehaviour
     private bool isMoving;
     private bool SettingPathBool;
     private List<Block> blockList = new List<Block>();
-    private List<GameObject> coverList = new List<GameObject>();
+   [SerializeField] private List<Cover> coverList = new List<Cover>();
     private List<GameObject> maxRangeBlockList = new List<GameObject>();
     private int indexRangeMovement;
     private bool oneAction;
@@ -88,11 +88,7 @@ public class NPCcontroller : MonoBehaviour
     {
         playerScript = GameObject.Find("Character").GetComponentInChildren<CharacterControler>();
         distractPos = playerScript.gameObject.transform.position;
-
-
-
-
-        Debug.Log(transform.position + playerScript.transform.position);
+       
         FreeMode = !playerScript.TacticalMode;
         IndexPatrolMax = PatrolPath.Length;
         nav = GetComponent<NavMeshAgent>();
@@ -335,20 +331,28 @@ public class NPCcontroller : MonoBehaviour
             if (isMoving)
                 ReachPointDestination();
 
-            if (!distracted)
+            if (!alerted)
             {
-                if (isPatroling)
+                if (!distracted)
                 {
-                    if (!oneAction)
-                        PatrolTactial();
+                    if (isPatroling)
+                    {
+                        if (!oneAction)
+                            PatrolTactial();
+                    }
+                    else if (!oneAction)
+                        StartCoroutine(waitBeforeChangeTurn(2));
                 }
                 else if (!oneAction)
-                    StartCoroutine(waitBeforeChangeTurn(2));
+                    DistractTactical(distractPos);
             }
             else if (!oneAction)
             {
-                DistractTactical(distractPos);
+                distractPos = playerScript.transform.position;
+                AlertTactical(distractPos);
             }
+
+           
             
         }
         else
@@ -399,8 +403,7 @@ public class NPCcontroller : MonoBehaviour
                 }
                 else
                 {
-                    system.NextTurn();
-                    ResetVariables();
+                    StartCoroutine(waitBeforeChangeTurn(2));
                 }
             }
             else
@@ -480,7 +483,7 @@ public class NPCcontroller : MonoBehaviour
                                     blockList.Add(blockAdj);
                                     blockAdj.pathIndex += indexRangeMovement;
                                     if (blockAdj.isCover)
-                                        coverList.Add(blockAdj.gameObject);
+                                        coverList.Add(blockAdj.coverScript);
                                     if (blockAdj.pathIndex == unitsRangeMovement)
                                         maxRangeBlockList.Add(blockAdj.gameObject);
                                 }
@@ -561,9 +564,42 @@ public class NPCcontroller : MonoBehaviour
         }
     }
 
-    private void AlertTactical()
+    private void AlertTactical(Vector3 position)
     {
-    
+        if (SettingPathBool)
+        {
+            Cover[] cover = coverList.ToArray();
+            List<GameObject> selectCoverList = new List<GameObject>();
+            Vector3 finalPos = Vector3.zero;
+            float lastClosestDistance = Vector3.Distance(transform.position, position);
+            for (int i = 0; i < cover.Length; i++)
+            {
+                cover[i].offsetLocalPos.transform.position = position;
+
+                if (cover[i].offsetLocalPos.transform.localPosition.z > 1)
+                    selectCoverList.Add(cover[i].gameObject);
+
+                cover[i].offsetLocalPos.transform.position = cover[i].transform.position;
+            }
+
+
+            GameObject[] selectCover = selectCoverList.ToArray();
+            for (int i = 0; i < selectCover.Length; i++)
+            {
+                float testDistance = Vector3.Distance(selectCover[i].transform.position, position);
+               
+                if (testDistance < lastClosestDistance)
+                {
+                    lastClosestDistance = testDistance;
+                    finalPos = selectCover[i].transform.position;
+                }
+            }
+
+            pos = new Vector3(finalPos.x,0.1f,finalPos.z);
+            //Debug.Log(finalPos);
+            MovementTactical();
+            oneAction = true;
+        }
     }
 
     private void ResetVariables()
@@ -601,6 +637,11 @@ public class NPCcontroller : MonoBehaviour
     public void BackStabDeath()
     {
         anim.SetTrigger("Death");
+    }
+
+    public void CrouchIdle(bool b)
+    {
+        anim.SetBool("CrouchIdle", b);
     }
     #endregion
 
