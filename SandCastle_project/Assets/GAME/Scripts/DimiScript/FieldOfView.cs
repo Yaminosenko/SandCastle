@@ -164,13 +164,17 @@ public class FieldOfView : MonoBehaviour {
             visibleTargets.Add(target);
             FreeNPCMode();
         }
+        else if (target.gameObject.layer == 11 && !FreeMode)
+        {
+
+        }
         else if(target.gameObject.layer == 12 && target.GetComponent<NPCcontroller>().dead && FreeMode)
         {
             NPCcontroller[] list = npc.deadAlly.ToArray();
             if(list.Length == 0)
             {
                 //pensé a alerté les autres guard du secteur
-                npc.alerted = true;
+                //npc.alerted = true;
                 npc.deadAlly.Add(target.GetComponent<NPCcontroller>());
                 StartCoroutine(npc.HeardOrSeeWait(1, target.position, false));
             }
@@ -179,9 +183,32 @@ public class FieldOfView : MonoBehaviour {
                 if(target != list[i].transform)
                 {
                     //pensé a alerté les autres guard du secteur
-                    npc.alerted = true;
+                    //npc.alerted = true;
                     npc.deadAlly.Add(target.GetComponent<NPCcontroller>());
                     StartCoroutine(npc.HeardOrSeeWait(1, target.position, false));
+                }
+            }
+        }
+        else if(target.gameObject.layer == 12 && target.GetComponent<NPCcontroller>().dead && !FreeMode)
+        {
+            NPCcontroller[] list = npc.deadAlly.ToArray();
+            if (list.Length == 0)
+            {
+                //pensé a alerté les autres guard du secteur
+                StartCoroutine(npc.SeeCorpsTactical());
+                npc.deadAlly.Add(target.GetComponent<NPCcontroller>());
+                npc.alertedPos = player.transform.position;
+                npc.lastKnowPosition = player.transform.position;
+            }
+            for (int i = 0; i < list.Length; i++)
+            {
+                if (target != list[i].transform)
+                {
+                    //pensé a alerté les autres guard du secteur
+                    StartCoroutine(npc.SeeCorpsTactical());
+                    npc.deadAlly.Add(target.GetComponent<NPCcontroller>());
+                    npc.alertedPos = player.transform.position;
+                    npc.lastKnowPosition = player.transform.position;
                 }
             }
         }

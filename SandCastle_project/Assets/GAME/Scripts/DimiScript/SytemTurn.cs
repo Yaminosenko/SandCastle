@@ -36,7 +36,21 @@ public class SytemTurn : MonoBehaviour
             {
                 //Debug.Log(i + " " + indexNbrTurn);
                 if (i == indexNbrTurn)
-                    npcTurn = npcTab[i];
+                {
+                    if (!npcTab[i].dead)
+                        npcTurn = npcTab[i];
+                    else
+                    {
+                        indexNbrTurn++;
+                        if (indexNbrTurn == nbrTurnMax)
+                        {
+                            cam.target = player.transform;
+                            StartCoroutine(waitEndTurnNPC());
+                            indexNbrTurn = 0;
+                            return;
+                        }
+                    }
+                }
             }
             npcTurn.system = GetComponent<SytemTurn>();
             npcTurn.Walk(false);
