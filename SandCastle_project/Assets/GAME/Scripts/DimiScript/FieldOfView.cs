@@ -56,6 +56,7 @@ public class FieldOfView : MonoBehaviour {
     private int _targetSelect = 1;
 
 
+
     private void Awake()
     {
         if(playerFOV == false)
@@ -126,20 +127,24 @@ public class FieldOfView : MonoBehaviour {
         for (int i = 0; i < targetsInViewRadius.Length; i++)
         {
             Transform target = targetsInViewRadius[i].transform;
-            Vector3 dirToTarget = (target.position - t.position).normalized;
-            RaycastHit hit;
-            if (Vector3.Angle(t.forward, dirToTarget) < viewAngle / 2)
+            if(target != transform)
             {
-                float dstToTarget = Vector3.Distance(t.position, target.position);
-                if (!Physics.Raycast(t.position, dirToTarget, out hit, dstToTarget, obstacleMask))
+                Vector3 dirToTarget = (target.position - t.position).normalized;
+                RaycastHit hit;
+                if (Vector3.Angle(t.forward, dirToTarget) < viewAngle / 2)
                 {
-                    AddTarget(target);
-                }
-                else if(Physics.Raycast(t.position, dirToTarget, out hit, dstToTarget, obstacleMask))
-                {
-                    if (hit.transform.gameObject.tag == "Obs1")
+                    float dstToTarget = Vector3.Distance(t.position, target.position);
+                    if (!Physics.Raycast(t.position, dirToTarget, out hit, dstToTarget, obstacleMask))
                     {
+
                         AddTarget(target);
+                    }
+                    else if (Physics.Raycast(t.position, dirToTarget, out hit, dstToTarget, obstacleMask))
+                    {
+                        if (hit.transform.gameObject.tag == "Obs1" && target.gameObject.layer == 11)
+                        {
+                            AddTarget(target);
+                        }
                     }
                 }
             }
@@ -154,10 +159,31 @@ public class FieldOfView : MonoBehaviour {
 
     private void AddTarget(Transform target)
     {
-        if (FreeMode)
+        if (FreeMode && target.gameObject.layer == 11)
         {
             visibleTargets.Add(target);
             FreeNPCMode();
+        }
+        else if(target.gameObject.layer == 12 && target.GetComponent<NPCcontroller>().dead && FreeMode)
+        {
+            NPCcontroller[] list = npc.deadAlly.ToArray();
+            if(list.Length == 0)
+            {
+                //pensé a alerté les autres guard du secteur
+                npc.alerted = true;
+                npc.deadAlly.Add(target.GetComponent<NPCcontroller>());
+                StartCoroutine(npc.HeardOrSeeWait(1, target.position, false));
+            }
+            for (int i = 0; i < list.Length; i++)
+            {
+                if(target != list[i].transform)
+                {
+                    //pensé a alerté les autres guard du secteur
+                    npc.alerted = true;
+                    npc.deadAlly.Add(target.GetComponent<NPCcontroller>());
+                    StartCoroutine(npc.HeardOrSeeWait(1, target.position, false));
+                }
+            }
         }
     }
 
