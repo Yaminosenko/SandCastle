@@ -290,17 +290,18 @@ public class NPCcontroller : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetAngles, 0.02f);
     }
 
-    public void GetSilentKill(bool firstOrSecond)
+    public void GetKill(bool firstOrSecond)
     {
         if (firstOrSecond)
+        {
+            
+        }
+        else
         {
             dead = true;
             nav.SetDestination(transform.position);
             nav.isStopped = true;
             Walk(false);
-        }
-        else
-        {
             fov.viewMeshFilter.gameObject.SetActive(false);
             //fov.dead = true;
             nav.enabled = false;
@@ -773,7 +774,6 @@ public class NPCcontroller : MonoBehaviour
         yield return new WaitForSeconds(timeToWait);
         stopMove = false;
     }
-
 
     public IEnumerator HeardOrSeeWait(float WaitTime, Vector3 pos, bool sound)
     {

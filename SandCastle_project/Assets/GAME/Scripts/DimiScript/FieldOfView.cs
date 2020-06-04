@@ -43,6 +43,8 @@ public class FieldOfView : MonoBehaviour {
     public int _actuaTargetCover;
     public bool _isFlank = false;
     public bool _isOverwatched = false;
+    public CameraShoulderMouv camShoulder;
+
 
 
 
@@ -54,6 +56,7 @@ public class FieldOfView : MonoBehaviour {
     //public CameraMouv _camMouvScript;
     private int _nbOfTarget = 0;
     private int _targetSelect = 1;
+    private List<Transform> targetInSight = new List<Transform>();
 
 
 
@@ -127,24 +130,37 @@ public class FieldOfView : MonoBehaviour {
         for (int i = 0; i < targetsInViewRadius.Length; i++)
         {
             Transform target = targetsInViewRadius[i].transform;
+            Vector3 targetPos = new Vector3(target.transform.position.x, target.transform.position.y + 1f, target.transform.position.z);
             if(target != transform)
             {
-                Vector3 dirToTarget = (target.position - t.position).normalized;
+                Vector3 dirToTarget = (targetPos - t.position).normalized;
                 RaycastHit hit;
                 if (Vector3.Angle(t.forward, dirToTarget) < viewAngle / 2)
                 {
-                    float dstToTarget = Vector3.Distance(t.position, target.position);
+                    float dstToTarget = Vector3.Distance(t.position, targetPos);
                     if (!Physics.Raycast(t.position, dirToTarget, out hit, dstToTarget, obstacleMask))
                     {
-
-                        AddTarget(target);
+                        //Debug.Log(dstToTarget);
+                        visibleTargets.Add(target);
+                        if(!playerFOV)
+                            AddNPCTarget(target);
                     }
                     else if (Physics.Raycast(t.position, dirToTarget, out hit, dstToTarget, obstacleMask))
                     {
                         if (hit.transform.gameObject.tag == "Obs1" && target.gameObject.layer == 11)
                         {
-                            AddTarget(target);
+                            //visibleTargets.Add(target);
+                            //if (!playerFOV)
+                            //    AddNPCTarget(target);
                         }
+                        else if(hit.transform.gameObject.tag == "Obs1" && playerFOV)
+                        {
+                            visibleTargets.Add(target);
+                        }
+                    }
+                    else
+                    {
+                        Debug.DrawRay(t.position, dirToTarget * hit.distance, Color.blue, Mathf.Infinity);
                     }
                 }
             }
@@ -157,7 +173,7 @@ public class FieldOfView : MonoBehaviour {
             npc.KillPlayer();
     }
 
-    private void AddTarget(Transform target)
+    private void AddNPCTarget(Transform target)
     {
         if (FreeMode && target.gameObject.layer == 11)
         {
@@ -214,6 +230,15 @@ public class FieldOfView : MonoBehaviour {
         }
     }
 
+    //private void AddPlayerTarget(Transform target)
+    //{
+    //    for (int i = 0; i < targetInSight.ToArray().Length; i++)
+    //    {
+
+    //    }
+    //    targetInSight.Add(target);
+    //}
+
     public void AimTarget() //lance à la fin du déplacement penser a clear a la fin du tour 
     {
         foreach (Transform Target in visibleTargets)
@@ -222,6 +247,10 @@ public class FieldOfView : MonoBehaviour {
         }
         //Debug.Log(_nbOfTarget);
         _aimTrue = true;
+        FirstSelect();
+        TargetLock();
+        _targetSelect++;
+        camShoulder.targetObj = _actualTarget;
     }
 
     void SelectTarget() //Change l'unité visée a chaque "Tab". Penser a lock le changement d'unité lors de l'aim. 
@@ -265,21 +294,17 @@ public class FieldOfView : MonoBehaviour {
                 {
                     
                     _actualTarget = _currentTargets[i];
-                    //_camMouvScript.targetObj = _actualTarget;
+                    camShoulder.targetObj = _actualTarget;
                     focused = _actualTarget;
-                    CoverSystem();
-                    GiveCover(direction);
+                    //CoverSystem();
+                   // GiveCover(direction);
                     //var targetRotation = Quaternion.LookRotation(_actualTarget.position - transform.position);
 
                     //transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, speed * Time.deltaTime);
                 }
-                _distanceTarget = Vector3.Distance(transform.position, _currentTargets[i].transform.position);
+                //_distanceTarget = Vector3.Distance(transform.position, _currentTargets[i].transform.position);
 
             }
-            //else
-            //{
-             
-            //}
         }
     }
 
@@ -290,7 +315,7 @@ public class FieldOfView : MonoBehaviour {
             //Material _m;
             //_m = _currentTargets[0].GetComponent<Renderer>().material;
             _actualTarget = _currentTargets[0];
-            _distanceTarget = Vector3.Distance(transform.position, _currentTargets[0].transform.position);
+            //_distanceTarget = Vector3.Distance(transform.position, _currentTargets[0].transform.position);
             //_m.color = Color.red;
         }
 
@@ -318,6 +343,7 @@ public class FieldOfView : MonoBehaviour {
             if (_currentTargets.Length != 0)
             {
                 _actualTarget = _currentTargets[0];
+                focused = _actualTarget;
             }
         }
     }
