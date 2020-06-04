@@ -31,7 +31,9 @@ public class NPCcontroller : MonoBehaviour
     [Header("Tactical")]
     public Vector3 pos;
     public Vector3 distractPos;
+    public Vector3 alertedPos;
     public int unitsRangeMovement = 5;
+    public bool playerSpotted;
     public bool yourTurn;
     public bool alerted;
     public bool distracted;
@@ -40,11 +42,8 @@ public class NPCcontroller : MonoBehaviour
     [Header("Other")]
     public float cooldownShootMax = 0.2f;
     public Animator anim;
-    public Vector3 position;
-    public Transform player;
     public Vector3 targetPosition;
     public Vector3 lastKnowPosition;
-    public Transform head;
     public GameObject trigger;
     public bool heard = false;
     public bool stopPatrol = false;
@@ -74,11 +73,15 @@ public class NPCcontroller : MonoBehaviour
     private bool isMoving;
     private bool SettingPathBool;
     private List<Block> blockList = new List<Block>();
-   [SerializeField] private List<Cover> coverList = new List<Cover>();
+    private List<Cover> coverList = new List<Cover>();
     private List<GameObject> maxRangeBlockList = new List<GameObject>();
     private int indexRangeMovement;
     private bool oneAction;
+    private bool randomPosTrigger;
+    private bool playerNear;
     private int indexAction;
+    private int indexRandom;
+    private int indexAlert;
 
     #endregion
 
@@ -97,18 +100,25 @@ public class NPCcontroller : MonoBehaviour
         sentinelPosition = transform.position;
         defaultRotation = transform.rotation;
         fov.player = playerScript;
+        FreeMode = true;
     }
 
     private void Update()
     {
         if (!dead)
         {
-            FreeMode = !playerScript.TacticalMode;
+            if(playerScript != null)
+                FreeMode = !playerScript.TacticalMode;
+
 
             if (FreeMode)
                 UpdateFreeMode();
             else
                 UpdateTacticalMode();
+        }
+        else
+        {
+            fov._isActive = false;
         }
     }
 
@@ -258,7 +268,6 @@ public class NPCcontroller : MonoBehaviour
         }
     }
 
-    //Looking for a random position in the NavaMesh
     private void RandomPosition()
     {
         Vector3 randomDirection = Random.insideUnitSphere * unitsRangeMovement;
@@ -269,21 +278,18 @@ public class NPCcontroller : MonoBehaviour
         targetPosition = finalPosition;
     }
 
-    //Rotate the NPC in the direction of the target
     private void RotateToTarget()
     {
         var targetRotation = Quaternion.LookRotation(lastKnowPosition - transform.position);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 2 * Time.deltaTime);
     }
 
-    //Turn head with the wanted angle
     private void TurnHead(Quaternion targetAngles)
     {
         if (isTurningHead)
             transform.rotation = Quaternion.Slerp(transform.rotation, targetAngles, 0.02f);
     }
 
-    //Action when the NPC get kill
     public void GetSilentKill(bool firstOrSecond)
     {
         if (firstOrSecond)
@@ -324,36 +330,38 @@ public class NPCcontroller : MonoBehaviour
 
     private void UpdateTacticalMode()
     {
-        if (yourTurn)
+        if (yourTurn && !dead)
         {
             if (!SettingPathBool)
                 StartCoroutine(LateUp(0.1f));
             if (isMoving)
                 ReachPointDestination();
 
-            if (!alerted)
+
+            if(randomPosTrigger && !oneAction)
             {
-                if (!distracted)
-                {
-                    if (isPatroling)
-                    {
-                        if (!oneAction)
-                            PatrolTactial();
-                    }
-                    else if (!oneAction)
-                        StartCoroutine(waitBeforeChangeTurn(2));
-                }
-                else if (!oneAction)
-                    DistractTactical(distractPos);
+                Debug.Log("random");
+                RandomPositionTactical();
+            }
+            else if (alerted && !oneAction)
+            {
+                Debug.Log("alerted");
+                AlertTactical(alertedPos);
+            }
+            else if (distracted && !oneAction)
+            {
+                Debug.Log("distract");
+                DistractTactical(distractPos);
+            }
+            else if (isPatroling && !oneAction)
+            {
+                Debug.Log("patrol");
+                PatrolTactial();
             }
             else if (!oneAction)
             {
-                distractPos = playerScript.transform.position;
-                AlertTactical(distractPos);
+                StartCoroutine(waitBeforeChangeTurn(2));
             }
-
-           
-            
         }
         else
         {
@@ -387,7 +395,9 @@ public class NPCcontroller : MonoBehaviour
 
     private void ReachPointDestination()
     {
-        float dist = Vector3.Distance(transform.position, pos);
+
+        Vector3 newPos = new Vector3(pos.x, transform.position.y - 0.5f, pos.z);
+        float dist = Vector3.Distance(transform.position, newPos);
 
         // Debug.Log(dist);
         if (dist <= 0.5f)
@@ -397,19 +407,22 @@ public class NPCcontroller : MonoBehaviour
                 Walk(false);
                 oneAction = true;
                 isMoving = false;
-                if (fov.iSeeYou)
+                if (fov.iSeeYou || playerNear)
                 {
                     KillPlayer();
                 }
                 else
                 {
-                    StartCoroutine(waitBeforeChangeTurn(2));
+                    if(dead)
+                        StartCoroutine(waitBeforeChangeTurn(0));
+                    else
+                        StartCoroutine(waitBeforeChangeTurn(2));
                 }
             }
             else
                 indexAction++;
 
-            if (isPatroling)
+            if (isPatroling && !distracted && !alerted)
             {
                 switch (loop)
                 {
@@ -445,7 +458,18 @@ public class NPCcontroller : MonoBehaviour
                 }
             }
 
-           
+            if (randomPosTrigger && indexRandom == 2)
+            {
+                randomPosTrigger = false;
+                indexRandom = 0;
+            }
+
+            if(alerted && indexAlert == 3)
+            {
+                randomPosTrigger = true;
+                alerted = false;
+                indexAlert = 0;
+            }
         }
     }
 
@@ -525,6 +549,8 @@ public class NPCcontroller : MonoBehaviour
                     pos = hitFirst.transform.position;
                     MovementTactical();
                     oneAction = true;
+                    randomPosTrigger = true;
+                    distracted = false;
                     Debug.Log("toShort");
                     return;
                 }
@@ -571,7 +597,7 @@ public class NPCcontroller : MonoBehaviour
             Cover[] cover = coverList.ToArray();
             List<GameObject> selectCoverList = new List<GameObject>();
             Vector3 finalPos = Vector3.zero;
-            float lastClosestDistance = Vector3.Distance(transform.position, position);
+            float lastClosestDistance = Vector3.Distance(transform.position, Vector3.positiveInfinity);
             for (int i = 0; i < cover.Length; i++)
             {
                 cover[i].offsetLocalPos.transform.position = position;
@@ -582,6 +608,19 @@ public class NPCcontroller : MonoBehaviour
                 cover[i].offsetLocalPos.transform.position = cover[i].transform.position;
             }
 
+
+            RaycastHit hitFirst;
+            if (Physics.Raycast(position, Vector3.down, out hitFirst, blockMask))
+            {
+                if (hitFirst.transform.GetComponent<Block>().pathIndex != 0)
+                {
+                    randomPosTrigger = true;
+                    alerted = false;
+
+                    if(hitFirst.transform.GetComponent<Block>().pathIndex <= unitsRangeMovement / 2 && playerSpotted)
+                        playerNear = true;
+                }
+            }
 
             GameObject[] selectCover = selectCoverList.ToArray();
             for (int i = 0; i < selectCover.Length; i++)
@@ -595,11 +634,75 @@ public class NPCcontroller : MonoBehaviour
                 }
             }
 
+            Debug.Log(position);
             pos = new Vector3(finalPos.x,0.1f,finalPos.z);
             //Debug.Log(finalPos);
+            indexAlert++;
             MovementTactical();
             oneAction = true;
         }
+    }
+
+    private void GetClosestCover()
+    {
+        if (SettingPathBool)
+        {
+            Cover[] cover = coverList.ToArray();
+            List<GameObject> selectCoverList = new List<GameObject>();
+            Vector3 finalPos = Vector3.zero;
+            float lastClosestDistance = Vector3.Distance(transform.position, Vector3.positiveInfinity);
+            for (int i = 0; i < cover.Length; i++)
+            {
+                cover[i].offsetLocalPos.transform.position = playerScript.transform.position;
+
+                if (cover[i].offsetLocalPos.transform.localPosition.z > 1)
+                    selectCoverList.Add(cover[i].gameObject);
+
+                cover[i].offsetLocalPos.transform.position = cover[i].transform.position;
+            }
+
+            GameObject[] selectCover = selectCoverList.ToArray();
+            for (int i = 0; i < selectCover.Length; i++)
+            {
+                float testDistance = Vector3.Distance(selectCover[i].transform.position, transform.position);
+
+                if (testDistance < lastClosestDistance)
+                {
+                    lastClosestDistance = testDistance;
+                    finalPos = selectCover[i].transform.position;
+                }
+            }
+
+            pos = new Vector3(finalPos.x, 0.1f, finalPos.z);
+            //Debug.Log(finalPos);
+            MovementTactical();
+            alerted = true;
+            oneAction = true;
+        }
+    }
+
+    private void RandomPositionTactical()
+    {
+        Vector3 randomDirection = Random.insideUnitSphere * unitsRangeMovement;
+        randomDirection += lastKnowPosition;
+        NavMeshHit hit;
+        Vector3 finalPosition = Vector3.zero;
+        NavMesh.SamplePosition(randomDirection, out hit, unitsRangeMovement, 1);
+        RaycastHit hitBlock;
+        if (Physics.Raycast(hit.position, Vector3.down, out hitBlock, blockMask))
+        {
+           finalPosition = hitBlock.transform.position;
+        }
+        else
+        {
+            finalPosition = hit.position;
+        }
+
+        indexRandom++;
+        targetPosition = finalPosition;
+        pos = finalPosition;
+        MovementTactical();
+        oneAction = true;
     }
 
     private void ResetVariables()
@@ -615,6 +718,22 @@ public class NPCcontroller : MonoBehaviour
         blockList.Clear();
         coverList.Clear();
     }
+
+    public void HeardSomething()
+    {
+        randomPosTrigger = false;
+        indexRandom = 0;
+        distracted = true;
+    }
+
+    public void GetAlerted()
+    {
+        randomPosTrigger = false;
+        alerted = true;
+        indexAlert = 0;
+        indexRandom = 0;
+    }
+
     #endregion
 
     #region Animation
@@ -710,6 +829,13 @@ public class NPCcontroller : MonoBehaviour
         ResetVariables();
     }
 
+    public IEnumerator SeeCorpsTactical()
+    {
+        nav.isStopped = true;
+        Walk(false);
+        yield return new WaitForSeconds(2);
+        GetClosestCover();
+    }
     //public IEnumerator SetActiveWithCooldown(float time, Image image)
     //{
     //    image.gameObject.SetActive(true);

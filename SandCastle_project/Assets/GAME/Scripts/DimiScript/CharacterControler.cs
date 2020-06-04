@@ -288,8 +288,8 @@ public class CharacterControler : MonoBehaviour
 
     private void ReachPointDestination()
     {
-        float dist = Vector3.Distance(transform.position, pos);
-
+        Vector3 newPos = new Vector3(pos.x, transform.position.y - 0.5f, pos.z);
+        float dist = Vector3.Distance(transform.position, newPos);
            // Debug.Log(dist);
         if (dist <= 0.5f)
         {
