@@ -53,8 +53,9 @@ public class Block : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (one < 2)
+        if (one < 3)
         {
+            
             GetAdjacentBlock();
             StairSetUp();
             one++;
@@ -208,6 +209,8 @@ public class Block : MonoBehaviour
     public void GetAdjacentBlock()
     {
         Collider[] AdjacentBlock = Physics.OverlapSphere(transform.position, 1, blockMask);
+
+
 
         for (int i = 0; i < AdjacentBlock.Length; i++)
         {

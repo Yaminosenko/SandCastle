@@ -70,6 +70,7 @@ public class CameraController : MonoBehaviour
             system.cam = GetComponent<CameraController>();
         offsetRotate.position = player.position;
         playerScript = player.GetComponent<CharacterControler>();
+        playerScript.camControl = this;
     }
     void LateUpdate()
     {
@@ -120,7 +121,7 @@ public class CameraController : MonoBehaviour
     {
         if (turnPlayer)
         {
-            if (playerScript.isMoving)
+            if (playerScript.isMoving || playerScript.selectDevice)
             {
                 FollowTargetTactical();
             }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SytemTurn : MonoBehaviour
 {
@@ -62,13 +63,18 @@ public class SytemTurn : MonoBehaviour
     public void EndPlayerTurn()
     {
         NPCcontroller[] npcTab = actualEnnemy.ToArray();
-       
         npcTurn = npcTab[0];
+        nbrTurnMax = actualEnnemy.ToArray().Length;
+        cam.turnPlayer = false;
+
+        if (npcTurn.dead == true)
+        {
+            NextTurn();
+            return;
+        }
         npcTurn.system = GetComponent<SytemTurn>();
         npcTurn.Walk(false);
-        nbrTurnMax = actualEnnemy.ToArray().Length;
         cam.target = npcTurn.transform;
-        cam.turnPlayer = false;
         npcTurn.yourTurn = true;
     }
 
@@ -77,6 +83,18 @@ public class SytemTurn : MonoBehaviour
         indexNbrTurn = 0; 
     }
 
+    public void KillPlayerSystem(NPCcontroller npc)
+    {
+        player.DontMove();
+        cam.turnPlayer = false;
+        player.turnPlayer = false;
+        cam.target = npc.transform;
+    }
+
+    public void Restart()
+    {
+        SceneManager.LoadScene(0, LoadSceneMode.Single);
+    }
 
     IEnumerator waitEndTurnNPC()
     {

@@ -26,6 +26,7 @@ public class NPCcontroller : MonoBehaviour
     [Header("combat")]
     public float damage = 25;
     public List<NPCcontroller> deadAlly = new List<NPCcontroller>();
+    public Transform offsetCam;
 
 
     [Header("Tactical")]
@@ -56,7 +57,8 @@ public class NPCcontroller : MonoBehaviour
     public LayerMask blockMask;
     public int IndexRandomPos;
     public SytemTurn system;
-
+    public CameraShoulderMouv camScriptInst;
+    public GameObject camShoulder;
 
 
     private Vector3 sentinelPosition;
@@ -82,6 +84,7 @@ public class NPCcontroller : MonoBehaviour
     private int indexAction;
     private int indexRandom;
     private int indexAlert;
+    private Camera cam;
 
     #endregion
 
@@ -90,8 +93,9 @@ public class NPCcontroller : MonoBehaviour
     private void OnEnable()
     {
         playerScript = GameObject.Find("Character").GetComponentInChildren<CharacterControler>();
+        system = GameObject.Find("SystemTurn").GetComponent<SytemTurn>();
         distractPos = playerScript.gameObject.transform.position;
-       
+        cam = Camera.main;
         FreeMode = !playerScript.TacticalMode;
         IndexPatrolMax = PatrolPath.Length;
         nav = GetComponent<NavMeshAgent>();
@@ -725,6 +729,8 @@ public class NPCcontroller : MonoBehaviour
         randomPosTrigger = false;
         indexRandom = 0;
         distracted = true;
+        if (alerted)
+            alertedPos = distractPos;
     }
 
     public void GetAlerted()
@@ -733,6 +739,36 @@ public class NPCcontroller : MonoBehaviour
         alerted = true;
         indexAlert = 0;
         indexRandom = 0;
+    }
+
+    private void InstanciateCamera(Transform target)
+    {
+
+        GameObject _currentCam = (GameObject)Instantiate(camShoulder, cam.transform.position, cam.transform.rotation) as GameObject;
+        //Debug.Log(_currentCam);
+        camScriptInst = _currentCam.GetComponent<CameraShoulderMouv>();
+        //_camSwitch.cameraOne = _currentCam;
+        //_camSwitch.cameraChangeCounter();
+        camScriptInst.targetObj = target;
+        camScriptInst.views[0] = offsetCam.transform;
+        camScriptInst.LetsGo();
+        fov.camShoulder = camScriptInst;
+
+        //if (_currentFov._actualTarget != null)
+        //{
+        //    _currentFov._actualTarget = _camMouv.targetObj;
+        //}
+
+    }
+
+    public void KillPlayerTactical(Transform target)
+    {
+        int random = Random.Range(0, 1);
+        Debug.Log(random);
+        if(random == 1)
+            InstanciateCamera(target);
+        system.KillPlayerSystem(this);
+        StartCoroutine(KillPlayerAnim());
     }
 
     #endregion
@@ -843,8 +879,17 @@ public class NPCcontroller : MonoBehaviour
     //    image.gameObject.SetActive(false);
     //}
 
+    public IEnumerator KillPlayerAnim()
+    {
+        Fire(true);
+        yield return new WaitForSeconds(1);
+        Fire(false);
+        playerScript.Death();
+        yield return new WaitForSeconds(3);
+        system.Restart();
+    }
+
 
 
     #endregion
-
 }
