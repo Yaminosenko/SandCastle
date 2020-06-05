@@ -66,7 +66,8 @@ public class CameraController : MonoBehaviour
         angleTarget[2] = 225;
         angleTarget[3] = 315;
         target = player;
-        system.cam = GetComponent<CameraController>();
+        if(system != null)
+            system.cam = GetComponent<CameraController>();
         offsetRotate.position = player.position;
         playerScript = player.GetComponent<CharacterControler>();
     }

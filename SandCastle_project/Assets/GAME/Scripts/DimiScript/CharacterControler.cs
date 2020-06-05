@@ -19,6 +19,9 @@ public class CharacterControler : MonoBehaviour
     public Material mRenderCant;
     public Animator anim;
     public SytemTurn system;
+    public GameObject offsetCamShoulder;
+    public GameObject camShoulder;
+    public CameraShoulderMouv camScriptInst;
 
     [Header("FreeMode")]
     public float speedPlayer = 4;
@@ -54,6 +57,7 @@ public class CharacterControler : MonoBehaviour
     private List<Vector3> pathWaypoint = new List<Vector3>();
     private bool statick;
     private FieldOfView fov;
+    private bool isAiming;
 
     #endregion 
 
@@ -64,7 +68,8 @@ public class CharacterControler : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         nav = GetComponent<NavMeshAgent>();
         fov = GetComponent<FieldOfView>();
-        system.player = gameObject.GetComponent<CharacterControler>();
+        if(system != null)
+            system.player = gameObject.GetComponent<CharacterControler>();
     }
     private void Update()
     {
@@ -79,11 +84,30 @@ public class CharacterControler : MonoBehaviour
             if (turnPlayer)
             {
                 skin.rotation = transform.rotation;
-                Movement();
+                if(!isAiming)
+                    Movement();
+                else
+                {
+                    if (Input.GetKeyDown(KeyCode.O))
+                        ShootKill();
+                }
                 if (!SettingPathBool)
                     StartCoroutine(LateUp(0.1f));
                 if(isMoving)
                     ReachPointDestination();
+
+                if (!cantMove)
+                {
+                    if (Input.GetKeyDown(KeyCode.Alpha1))
+                    {
+                        Aim();
+                    }
+
+                    if (Input.GetKeyDown(KeyCode.Escape))
+                    {
+                        UnAim();
+                    }
+                }
             }
         }
 
@@ -105,6 +129,11 @@ public class CharacterControler : MonoBehaviour
                 //sStartCoroutine(changeCamMode(1f, true));
             }
         }
+
+        //if (Input.GetKeyDown(KeyCode.M))
+        //{
+        //    InstanciateCamera();
+        //}
     }
 
     #endregion
@@ -228,7 +257,6 @@ public class CharacterControler : MonoBehaviour
             }
         }
     }
-
 
     private void PreviewPath(RaycastHit hit)
     {
@@ -387,6 +415,7 @@ public class CharacterControler : MonoBehaviour
         {
             turnPlayer = false;
             actionPointIndex = 0;
+            UnAim();
             StartCoroutine(ChangeTurn());
             return false;
         }
@@ -410,6 +439,62 @@ public class CharacterControler : MonoBehaviour
         pathWaypoint.Clear();
         limits.Clear();
     }
+
+    private void InstanciateCamera()
+    {
+
+        GameObject _currentCam = (GameObject)Instantiate(camShoulder, cam.transform.position, cam.transform.rotation) as GameObject;
+        //Debug.Log(_currentCam);
+        camScriptInst = _currentCam.GetComponent<CameraShoulderMouv>();
+        //_camSwitch.cameraOne = _currentCam;
+        //_camSwitch.cameraChangeCounter();
+        camScriptInst.views[0] = offsetCamShoulder.transform;
+        camScriptInst.LetsGo();
+        fov.camShoulder = camScriptInst;
+
+        //if (_currentFov._actualTarget != null)
+        //{
+        //    _currentFov._actualTarget = _camMouv.targetObj;
+        //}
+
+    }
+
+    private void Aim()
+    {
+        pathPreviewLine.positionCount = 0;
+        pathWaypoint.Clear();
+        isAiming = true;
+        fov._swap = true;
+        fov._isAimaing = true;
+        InstanciateCamera();
+        fov.Refresh();
+    }
+
+    private void UnAim()
+    {
+        isAiming = false;
+        if(camScriptInst != null)
+        {
+            camScriptInst._isActive = true;
+            camScriptInst.DestroyObject();
+        }
+    }
+
+    private void ShootKill()
+    {
+        Transform npc;
+        if (fov._actualTarget != null)
+        {
+            npc = fov._actualTarget;
+            npc.GetComponent<NPCcontroller>().GetKill(false);
+            actionPointIndex++;
+            if (StillYourTurn())
+            {
+                
+            }
+        }
+    }
+
     #endregion
 
     #region Animations
@@ -455,6 +540,17 @@ public class CharacterControler : MonoBehaviour
         //cantMove = false;
         //SettingPathBool = false;
         //NextTurn();
+    }
+
+    IEnumerator KillNPC(float time)
+    {
+        
+        yield return new WaitForSeconds(2);
+        actionPointIndex++;
+        if(StillYourTurn())
+        {
+            UnAim();
+        }
     }
     #endregion
 

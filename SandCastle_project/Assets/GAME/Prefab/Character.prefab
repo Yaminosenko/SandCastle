@@ -60,7 +60,38 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 8701447331255753449}
+  - {fileID: 4791008132128021804}
   m_Father: {fileID: 832849505037898308}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6619362068593950029
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4791008132128021804}
+  m_Layer: 11
+  m_Name: offsetCamShodler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4791008132128021804
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6619362068593950029}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1, y: 1, z: -2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 832849505662247656}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &4448277632623882739
@@ -205,6 +236,17 @@ PrefabInstance:
       propertyPath: anim
       value: 
       objectReference: {fileID: 1606593194040080275}
+    - target: {fileID: 5146668735904368488, guid: 16bcdbce376427947acfa08e48bdb523,
+        type: 3}
+      propertyPath: offsetCamShoulder
+      value: 
+      objectReference: {fileID: 6619362068593950029}
+    - target: {fileID: 5146668735904368488, guid: 16bcdbce376427947acfa08e48bdb523,
+        type: 3}
+      propertyPath: camShoulder
+      value: 
+      objectReference: {fileID: 3575698755927005625, guid: 06eb120f8b47bbc46ac78074997b5eda,
+        type: 3}
     - target: {fileID: 5146668735904368493, guid: 16bcdbce376427947acfa08e48bdb523,
         type: 3}
       propertyPath: m_LocalPosition.x
