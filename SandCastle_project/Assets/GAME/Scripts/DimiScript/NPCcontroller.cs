@@ -177,7 +177,7 @@ public class NPCcontroller : MonoBehaviour
     private void Patrol()
     {
         Vector3 TargetPoint = PatrolPath[indexPatrol].position;
-        TargetPoint.y = 0.5f;
+        //TargetPoint.y = 0.5f;
         float distance = Vector3.Distance(TargetPoint, transform.position);
         targetPosition = TargetPoint;
 
