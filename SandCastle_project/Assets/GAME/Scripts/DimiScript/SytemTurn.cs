@@ -16,7 +16,8 @@ public class SytemTurn : MonoBehaviour
 
     private void Start()
     {
-        nbrTurnMax = actualEnnemy.ToArray().Length;    
+        nbrTurnMax = actualEnnemy.ToArray().Length;
+        cam = Camera.main.GetComponent<CameraController>();
     }
 
 
