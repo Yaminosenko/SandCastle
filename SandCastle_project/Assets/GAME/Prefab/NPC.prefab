@@ -79,6 +79,36 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!1 &1047551118822451856
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4875875576965515871}
+  m_Layer: 12
+  m_Name: offsetCam
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4875875576965515871
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1047551118822451856}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0, y: 2.25, z: -1.75}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2506836205671459620}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2506836205439051253
 GameObject:
   m_ObjectHideFlags: 0
@@ -196,20 +226,19 @@ MonoBehaviour:
   cooldownSeekModeMax: 4
   damage: 25
   deadAlly: []
+  offsetCam: {fileID: 4875875576965515871}
   pos: {x: 0, y: 0, z: 0}
   distractPos: {x: 0, y: 0, z: 0}
-  offsetAlertLocalPos: {fileID: 333907666193656180}
+  alertedPos: {x: 0, y: 0, z: 0}
   unitsRangeMovement: 10
+  playerSpotted: 0
   yourTurn: 0
   alerted: 0
   distracted: 0
   cooldownShootMax: 0.2
   anim: {fileID: 4256069713951752743}
-  position: {x: 0, y: 0, z: 0}
-  player: {fileID: 0}
   targetPosition: {x: 0, y: 0, z: 0}
   lastKnowPosition: {x: 0, y: 0, z: 0}
-  head: {fileID: 0}
   trigger: {fileID: 0}
   heard: 0
   stopPatrol: 0
@@ -224,6 +253,9 @@ MonoBehaviour:
     m_Bits: 256
   IndexRandomPos: 0
   system: {fileID: 0}
+  camScriptInst: {fileID: 0}
+  camShoulder: {fileID: 3575698755927005625, guid: 06eb120f8b47bbc46ac78074997b5eda,
+    type: 3}
 --- !u!114 &5478412904192090675
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -274,6 +306,7 @@ MonoBehaviour:
   _actuaTargetCover: 0
   _isFlank: 0
   _isOverwatched: 0
+  camShoulder: {fileID: 0}
   acted: 0
 --- !u!1 &2506836205671459621
 GameObject:
@@ -303,6 +336,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 6168413181001609053}
+  - {fileID: 4875875576965515871}
   m_Father: {fileID: 2506836205439051251}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

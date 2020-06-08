@@ -182,7 +182,8 @@ public class FieldOfView : MonoBehaviour {
         }
         else if (target.gameObject.layer == 11 && !FreeMode)
         {
-
+            npc.KillPlayerTactical(target);
+            _isActive = false;
         }
         else if(target.gameObject.layer == 12 && target.GetComponent<NPCcontroller>().dead && FreeMode)
         {
@@ -229,15 +230,6 @@ public class FieldOfView : MonoBehaviour {
             }
         }
     }
-
-    //private void AddPlayerTarget(Transform target)
-    //{
-    //    for (int i = 0; i < targetInSight.ToArray().Length; i++)
-    //    {
-
-    //    }
-    //    targetInSight.Add(target);
-    //}
 
     public void AimTarget() //lance à la fin du déplacement penser a clear a la fin du tour 
     {

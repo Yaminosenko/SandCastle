@@ -22,11 +22,12 @@ public class CharacterControler : MonoBehaviour
     public GameObject offsetCamShoulder;
     public GameObject camShoulder;
     public CameraShoulderMouv camScriptInst;
+    public CameraController camControl;
 
     [Header("FreeMode")]
     public float speedPlayer = 4;
     public bool isOnCombat;
-
+    public List<Device> deviceList = new List<Device>();
 
     [Header("TacticalMode")]
     public bool TacticalMode = false;
@@ -43,6 +44,7 @@ public class CharacterControler : MonoBehaviour
     public List<GameObject> limits = new List<GameObject>();
     public bool notInArea;
     public bool SettingPathBool;
+    public bool selectDevice;
 
     //private
     private Vector3 move;
@@ -58,6 +60,9 @@ public class CharacterControler : MonoBehaviour
     private bool statick;
     private FieldOfView fov;
     private bool isAiming;
+    private bool occuped;
+    private int deviceIndex;
+    private int maxDeviceIndex;
 
     #endregion 
 
@@ -98,14 +103,27 @@ public class CharacterControler : MonoBehaviour
 
                 if (!cantMove)
                 {
-                    if (Input.GetKeyDown(KeyCode.Alpha1))
+
+                    if (selectDevice)
+                        DeviceChoice();
+
+                    if (Input.GetKeyDown(KeyCode.Alpha1) && !occuped)
                     {
                         Aim();
+                        occuped = true;
                     }
 
                     if (Input.GetKeyDown(KeyCode.Escape))
                     {
                         UnAim();
+                        selectDevice = false;
+                        occuped = false;
+                    }
+
+                    if (Input.GetKeyDown(KeyCode.Alpha2) && !occuped)
+                    {
+                        selectDevice = true;
+                        occuped = true;
                     }
                 }
             }
@@ -221,6 +239,7 @@ public class CharacterControler : MonoBehaviour
                     if (Input.GetMouseButtonDown(1) && hit.transform.GetComponent<Block>().pathIndex != 0)
                     {
                         pos = new Vector3(hit.collider.transform.position.x, hit.collider.transform.position.y + transform.position.y, hit.collider.transform.position.z);
+                        camControl.target = transform;
                         nav.SetDestination(pos);
                         cantMove = true;
                         isMoving = true;
@@ -245,6 +264,7 @@ public class CharacterControler : MonoBehaviour
                             {
                                 pos = new Vector3(hitAll.collider.transform.position.x, hitAll.collider.transform.position.y + transform.position.y, hitAll.collider.transform.position.z);
                                 nav.SetDestination(pos);
+                                camControl.target = transform; 
                                 cantMove = true;
                                 isMoving = true;
                                 actionPointIndex++;
@@ -407,7 +427,44 @@ public class CharacterControler : MonoBehaviour
     }
     #endregion
 
-    #region ActionTacticalMode
+    #region Action Tactical Methods
+
+    public void DeviceChoice()
+    {
+        Debug.Log(deviceIndex);
+        Device[] deviceTab = deviceList.ToArray();
+        maxDeviceIndex = deviceTab.Length;
+        Device selectDevice = null;
+        for (int i = 0; i < deviceTab.Length; i++)
+        {
+            if(deviceIndex == i)
+            {
+                camControl.target = deviceTab[i].transform;
+                selectDevice = deviceTab[i];
+            }
+        }
+
+        selectDevice.PreviewRangeDevice();
+        if (Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            selectDevice.SecuSound();
+            actionPointIndex++;
+            if (StillYourTurn())
+            {
+                occuped = false;
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            deviceIndex++;
+            if (deviceIndex == maxDeviceIndex)
+                deviceIndex = 0;
+        }
+    }
+
+    #endregion
+
+    #region Other Tactical Methods
 
     private bool StillYourTurn()
     {
@@ -416,6 +473,7 @@ public class CharacterControler : MonoBehaviour
             turnPlayer = false;
             actionPointIndex = 0;
             UnAim();
+            occuped = false;
             StartCoroutine(ChangeTurn());
             return false;
         }
@@ -490,9 +548,15 @@ public class CharacterControler : MonoBehaviour
             actionPointIndex++;
             if (StillYourTurn())
             {
-                
+                UnAim();
             }
         }
+    }
+
+    public void DontMove()
+    {
+        nav.isStopped = true;
+        Run(false);
     }
 
     #endregion
@@ -520,6 +584,11 @@ public class CharacterControler : MonoBehaviour
     public void CrouchIdle(bool b)
     {
         anim.SetBool("CrouchIdle", b);
+    }
+
+    public void Death()
+    {
+        anim.SetTrigger("death");
     }
 
     #endregion
