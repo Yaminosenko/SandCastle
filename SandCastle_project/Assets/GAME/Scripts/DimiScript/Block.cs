@@ -61,7 +61,7 @@ public class Block : MonoBehaviour
             one++;
         }
 
-        if (!player.TacticalMode)
+        if (!player.TacticalMode || player.selectDevice)
             mesh.enabled = false;
             
         if (Input.GetKeyDown(KeyCode.P))
@@ -290,7 +290,7 @@ public class Block : MonoBehaviour
 
     public void Over()
     {
-        if (player.TacticalMode && !player.isMoving && player.turnPlayer)
+        if (player.TacticalMode && !player.isMoving && player.turnPlayer && !player.selectDevice)
         {
             mesh.enabled = true;
             if(pathIndex != 0)

@@ -27,6 +27,7 @@ public class NPCcontroller : MonoBehaviour
     public float damage = 25;
     public List<NPCcontroller> deadAlly = new List<NPCcontroller>();
     public Transform offsetCam;
+    public List<NPCcontroller> allyNPC = new List<NPCcontroller>();
 
 
     [Header("Tactical")]
@@ -187,7 +188,7 @@ public class NPCcontroller : MonoBehaviour
 
 
 
-        if (distance <= 1)
+        if (distance <= 0.5f)
         {
             switch (loop)
             {
@@ -765,7 +766,7 @@ public class NPCcontroller : MonoBehaviour
     {
         int random = Random.Range(0, 1);
         Debug.Log(random);
-        if(random == 1)
+        if(random == 0)
             InstanciateCamera(target);
         system.KillPlayerSystem(this);
         StartCoroutine(KillPlayerAnim());
@@ -777,7 +778,7 @@ public class NPCcontroller : MonoBehaviour
 
     public void Walk(bool b)
     {
-        anim.SetBool("Walk", b);
+        anim.SetBool("walkAlert", b);
     }
 
     public void Run(bool b)
@@ -785,10 +786,10 @@ public class NPCcontroller : MonoBehaviour
         anim.SetBool("Run", b);
     }
 
-    public void Fire(bool b)
-    {
-        anim.SetBool("Fire", b);
-    }
+    //public void Fire(bool b)
+    //{
+    //    anim.SetBool("Fire", b);
+    //}
 
     public void BackStabDeath()
     {
@@ -799,6 +800,8 @@ public class NPCcontroller : MonoBehaviour
     {
         anim.SetBool("CrouchIdle", b);
     }
+
+
     #endregion
 
     #region Coroutine
@@ -881,9 +884,9 @@ public class NPCcontroller : MonoBehaviour
 
     public IEnumerator KillPlayerAnim()
     {
-        Fire(true);
+        //Fire(true);
         yield return new WaitForSeconds(1);
-        Fire(false);
+        //Fire(false);
         playerScript.Death();
         yield return new WaitForSeconds(3);
         system.Restart();

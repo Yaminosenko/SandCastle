@@ -141,9 +141,11 @@ public class FieldOfView : MonoBehaviour {
                     if (!Physics.Raycast(t.position, dirToTarget, out hit, dstToTarget, obstacleMask))
                     {
                         //Debug.Log(dstToTarget);
-                        visibleTargets.Add(target);
+                        
                         if(!playerFOV)
                             AddNPCTarget(target);
+                        else if(!target.transform.GetComponent<NPCcontroller>().dead)
+                            visibleTargets.Add(target);
                     }
                     else if (Physics.Raycast(t.position, dirToTarget, out hit, dstToTarget, obstacleMask))
                     {
@@ -155,7 +157,8 @@ public class FieldOfView : MonoBehaviour {
                         }
                         else if(hit.transform.gameObject.tag == "Obs1" && playerFOV)
                         {
-                            visibleTargets.Add(target);
+                            if (!target.transform.GetComponent<NPCcontroller>().dead)
+                                visibleTargets.Add(target);
                         }
                     }
                     else
@@ -190,7 +193,11 @@ public class FieldOfView : MonoBehaviour {
             NPCcontroller[] list = npc.deadAlly.ToArray();
             if(list.Length == 0)
             {
-                //pensé a alerté les autres guard du secteur
+                for (int i = 0; i < npc.allyNPC.ToArray().Length; i++)
+                {
+                    npc.allyNPC.ToArray()[i].alertedPos = player.transform.position;
+                    npc.allyNPC.ToArray()[i].GetAlerted();
+                }
                 //npc.alerted = true;
                 npc.deadAlly.Add(target.GetComponent<NPCcontroller>());
                 StartCoroutine(npc.HeardOrSeeWait(1, target.position, false));
@@ -211,7 +218,11 @@ public class FieldOfView : MonoBehaviour {
             NPCcontroller[] list = npc.deadAlly.ToArray();
             if (list.Length == 0)
             {
-                //pensé a alerté les autres guard du secteur
+                for (int i = 0; i < npc.allyNPC.ToArray().Length; i++)
+                {
+                    npc.allyNPC.ToArray()[i].alertedPos = player.transform.position;
+                    npc.allyNPC.ToArray()[i].GetAlerted();
+                }
                 StartCoroutine(npc.SeeCorpsTactical());
                 npc.deadAlly.Add(target.GetComponent<NPCcontroller>());
                 npc.alertedPos = player.transform.position;
@@ -221,7 +232,11 @@ public class FieldOfView : MonoBehaviour {
             {
                 if (target != list[i].transform)
                 {
-                    //pensé a alerté les autres guard du secteur
+                    for (int o = 0; o < npc.allyNPC.ToArray().Length; o++)
+                    {
+                        npc.allyNPC.ToArray()[o].alertedPos = player.transform.position;
+                        npc.allyNPC.ToArray()[o].GetAlerted();
+                    }
                     StartCoroutine(npc.SeeCorpsTactical());
                     npc.deadAlly.Add(target.GetComponent<NPCcontroller>());
                     npc.alertedPos = player.transform.position;

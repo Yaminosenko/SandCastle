@@ -45,6 +45,7 @@ public class CharacterControler : MonoBehaviour
     public bool notInArea;
     public bool SettingPathBool;
     public bool selectDevice;
+    public bool targetPlayer;
 
     //private
     private Vector3 move;
@@ -63,6 +64,7 @@ public class CharacterControler : MonoBehaviour
     private bool occuped;
     private int deviceIndex;
     private int maxDeviceIndex;
+    private Device selectDeviceScript;
 
     #endregion 
 
@@ -118,12 +120,18 @@ public class CharacterControler : MonoBehaviour
                         UnAim();
                         selectDevice = false;
                         occuped = false;
+                        camControl.target = transform;
+                        if (selectDeviceScript != null)
+                            selectDeviceScript.ResetPreview();
+                        StartCoroutine(CamTargetPlayer());
                     }
 
                     if (Input.GetKeyDown(KeyCode.Alpha2) && !occuped)
                     {
                         selectDevice = true;
                         occuped = true;
+                        pathPreviewLine.positionCount = 0;
+                        pathWaypoint.Clear();
                     }
                 }
             }
@@ -280,57 +288,60 @@ public class CharacterControler : MonoBehaviour
 
     private void PreviewPath(RaycastHit hit)
     {
-        if (secuPathPreview != hit.transform.position)
+        if (!occuped)
         {
-            pathWaypoint.Clear();
-            NavMeshPath path = new NavMeshPath();
-            nav.CalculatePath(hit.transform.position , path);
-
-            for (int i = 0; i < path.corners.Length; i++)
+            if (secuPathPreview != hit.transform.position)
             {
-                Vector3 corners = new Vector3(path.corners[i].x, path.corners[i].y + 0.5f, path.corners[i].z);
-                RaycastHit wayHit;
-                if (Physics.Raycast(corners, Vector3.down, out wayHit, blockMask))
-                {
-                    pathWaypoint.Add(new Vector3(wayHit.transform.position.x, wayHit.transform.position.y + 0.5f, wayHit.transform.position.z));
-                }
-            }
+                pathWaypoint.Clear();
+                NavMeshPath path = new NavMeshPath();
+                nav.CalculatePath(hit.transform.position, path);
 
-
-            if(hit.transform.gameObject.GetComponent<Block>() != null)
-            {
-                if (hit.transform.gameObject.GetComponent<Block>().pathIndex == 0)
+                for (int i = 0; i < path.corners.Length; i++)
                 {
-                    pathPreviewLine.material = mRenderCant;
-                    if (limits.ToArray().Length != 0)
+                    Vector3 corners = new Vector3(path.corners[i].x, path.corners[i].y + 0.5f, path.corners[i].z);
+                    RaycastHit wayHit;
+                    if (Physics.Raycast(corners, Vector3.down, out wayHit, blockMask))
                     {
-                        for (int i = 0; i < limits.ToArray().Length; i++)
+                        pathWaypoint.Add(new Vector3(wayHit.transform.position.x, wayHit.transform.position.y + 0.5f, wayHit.transform.position.z));
+                    }
+                }
+
+
+                if (hit.transform.gameObject.GetComponent<Block>() != null)
+                {
+                    if (hit.transform.gameObject.GetComponent<Block>().pathIndex == 0)
+                    {
+                        pathPreviewLine.material = mRenderCant;
+                        if (limits.ToArray().Length != 0)
                         {
-                            limits.ToArray()[i].GetComponent<MeshRenderer>().material = mRenderCant;
-                            notInArea = true;
+                            for (int i = 0; i < limits.ToArray().Length; i++)
+                            {
+                                limits.ToArray()[i].GetComponent<MeshRenderer>().material = mRenderCant;
+                                notInArea = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        pathPreviewLine.material = mRenderClassic;
+                        if (limits.ToArray().Length != 0)
+                        {
+                            for (int i = 0; i < limits.ToArray().Length; i++)
+                            {
+                                limits.ToArray()[i].GetComponent<MeshRenderer>().material = mRenderClassic;
+                                notInArea = false;
+                            }
                         }
                     }
                 }
-                else
-                {
-                    pathPreviewLine.material = mRenderClassic;
-                    if (limits.ToArray().Length != 0)
-                    {
-                        for (int i = 0; i < limits.ToArray().Length; i++)
-                        {
-                            limits.ToArray()[i].GetComponent<MeshRenderer>().material = mRenderClassic;
-                            notInArea = false;
-                        }
-                    }
-                }
+
+
+                Vector3[] waypoints = pathWaypoint.ToArray();
+                pathPreviewLine.positionCount = waypoints.Length;
+                pathPreviewLine.SetPositions(waypoints);
+
+                secuPathPreview = hit.transform.position;
             }
-          
-
-            Vector3[] waypoints = pathWaypoint.ToArray();
-            pathPreviewLine.positionCount = waypoints.Length;
-            pathPreviewLine.SetPositions(waypoints);
-
-            secuPathPreview = hit.transform.position;
         }
     }
 
@@ -431,34 +442,63 @@ public class CharacterControler : MonoBehaviour
 
     public void DeviceChoice()
     {
-        Debug.Log(deviceIndex);
+        //Debug.Log(deviceIndex);
         Device[] deviceTab = deviceList.ToArray();
         maxDeviceIndex = deviceTab.Length;
-        Device selectDevice = null;
+        
         for (int i = 0; i < deviceTab.Length; i++)
         {
             if(deviceIndex == i)
             {
                 camControl.target = deviceTab[i].transform;
-                selectDevice = deviceTab[i];
+                selectDeviceScript = deviceTab[i];
             }
         }
 
-        selectDevice.PreviewRangeDevice();
-        if (Input.GetKeyDown(KeyCode.KeypadEnter))
+        selectDeviceScript.PreviewRangeDevice();
+        if (Input.GetKeyDown(KeyCode.L))
         {
-            selectDevice.SecuSound();
+        Debug.Log(selectDeviceScript);
+            selectDeviceScript.SecuSound();
+            selectDeviceScript.ResetPreview();
             actionPointIndex++;
             if (StillYourTurn())
             {
+                selectDevice = false;
                 occuped = false;
+                camControl.target = transform;
+                StartCoroutine(CamTargetPlayer());
             }
         }
         else if (Input.GetKeyDown(KeyCode.Tab))
         {
             deviceIndex++;
+            selectDeviceScript.ResetPreview();
             if (deviceIndex == maxDeviceIndex)
                 deviceIndex = 0;
+        }
+    }
+
+    private void Aim()
+    {
+        pathPreviewLine.positionCount = 0;
+        pathWaypoint.Clear();
+        isAiming = true;
+        fov._swap = true;
+        fov._isAimaing = true;
+        InstanciateCamera();
+        fov.Refresh();
+    }
+
+    private void UnAim()
+    {
+        isAiming = false;
+        occuped = false;
+        fov.Refresh();
+        if (camScriptInst != null)
+        {
+            camScriptInst._isActive = true;
+            camScriptInst.DestroyObject();
         }
     }
 
@@ -517,39 +557,12 @@ public class CharacterControler : MonoBehaviour
 
     }
 
-    private void Aim()
-    {
-        pathPreviewLine.positionCount = 0;
-        pathWaypoint.Clear();
-        isAiming = true;
-        fov._swap = true;
-        fov._isAimaing = true;
-        InstanciateCamera();
-        fov.Refresh();
-    }
-
-    private void UnAim()
-    {
-        isAiming = false;
-        if(camScriptInst != null)
-        {
-            camScriptInst._isActive = true;
-            camScriptInst.DestroyObject();
-        }
-    }
-
     private void ShootKill()
     {
-        Transform npc;
+        
         if (fov._actualTarget != null)
         {
-            npc = fov._actualTarget;
-            npc.GetComponent<NPCcontroller>().GetKill(false);
-            actionPointIndex++;
-            if (StillYourTurn())
-            {
-                UnAim();
-            }
+            StartCoroutine(KillNPC(1.5f));
         }
     }
 
@@ -586,10 +599,16 @@ public class CharacterControler : MonoBehaviour
         anim.SetBool("CrouchIdle", b);
     }
 
+    public void Shoot(bool b)
+    {
+        anim.SetBool("Shoot", b);
+    }
+
     public void Death()
     {
         anim.SetTrigger("death");
     }
+
 
     #endregion
 
@@ -611,12 +630,26 @@ public class CharacterControler : MonoBehaviour
         //NextTurn();
     }
 
+    IEnumerator CamTargetPlayer()
+    {
+        targetPlayer = true;
+        yield return new WaitForSeconds(0.5f);
+        targetPlayer = false;
+    }
+
     IEnumerator KillNPC(float time)
     {
+        Transform npc;
+        npc = fov._actualTarget;
+        transform.LookAt(npc);
+        Shoot(true);
+        yield return new WaitForSeconds(time);
+        Shoot(false);
+        npc.GetComponent<NPCcontroller>().GetKill(false);
+        yield return new WaitForSeconds(time);
         
-        yield return new WaitForSeconds(2);
         actionPointIndex++;
-        if(StillYourTurn())
+        if (StillYourTurn())
         {
             UnAim();
         }

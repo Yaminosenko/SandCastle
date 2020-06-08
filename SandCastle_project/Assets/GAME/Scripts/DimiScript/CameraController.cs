@@ -121,7 +121,7 @@ public class CameraController : MonoBehaviour
     {
         if (turnPlayer)
         {
-            if (playerScript.isMoving || playerScript.selectDevice)
+            if (playerScript.isMoving || playerScript.selectDevice || playerScript.targetPlayer)
             {
                 FollowTargetTactical();
             }
