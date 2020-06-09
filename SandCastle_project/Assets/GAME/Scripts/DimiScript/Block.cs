@@ -64,11 +64,11 @@ public class Block : MonoBehaviour
         if (!player.TacticalMode || player.selectDevice)
             mesh.enabled = false;
             
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            if (isIndexer)
-                Destroy(gameObject);
-        }
+        //if (Input.GetKeyDown(KeyCode.P))
+        //{
+        //    if (isIndexer)
+        //        Destroy(gameObject);
+        //}
     }
 
     private void SetRotationBlock()
@@ -272,28 +272,19 @@ public class Block : MonoBehaviour
         }
     }
 
-    public void ChangeColor()
-    {
-        //if (mainCell)
-        //{
-        //    mesh.enabled = true;
-        //    mesh.material.SetColor("_TintColor", colorMain);
-        //}
-        //else if (adjCell)
-        //{
-        //    mesh.enabled = true;
-        //    mesh.material.SetColor("_TintColor", colorMain);
-        //}
-        //else
-        //    mesh.enabled = false;
-    }
-
     public void Over()
     {
         if (player.TacticalMode && !player.isMoving && player.turnPlayer && !player.selectDevice)
         {
             mesh.enabled = true;
-            if(pathIndex != 0)
+
+            int indexPath = 0;
+            if (!player.selectTrap)
+                indexPath = player.unitsRangeMovement;
+            else
+                indexPath = player.unitsRangeMovement / 2;
+
+            if(pathIndex != 0 && pathIndex <= indexPath)
                 mesh.material.SetColor("_TintColor", colorMainInArea);
             else
                 mesh.material.SetColor("_TintColor", colorMainOutArea);
@@ -305,7 +296,7 @@ public class Block : MonoBehaviour
                     {
                         Block b = blockAdjacent[i].GetComponent<Block>();
                         b.mesh.enabled = true;
-                        if(pathIndex != 0)
+                        if(pathIndex != 0 && pathIndex <= indexPath)
                             b.mesh.material.SetColor("_TintColor", colorBaseInArea);
                         else
                             b.mesh.material.SetColor("_TintColor", colorBaseOutArea);

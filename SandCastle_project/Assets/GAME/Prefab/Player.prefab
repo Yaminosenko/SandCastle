@@ -283,9 +283,19 @@ MonoBehaviour:
   pathPreviewLine: {fileID: 1136225769}
   mRenderClassic: {fileID: 0}
   mRenderCant: {fileID: 0}
+  anim: {fileID: 0}
+  system: {fileID: 0}
+  offsetCamShoulder: {fileID: 0}
+  camShoulder: {fileID: 0}
+  camScriptInst: {fileID: 0}
+  camControl: {fileID: 0}
+  trapToInst: {fileID: 2422100656108920791, guid: 8be5b1c3865de3b42a500af86e155fa4,
+    type: 3}
   speedPlayer: 5
   isOnCombat: 0
+  deviceList: []
   TacticalMode: 0
+  invisibilityDuration: 2
   pos: {x: 0, y: 0, z: 0}
   unitsRangeMovement: 10
   blockMask:
@@ -300,6 +310,11 @@ MonoBehaviour:
   isCover: 0
   limits: []
   notInArea: 0
+  SettingPathBool: 0
+  selectDevice: 0
+  targetPlayer: 0
+  isInvisble: 0
+  selectTrap: 0
 --- !u!54 &5146668735904368489
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -366,27 +381,27 @@ MonoBehaviour:
     m_Bits: 1536
   _isActive: 0
   visibleTargets: []
-  _red: {fileID: 0}
-  _targetMaterial: {fileID: 0}
-  _currentTargets: []
-  _gd: {fileID: 0}
-  _lestestdufov: {fileID: 0}
-  player: {fileID: 0}
   playerFOV: 0
   _CamPos: {fileID: 0}
-  focused: {fileID: 0}
-  lr: {fileID: 0}
-  acted: 0
-  _swap: 0
-  _isAimaing: 0
-  _actualTarget: {fileID: 0}
-  _distanceTarget: 0
   meshResolution: 5
   edgeResolveIterations: 0
   edgeDstThreshold: 0
+  FreeMode: 0
+  viewMeshFilter: {fileID: 987533690562537610}
+  shootMode: 0
+  npc: {fileID: 0}
+  iSeeYou: 0
+  player: {fileID: 0}
+  focused: {fileID: 0}
+  _currentTargets: []
+  _actualTarget: {fileID: 0}
+  _swap: 0
+  _isAimaing: 0
+  _distanceTarget: 0
   _listNb: 0
   direction: {x: 0, y: 0, z: 0}
   _actuaTargetCover: 0
   _isFlank: 0
   _isOverwatched: 0
-  viewMeshFilter: {fileID: 987533690562537610}
+  camShoulder: {fileID: 0}
+  acted: 0
