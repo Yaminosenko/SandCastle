@@ -15,6 +15,8 @@ public class FieldOfView : MonoBehaviour {
     public bool _isActive = false;
     public List<Transform> visibleTargets = new List<Transform>();
     public bool playerFOV = false;
+    public bool isDetector;
+    public Detector detectorScript;
     public Transform _CamPos;
     public float meshResolution;
     public int edgeResolveIterations;
@@ -72,6 +74,11 @@ public class FieldOfView : MonoBehaviour {
             targetMask = NPCmask;
             player = GetComponent<CharacterControler>();
         }
+
+        if (isDetector)
+        {
+            player = GameObject.Find("Character").GetComponentInChildren<CharacterControler>();
+        }
     }
 
     void Start()
@@ -119,55 +126,65 @@ public class FieldOfView : MonoBehaviour {
 
     void FindVisibleTargets() //mise en place des targets dans une list 
     {
-        _listNb = visibleTargets.Count;
-        visibleTargets.Clear();
-        Transform t = transform;
-
-       
-
-        Collider[] targetsInViewRadius = Physics.OverlapSphere(t.position, viewRadius, targetMask);
-
-        for (int i = 0; i < targetsInViewRadius.Length; i++)
+        if (_isActive)
         {
-            Transform target = targetsInViewRadius[i].transform;
-            Vector3 targetPos = new Vector3(target.transform.position.x, target.transform.position.y + 1f, target.transform.position.z);
-            if(target != transform)
+            _listNb = visibleTargets.Count;
+            visibleTargets.Clear();
+            Transform t = transform;
+
+
+
+            Collider[] targetsInViewRadius = Physics.OverlapSphere(t.position, viewRadius, targetMask);
+
+            for (int i = 0; i < targetsInViewRadius.Length; i++)
             {
-                Vector3 dirToTarget = (targetPos - t.position).normalized;
-                RaycastHit hit;
-                if (Vector3.Angle(t.forward, dirToTarget) < viewAngle / 2)
+                Transform target = targetsInViewRadius[i].transform;
+                Vector3 targetPos = new Vector3(target.transform.position.x, target.transform.position.y + 1f, target.transform.position.z);
+                if (target != transform)
                 {
-                    float dstToTarget = Vector3.Distance(t.position, targetPos);
-                    if (!Physics.Raycast(t.position, dirToTarget, out hit, dstToTarget, obstacleMask))
+                    Vector3 dirToTarget = (targetPos - t.position).normalized;
+                    RaycastHit hit;
+                    if (Vector3.Angle(t.forward, dirToTarget) < viewAngle / 2)
                     {
-                        if(dstToTarget < 3 && !playerFOV)
+                        float dstToTarget = Vector3.Distance(t.position, targetPos);
+                        if (!Physics.Raycast(t.position, dirToTarget, out hit, dstToTarget, obstacleMask))
                         {
-                            AddNPCTarget(target);
-                        }
-                        
-                        if(!playerFOV)
-                            if(!player.isInvisble)
+                            if (dstToTarget < 3 && !playerFOV && !isDetector)
+                            {
                                 AddNPCTarget(target);
-                        else if(!target.transform.GetComponent<NPCcontroller>().dead)
-                            visibleTargets.Add(target);
-                    }
-                    else if (Physics.Raycast(t.position, dirToTarget, out hit, dstToTarget, obstacleMask))
-                    {
-                        if (hit.transform.gameObject.tag == "Obs1" && target.gameObject.layer == 11)
-                        {
-                            //visibleTargets.Add(target);
-                            //if (!playerFOV)
-                            //    AddNPCTarget(target);
+                            }
+                            else if (isDetector)
+                            {
+                                DetectorAlert();
+                            }
+
+                            if (!isDetector)
+                            {
+                                if (!playerFOV)
+                                    if (!player.isInvisble)
+                                        AddNPCTarget(target);
+                                    else if (!target.transform.GetComponent<NPCcontroller>().dead)
+                                        visibleTargets.Add(target);
+                            }
                         }
-                        else if(hit.transform.gameObject.tag == "Obs1" && playerFOV)
+                        else if (Physics.Raycast(t.position, dirToTarget, out hit, dstToTarget, obstacleMask))
                         {
-                            if (!target.transform.GetComponent<NPCcontroller>().dead)
-                                visibleTargets.Add(target);
+                            if (hit.transform.gameObject.tag == "Obs1" && target.gameObject.layer == 11)
+                            {
+                                //visibleTargets.Add(target);
+                                //if (!playerFOV)
+                                //    AddNPCTarget(target);
+                            }
+                            else if (hit.transform.gameObject.tag == "Obs1" && playerFOV)
+                            {
+                                if (!target.transform.GetComponent<NPCcontroller>().dead)
+                                    visibleTargets.Add(target);
+                            }
                         }
-                    }
-                    else
-                    {
-                        Debug.DrawRay(t.position, dirToTarget * hit.distance, Color.blue, Mathf.Infinity);
+                        else
+                        {
+                            Debug.DrawRay(t.position, dirToTarget * hit.distance, Color.blue, Mathf.Infinity);
+                        }
                     }
                 }
             }
@@ -247,6 +264,14 @@ public class FieldOfView : MonoBehaviour {
                     npc.lastKnowPosition = player.transform.position;
                 }
             }
+        }
+    }
+
+    private void DetectorAlert()
+    {
+        if(detectorScript != null)
+        {
+            detectorScript.AlertGuard();
         }
     }
 

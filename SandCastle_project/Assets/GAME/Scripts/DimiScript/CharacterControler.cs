@@ -29,6 +29,8 @@ public class CharacterControler : MonoBehaviour
     public float speedPlayer = 4;
     public bool isOnCombat;
     public List<Device> deviceList = new List<Device>();
+    public int Water;
+    public int Trap;
 
     [Header("TacticalMode")]
     public bool TacticalMode = false;

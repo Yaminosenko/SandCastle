@@ -69,7 +69,7 @@ public class NPCcontroller : MonoBehaviour
     private int indexPatrol = 0;
     private int IndexPatrolMax;
     private Vector3 targetRotate;
-    private FieldOfView fov;
+    public FieldOfView fov;
     private float cooldownShoot;
     private bool turnHead;
     private Quaternion angleTarget;
@@ -878,6 +878,7 @@ public class NPCcontroller : MonoBehaviour
     }
 
     #endregion
+
 
     #region Coroutine
 

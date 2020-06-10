@@ -9,6 +9,8 @@ public class TriggerRef : MonoBehaviour
 
     public List<NPCcontroller> npcArea = new List<NPCcontroller>();
     public List<Device> deviceArea = new List<Device>();
+    public List<Detector> detectorArea = new List<Detector>();
+
 
     private List<NPCcontroller> npclist = new List<NPCcontroller>();
     private List<Device> deviceList = new List<Device>();
@@ -39,11 +41,13 @@ public class TriggerRef : MonoBehaviour
             for (int i = 0; i < system.actualEnnemy.ToArray().Length; i++)
             {
                 npclist.Add(system.actualEnnemy.ToArray()[i]);
+                system.actualEnnemy.ToArray()[i].fov._isActive = false;
             }
             system.actualEnnemy.Clear();
             for (int i = 0; i < npcArea.ToArray().Length; i++)
             {
                 system.actualEnnemy.Add(npcArea.ToArray()[i]);
+                npcArea.ToArray()[i].fov._isActive = true;
             }
 
             for (int i = 0; i < system.actualEnnemy.ToArray().Length; i++)
@@ -55,8 +59,14 @@ public class TriggerRef : MonoBehaviour
                         system.actualEnnemy.ToArray()[i].allyNPC.Add(system.actualEnnemy.ToArray()[o]);
                 }
             }
-           
 
+            for (int i = 0; i < detectorArea.ToArray().Length; i++)
+            {
+                for (int o = 0; o < npcArea.ToArray().Length; o++)
+                {
+                    detectorArea.ToArray()[i].npcList.Add(npcArea.ToArray()[o]);
+                }
+            }
         }
     }
 
