@@ -8,10 +8,13 @@ public class SytemTurn : MonoBehaviour
     public List<NPCcontroller> actualEnnemy = new List<NPCcontroller>();
     public CharacterControler player;
     public CameraController cam;
+    public bool cdInvisibilty;
+    public int coolDownInvisibility = 4;
 
     private NPCcontroller npcTurn;
     private int nbrTurnMax;
-    private int indexNbrTurn;
+    [SerializeField]private int indexNbrTurn;
+    private int coolDownInv;
 
 
     private void Start()
@@ -97,9 +100,24 @@ public class SytemTurn : MonoBehaviour
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 
+    public IEnumerator NPCgetKill(float time)
+    {
+        yield return new WaitForSeconds(time);
+        NextTurn();
+    }
+
     IEnumerator waitEndTurnNPC()
     {
         yield return new WaitForSeconds(2);
+        if (cdInvisibilty)
+        {
+            coolDownInv++;
+            if(coolDownInv == coolDownInvisibility)
+                cdInvisibilty = false;
+
+            if (coolDownInv == player.invisibilityDuration)
+                player.isInvisble = false;
+        }
         cam.turnPlayer = true;
         player.turnPlayer = true;
         player.cantMove = false;

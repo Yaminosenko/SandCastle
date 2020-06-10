@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 public class NPCcontroller : MonoBehaviour
 {
     #region Variables
@@ -60,7 +62,7 @@ public class NPCcontroller : MonoBehaviour
     public SytemTurn system;
     public CameraShoulderMouv camScriptInst;
     public GameObject camShoulder;
-
+    public bool isOnCover;
 
     private Vector3 sentinelPosition;
     private int indexPatrol = 0;
@@ -86,6 +88,8 @@ public class NPCcontroller : MonoBehaviour
     private int indexRandom;
     private int indexAlert;
     private Camera cam;
+    private Vector3 testVct;
+    private Vector3 testVct2;
 
     #endregion
 
@@ -112,6 +116,8 @@ public class NPCcontroller : MonoBehaviour
     {
         if (!dead)
         {
+            
+
             if(playerScript != null)
                 FreeMode = !playerScript.TacticalMode;
 
@@ -170,7 +176,7 @@ public class NPCcontroller : MonoBehaviour
 
     private void Movement()
     {
-        Walk(true);
+        walkRunMethods(true);
         nav.speed = walkSpeed;
         nav.isStopped = false;
         //Run(false);
@@ -236,7 +242,7 @@ public class NPCcontroller : MonoBehaviour
         if (distance <= 1)
         {
             stopMove = true;
-            Walk(false);
+            walkRunMethods(false);
 
             if (!turnHead)
                 StartCoroutine(TurnHeadOff(4));
@@ -306,12 +312,12 @@ public class NPCcontroller : MonoBehaviour
             dead = true;
             nav.SetDestination(transform.position);
             nav.isStopped = true;
-            Walk(false);
+            walkRunMethods(false);
             fov.viewMeshFilter.gameObject.SetActive(false);
             //fov.dead = true;
             nav.enabled = false;
             GetComponent<Collider>().isTrigger = true;
-            BackStabDeath();
+            //BackStabDeath();
             TriggerEffect();
         }
     }
@@ -338,6 +344,22 @@ public class NPCcontroller : MonoBehaviour
     {
         if (yourTurn && !dead)
         {
+            if (isOnCover)
+            {
+                CrouchIdle(true);
+                IdleAlert(false);
+            }
+            else if (distracted || alerted || randomPosTrigger)
+            {
+                IdleAlert(true);
+                CrouchIdle(false);
+            }
+            else
+            {
+                IdleAlert(false);
+                CrouchIdle(false);
+            }
+
             if (!SettingPathBool)
                 StartCoroutine(LateUp(0.1f));
             if (isMoving)
@@ -372,7 +394,7 @@ public class NPCcontroller : MonoBehaviour
         else
         {
             nav.isStopped = true;
-            Walk(false);
+            walkRunMethods(false);
         }
     }
 
@@ -382,7 +404,14 @@ public class NPCcontroller : MonoBehaviour
         nav.SetDestination(pos);
         //cantMove = true;
         isMoving = true;
-        Walk(true);
+
+        //if (distracted)
+        //    nav.speed = runSpeed;
+        //else
+        //    nav.speed = walkSpeed;
+
+        walkRunMethods(true);
+
     }
 
     private void PatrolTactial()
@@ -410,7 +439,8 @@ public class NPCcontroller : MonoBehaviour
         {
             if (indexAction == 1)
             {
-                Walk(false);
+                walkRunMethods(false);
+                WalkAlert(false);
                 oneAction = true;
                 isMoving = false;
                 if (fov.iSeeYou || playerNear)
@@ -601,6 +631,7 @@ public class NPCcontroller : MonoBehaviour
         if (SettingPathBool)
         {
             Cover[] cover = coverList.ToArray();
+            Debug.Log(cover.Length);
             List<GameObject> selectCoverList = new List<GameObject>();
             Vector3 finalPos = Vector3.zero;
             float lastClosestDistance = Vector3.Distance(transform.position, Vector3.positiveInfinity);
@@ -639,9 +670,10 @@ public class NPCcontroller : MonoBehaviour
                     finalPos = selectCover[i].transform.position;
                 }
             }
-
-            Debug.Log(position);
             pos = new Vector3(finalPos.x,0.1f,finalPos.z);
+            testVct2 = position;
+            testVct = pos;
+            //Debug.Log(pos);
             //Debug.Log(finalPos);
             indexAlert++;
             MovementTactical();
@@ -706,12 +738,13 @@ public class NPCcontroller : MonoBehaviour
 
         indexRandom++;
         targetPosition = finalPosition;
+        
         pos = finalPosition;
         MovementTactical();
         oneAction = true;
     }
 
-    private void ResetVariables()
+    public void ResetVariables()
     {
         yourTurn = false;
         indexAction = 0;
@@ -765,7 +798,7 @@ public class NPCcontroller : MonoBehaviour
     public void KillPlayerTactical(Transform target)
     {
         int random = Random.Range(0, 1);
-        Debug.Log(random);
+        //Debug.Log(random);
         if(random == 0)
             InstanciateCamera(target);
         system.KillPlayerSystem(this);
@@ -778,12 +811,12 @@ public class NPCcontroller : MonoBehaviour
 
     public void Walk(bool b)
     {
-        anim.SetBool("walkAlert", b);
+        anim.SetBool("walk", b);
     }
 
-    public void Run(bool b)
+    public void WalkAlert(bool b)
     {
-        anim.SetBool("Run", b);
+        anim.SetBool("walkAlert", b);
     }
 
     //public void Fire(bool b)
@@ -791,16 +824,44 @@ public class NPCcontroller : MonoBehaviour
     //    anim.SetBool("Fire", b);
     //}
 
-    public void BackStabDeath()
-    {
-        anim.SetTrigger("Death");
-    }
+    //public void BackStabDeath()
+    //{
+    //    anim.SetTrigger("Death");
+    //}
 
     public void CrouchIdle(bool b)
     {
-        anim.SetBool("CrouchIdle", b);
+        anim.SetBool("crouchIdle", b);
     }
 
+    public void CrouchWalk(bool b)
+    {
+        anim.SetBool("crouchWalk", b);
+    }
+
+    public void IdleAlert(bool b)
+    {
+        anim.SetBool("idleAlert", b);
+    }
+
+
+    private void walkRunMethods(bool b)
+    {
+        if (distracted || alerted || randomPosTrigger)
+        {
+            WalkAlert(b);
+            //Walk(b);
+        }
+        else if (isOnCover)
+        {
+            CrouchWalk(b);
+        }
+        else 
+        {
+            Walk(b);
+            //Run(b);
+        }
+    }
 
     #endregion
 
@@ -819,7 +880,7 @@ public class NPCcontroller : MonoBehaviour
         stopMove = true;
         stopPatrol = true;
         nav.isStopped = true;
-        Walk(false);
+        walkRunMethods(true);
         turnHead = false;
         StopCoroutine(TurnHeadOff(4));
         lastKnowPosition = pos;
@@ -894,5 +955,22 @@ public class NPCcontroller : MonoBehaviour
 
 
 
+    #endregion
+
+
+    #region Handles
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+
+        //Handles.color = Color.red;
+        //Handles.SphereHandleCap(-1, testVct, Quaternion.identity, 1, EventType.Repaint);
+        //Handles.color = Color.blue;
+        //Handles.SphereHandleCap(-1, testVct, Quaternion.identity, 1, EventType.Repaint);
+
+
+
+    }
+#endif
     #endregion
 }

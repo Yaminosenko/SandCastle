@@ -66,12 +66,12 @@ public class Cover : MonoBehaviour
             else
                 col.GetComponent<CharacterControler>().isCover = 2;
 
-            col.GetComponent<CharacterControler>().CrouchIdle(true);
+            //col.GetComponent<CharacterControler>().CrouchIdle(true);
         }
-        //else if(col.gameObject.layer == 12 && col.GetComponent<NPCcontroller>() != null)
-        //{
-        //    col.GetComponent<NPCcontroller>().CrouchIdle(true);
-        //}
+        else if (col.gameObject.layer == 12 && col.GetComponent<NPCcontroller>() != null)
+        {
+            col.GetComponent<NPCcontroller>().isOnCover = true;
+        }
     }
 
     private void OnTriggerExit(Collider col)
@@ -79,11 +79,11 @@ public class Cover : MonoBehaviour
         if (col.gameObject.layer == 11 && col.GetComponent<CharacterControler>() != null)
         {
             col.GetComponent<CharacterControler>().isCover = 0;
-            col.GetComponent<CharacterControler>().CrouchIdle(false);
+            //col.GetComponent<CharacterControler>().CrouchIdle(false);
         }
-        //else if (col.gameObject.layer == 12 && col.GetComponent<NPCcontroller>() != null)
-        //{
-        //    col.GetComponent<NPCcontroller>().CrouchIdle(false);
-        //}
+        else if (col.gameObject.layer == 12 && col.GetComponent<NPCcontroller>() != null)
+        {
+            col.GetComponent<NPCcontroller>().isOnCover = false;
+        }
     }
 }

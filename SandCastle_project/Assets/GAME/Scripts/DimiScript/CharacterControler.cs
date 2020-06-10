@@ -23,6 +23,7 @@ public class CharacterControler : MonoBehaviour
     public GameObject camShoulder;
     public CameraShoulderMouv camScriptInst;
     public CameraController camControl;
+    public GameObject trapToInst;
 
     [Header("FreeMode")]
     public float speedPlayer = 4;
@@ -31,6 +32,7 @@ public class CharacterControler : MonoBehaviour
 
     [Header("TacticalMode")]
     public bool TacticalMode = false;
+    public int invisibilityDuration = 2;
     public Vector3 pos;
     public int unitsRangeMovement = 3;
     public LayerMask blockMask = 8;
@@ -46,6 +48,7 @@ public class CharacterControler : MonoBehaviour
     public bool SettingPathBool;
     public bool selectDevice;
     public bool targetPlayer;
+    public bool isInvisble;
 
     //private
     private Vector3 move;
@@ -65,6 +68,9 @@ public class CharacterControler : MonoBehaviour
     private int deviceIndex;
     private int maxDeviceIndex;
     private Device selectDeviceScript;
+    private bool selectInvisiblity;
+    public bool selectTrap;
+
 
     #endregion 
 
@@ -105,9 +111,12 @@ public class CharacterControler : MonoBehaviour
 
                 if (!cantMove)
                 {
-
                     if (selectDevice)
                         DeviceChoice();
+                    else if (selectInvisiblity)
+                        Invisibility();
+                    else if (selectTrap)
+                        TrapSetUp();
 
                     if (Input.GetKeyDown(KeyCode.Alpha1) && !occuped)
                     {
@@ -119,6 +128,8 @@ public class CharacterControler : MonoBehaviour
                     {
                         UnAim();
                         selectDevice = false;
+                        selectInvisiblity = false;
+                        selectTrap = false;
                         occuped = false;
                         camControl.target = transform;
                         if (selectDeviceScript != null)
@@ -130,6 +141,23 @@ public class CharacterControler : MonoBehaviour
                     {
                         selectDevice = true;
                         occuped = true;
+                        pathPreviewLine.positionCount = 0;
+                        pathWaypoint.Clear();
+                    }
+
+                    if(Input.GetKeyDown(KeyCode.Alpha3) && !occuped && !system.cdInvisibilty)
+                    {
+                        occuped = true;
+                        selectInvisiblity = true;
+                        pathPreviewLine.positionCount = 0;
+                        pathWaypoint.Clear();
+                    }
+
+                    if (Input.GetKeyDown(KeyCode.Alpha4) && !occuped)
+                    {
+                        occuped = true;
+                        selectTrap = true;
+                        StartCoroutine(CamTargetPlayer());
                         pathPreviewLine.positionCount = 0;
                         pathWaypoint.Clear();
                     }
@@ -155,11 +183,6 @@ public class CharacterControler : MonoBehaviour
                 //sStartCoroutine(changeCamMode(1f, true));
             }
         }
-
-        //if (Input.GetKeyDown(KeyCode.M))
-        //{
-        //    InstanciateCamera();
-        //}
     }
 
     #endregion
@@ -238,7 +261,7 @@ public class CharacterControler : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit))
             {
-                if (hit.transform.gameObject.layer == 8)
+                if (hit.transform.gameObject.layer == 8 && !occuped)
                 {
 
                     PreviewPath(hit);
@@ -256,6 +279,17 @@ public class CharacterControler : MonoBehaviour
                         Run(true);
                     }
                 }
+                else if (selectTrap && hit.transform.gameObject.layer == 8)
+                {
+                    if (Input.GetMouseButtonDown(0) && hit.transform.GetComponent<Block>().pathIndex != 0 && hit.transform.GetComponent<Block>().pathIndex <= unitsRangeMovement / 2)
+                    {
+                        pos = new Vector3(hit.collider.transform.position.x, hit.collider.transform.position.y, hit.collider.transform.position.z);
+                        GameObject trap = Instantiate(trapToInst, pos, Quaternion.identity);
+                        trap.transform.position = pos;
+                        trap.GetComponent<TrapScript>().player = this;
+                        StartCoroutine(TrapEnable(1));
+                    }
+                }
                 else if(hit.transform.gameObject.layer == 13)
                 {
                     RaycastHit[] hits;
@@ -263,12 +297,12 @@ public class CharacterControler : MonoBehaviour
                     for (int i = 0; i < hits.Length; i++)
                     {
                         RaycastHit hitAll = hits[i];
-                        if (hitAll.transform.gameObject.layer == 8)
+                        if (hitAll.transform.gameObject.layer == 8 && !occuped)
                         {
                             PreviewPath(hit);
 
 
-                            if (Input.GetMouseButtonDown(1) && hitAll.transform.GetComponent<Block>().pathIndex != 0)
+                            if (Input.GetMouseButtonDown(1) && hitAll.transform.GetComponent<Block>().pathIndex != 0 )
                             {
                                 pos = new Vector3(hitAll.collider.transform.position.x, hitAll.collider.transform.position.y + transform.position.y, hitAll.collider.transform.position.z);
                                 nav.SetDestination(pos);
@@ -278,6 +312,17 @@ public class CharacterControler : MonoBehaviour
                                 actionPointIndex++;
                                 ResetAllPreview();
                                 Run(true);
+                            }
+                        }
+                        else if(selectTrap && hitAll.transform.gameObject.layer == 8)
+                        {
+                            if(Input.GetMouseButtonDown(0) && hitAll.transform.GetComponent<Block>().pathIndex != 0 && hitAll.transform.GetComponent<Block>().pathIndex <= unitsRangeMovement / 2)
+                            {
+                                pos = new Vector3(hitAll.collider.transform.position.x, hitAll.collider.transform.position.y, hitAll.collider.transform.position.z);
+                                GameObject trap = Instantiate(trapToInst, pos, Quaternion.identity);
+                                trap.transform.position = pos;
+                                trap.GetComponent<TrapScript>().player = this;
+                                StartCoroutine(TrapEnable(1));
                             }
                         }
                     }
@@ -502,6 +547,26 @@ public class CharacterControler : MonoBehaviour
         }
     }
 
+    private void Invisibility()
+    {
+        camControl.target = transform;
+        targetPlayer = true;
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            isInvisble = true;
+            system.cdInvisibilty = true;
+            StartCoroutine(getInvisible(1));
+        }
+        
+        //MeshRenderer mesh = transform.GetComponent<MeshRenderer>();
+        //mesh.material = /*new Material(0,0,0)*/
+    }
+
+    private void TrapSetUp()
+    {
+
+    }
+
     #endregion
 
     #region Other Tactical Methods
@@ -510,7 +575,10 @@ public class CharacterControler : MonoBehaviour
     {
         if (actionPointIndex == actionPoint)
         {
+            ResetAllPreview();
             turnPlayer = false;
+            selectInvisiblity = false;
+            selectDevice = false;
             actionPointIndex = 0;
             UnAim();
             occuped = false;
@@ -570,6 +638,27 @@ public class CharacterControler : MonoBehaviour
     {
         nav.isStopped = true;
         Run(false);
+    }
+
+    public Vector3 RandomPositionAroundPlayer()
+    {
+        Vector3 randomDirection = Random.insideUnitSphere * unitsRangeMovement;
+        randomDirection += transform.position;
+        NavMeshHit hit;
+        Vector3 finalPosition = Vector3.zero;
+        NavMesh.SamplePosition(randomDirection, out hit, unitsRangeMovement, 1);
+        RaycastHit hitBlock;
+        if (Physics.Raycast(hit.position, Vector3.down, out hitBlock, blockMask))
+        {
+            finalPosition = hitBlock.transform.position;
+            return finalPosition;
+        }
+        else
+        {
+            
+            finalPosition = hit.position;
+            return finalPosition;
+        }
     }
 
     #endregion
@@ -632,6 +721,7 @@ public class CharacterControler : MonoBehaviour
 
     IEnumerator CamTargetPlayer()
     {
+        camControl.target = transform;
         targetPlayer = true;
         yield return new WaitForSeconds(0.5f);
         targetPlayer = false;
@@ -654,6 +744,38 @@ public class CharacterControler : MonoBehaviour
             UnAim();
         }
     }
+
+    IEnumerator getInvisible(float time)
+    {
+        yield return new WaitForSeconds(time);
+
+        actionPointIndex++;
+        if (StillYourTurn())
+        {
+            selectInvisiblity = false;
+            selectDevice = false;
+            occuped = false;
+            camControl.target = transform;
+            targetPlayer = false;
+            //StartCoroutine(CamTargetPlayer());
+        }
+    }
+
+    IEnumerator TrapEnable(float time)
+    {
+        yield return new WaitForSeconds(time);
+        actionPointIndex++;
+        if (StillYourTurn())
+        {
+            selectInvisiblity = false;
+            selectDevice = false;
+            selectTrap = false;
+            occuped = false;
+            camControl.target = transform;
+            targetPlayer = false;
+            //StartCoroutine(CamTargetPlayer());
+        }
+    }
     #endregion
 
     #region Handles
@@ -670,7 +792,12 @@ public class CharacterControler : MonoBehaviour
             }
             
         }
-    }
+
+        //Handles.color = Color.red;
+        //Handles.SphereHandleCap(-1, testVect, Quaternion.identity, 1, EventType.Repaint);
+    
+
+}
 #endif
     #endregion
 }

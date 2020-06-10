@@ -140,10 +140,14 @@ public class FieldOfView : MonoBehaviour {
                     float dstToTarget = Vector3.Distance(t.position, targetPos);
                     if (!Physics.Raycast(t.position, dirToTarget, out hit, dstToTarget, obstacleMask))
                     {
-                        //Debug.Log(dstToTarget);
+                        if(dstToTarget < 3 && !playerFOV)
+                        {
+                            AddNPCTarget(target);
+                        }
                         
                         if(!playerFOV)
-                            AddNPCTarget(target);
+                            if(!player.isInvisble)
+                                AddNPCTarget(target);
                         else if(!target.transform.GetComponent<NPCcontroller>().dead)
                             visibleTargets.Add(target);
                     }
@@ -195,7 +199,7 @@ public class FieldOfView : MonoBehaviour {
             {
                 for (int i = 0; i < npc.allyNPC.ToArray().Length; i++)
                 {
-                    npc.allyNPC.ToArray()[i].alertedPos = player.transform.position;
+                    npc.allyNPC.ToArray()[i].alertedPos = player.RandomPositionAroundPlayer();
                     npc.allyNPC.ToArray()[i].GetAlerted();
                 }
                 //npc.alerted = true;
@@ -220,7 +224,7 @@ public class FieldOfView : MonoBehaviour {
             {
                 for (int i = 0; i < npc.allyNPC.ToArray().Length; i++)
                 {
-                    npc.allyNPC.ToArray()[i].alertedPos = player.transform.position;
+                    npc.allyNPC.ToArray()[i].alertedPos = player.RandomPositionAroundPlayer();
                     npc.allyNPC.ToArray()[i].GetAlerted();
                 }
                 StartCoroutine(npc.SeeCorpsTactical());
@@ -234,7 +238,7 @@ public class FieldOfView : MonoBehaviour {
                 {
                     for (int o = 0; o < npc.allyNPC.ToArray().Length; o++)
                     {
-                        npc.allyNPC.ToArray()[o].alertedPos = player.transform.position;
+                        npc.allyNPC.ToArray()[o].alertedPos = player.RandomPositionAroundPlayer();
                         npc.allyNPC.ToArray()[o].GetAlerted();
                     }
                     StartCoroutine(npc.SeeCorpsTactical());
@@ -572,10 +576,10 @@ public class FieldOfView : MonoBehaviour {
 
         if (Physics.Raycast(transform.position, dir, out hit, viewRadius, obstacleMask))
         {
-            if (hit.transform.gameObject.tag != "Obs1")
+            //if (hit.transform.gameObject.tag != "Obs1")
                 return new ViewCastInfo(true, hit.point, hit.distance, globalAngle);
-            else
-                return new ViewCastInfo(false, transform.position + dir * viewRadius, viewRadius, globalAngle);
+            //else
+            //    return new ViewCastInfo(false, transform.position + dir * viewRadius, viewRadius, globalAngle);
         }
         else
         {
