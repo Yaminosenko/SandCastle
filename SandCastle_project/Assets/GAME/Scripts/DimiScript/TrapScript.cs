@@ -20,7 +20,7 @@ public class TrapScript : MonoBehaviour
             }
             npc.GetKill(false);
             
-            Debug.Log(col.gameObject.layer);
+            //Debug.Log(col.gameObject.layer);
             //npc.system.NextTurn();
             StartCoroutine(NPCgetKill(2, npc));
             //explosion

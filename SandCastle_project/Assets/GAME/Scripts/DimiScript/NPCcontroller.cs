@@ -30,6 +30,7 @@ public class NPCcontroller : MonoBehaviour
     public List<NPCcontroller> deadAlly = new List<NPCcontroller>();
     public Transform offsetCam;
     public List<NPCcontroller> allyNPC = new List<NPCcontroller>();
+    public int isCover;
 
 
     [Header("Tactical")]
@@ -88,8 +89,6 @@ public class NPCcontroller : MonoBehaviour
     private int indexRandom;
     private int indexAlert;
     private Camera cam;
-    private Vector3 testVct;
-    private Vector3 testVct2;
 
     #endregion
 
@@ -314,10 +313,11 @@ public class NPCcontroller : MonoBehaviour
             nav.isStopped = true;
             walkRunMethods(false);
             fov.viewMeshFilter.gameObject.SetActive(false);
+            fov._isActive = false;
             //fov.dead = true;
             nav.enabled = false;
             GetComponent<Collider>().isTrigger = true;
-            //BackStabDeath();
+            Death();
             TriggerEffect();
         }
     }
@@ -344,20 +344,35 @@ public class NPCcontroller : MonoBehaviour
     {
         if (yourTurn && !dead)
         {
-            if (isOnCover)
+            
+            if (distracted || alerted || randomPosTrigger)
             {
-                CrouchIdle(true);
-                IdleAlert(false);
-            }
-            else if (distracted || alerted || randomPosTrigger)
-            {
-                IdleAlert(true);
-                CrouchIdle(false);
+                if (isOnCover)
+                {
+                    IdleAlert(false);
+                    if (isCover == 1)
+                    {
+                        CrouchIdle(true);
+                        CrouchIdleCover(false);
+                    }
+                    else
+                    {
+                        CrouchIdle(false);
+                        CrouchIdleCover(true);
+                    }
+                }
+                else
+                {
+                    IdleAlert(true);
+                    CrouchIdle(false);
+                    CrouchIdleCover(true);
+                }
             }
             else
             {
                 IdleAlert(false);
                 CrouchIdle(false);
+                CrouchIdleCover(false);
             }
 
             if (!SettingPathBool)
@@ -631,7 +646,7 @@ public class NPCcontroller : MonoBehaviour
         if (SettingPathBool)
         {
             Cover[] cover = coverList.ToArray();
-            Debug.Log(cover.Length);
+            //Debug.Log(position);
             List<GameObject> selectCoverList = new List<GameObject>();
             Vector3 finalPos = Vector3.zero;
             float lastClosestDistance = Vector3.Distance(transform.position, Vector3.positiveInfinity);
@@ -649,6 +664,9 @@ public class NPCcontroller : MonoBehaviour
             RaycastHit hitFirst;
             if (Physics.Raycast(position, Vector3.down, out hitFirst, blockMask))
             {
+                //Debug.Log(hitFirst.transform.position);
+                //Debug.Log(hitFirst.transform.gameObject);
+                Debug.DrawRay(position, Vector3.down*1000, Color.blue, Mathf.Infinity);
                 if (hitFirst.transform.GetComponent<Block>().pathIndex != 0)
                 {
                     randomPosTrigger = true;
@@ -671,8 +689,6 @@ public class NPCcontroller : MonoBehaviour
                 }
             }
             pos = new Vector3(finalPos.x,0.1f,finalPos.z);
-            testVct2 = position;
-            testVct = pos;
             //Debug.Log(pos);
             //Debug.Log(finalPos);
             indexAlert++;
@@ -721,6 +737,7 @@ public class NPCcontroller : MonoBehaviour
 
     private void RandomPositionTactical()
     {
+        playerSpotted = false;
         Vector3 randomDirection = Random.insideUnitSphere * unitsRangeMovement;
         randomDirection += lastKnowPosition;
         NavMeshHit hit;
@@ -819,25 +836,26 @@ public class NPCcontroller : MonoBehaviour
         anim.SetBool("walkAlert", b);
     }
 
-    //public void Fire(bool b)
-    //{
-    //    anim.SetBool("Fire", b);
-    //}
+    public void Fire()
+    {
+        anim.SetTrigger("fire");
+    }
 
-    //public void BackStabDeath()
-    //{
-    //    anim.SetTrigger("Death");
-    //}
+    public void Death()
+    {
+        anim.SetTrigger("death");
+    }
 
     public void CrouchIdle(bool b)
     {
         anim.SetBool("crouchIdle", b);
     }
 
-    public void CrouchWalk(bool b)
+    public void CrouchIdleCover(bool b)
     {
-        anim.SetBool("crouchWalk", b);
+        anim.SetBool("crouchIldeCover", b);
     }
+
 
     public void IdleAlert(bool b)
     {
@@ -851,10 +869,6 @@ public class NPCcontroller : MonoBehaviour
         {
             WalkAlert(b);
             //Walk(b);
-        }
-        else if (isOnCover)
-        {
-            CrouchWalk(b);
         }
         else 
         {
@@ -945,9 +959,8 @@ public class NPCcontroller : MonoBehaviour
 
     public IEnumerator KillPlayerAnim()
     {
-        //Fire(true);
         yield return new WaitForSeconds(1);
-        //Fire(false);
+        Fire();
         playerScript.Death();
         yield return new WaitForSeconds(3);
         system.Restart();
@@ -956,7 +969,6 @@ public class NPCcontroller : MonoBehaviour
 
 
     #endregion
-
 
     #region Handles
 #if UNITY_EDITOR

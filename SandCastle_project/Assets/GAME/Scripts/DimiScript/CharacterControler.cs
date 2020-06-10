@@ -94,6 +94,23 @@ public class CharacterControler : MonoBehaviour
         }
         else
         {
+            if(isCover == 1)
+            {
+                CoverIdle(false);
+                CoverCrouchIdle(true);
+            }
+            else if(isCover == 2)
+            {
+                CoverIdle(true);
+                CoverCrouchIdle(false);
+            }
+            else
+            {
+                CoverIdle(false);
+                CoverCrouchIdle(false);
+            }
+
+
             if (turnPlayer)
             {
                 skin.rotation = transform.rotation;
@@ -120,11 +137,14 @@ public class CharacterControler : MonoBehaviour
 
                     if (Input.GetKeyDown(KeyCode.Alpha1) && !occuped)
                     {
-                        Aim();
-                        occuped = true;
+                        if(fov.visibleTargets.ToArray().Length != 0)
+                        {
+                            Aim();
+                            occuped = true;
+                        }
                     }
 
-                    if (Input.GetKeyDown(KeyCode.Escape))
+                    if (Input.GetKeyDown(KeyCode.Escape) && occuped)
                     {
                         UnAim();
                         selectDevice = false;
@@ -169,7 +189,10 @@ public class CharacterControler : MonoBehaviour
         {
             if (TacticalMode)
             {
+                TacticalAnim(false);
                 TacticalMode = false;
+                Run(false);
+                WalkTactical(false);
                 ResetAllPreview();
                 SettingPathBool = false;
                 fov._isActive = false;
@@ -178,6 +201,9 @@ public class CharacterControler : MonoBehaviour
             }
             else
             {
+                Run(false);
+                WalkTactical(false);
+                TacticalAnim(true);
                 fov._isActive = true;
                 TacticalMode = true;
                 //sStartCoroutine(changeCamMode(1f, true));
@@ -276,7 +302,7 @@ public class CharacterControler : MonoBehaviour
                         isMoving = true;
                         actionPointIndex++;
                         ResetAllPreview();
-                        Run(true);
+                        WalkTactical(true);
                     }
                 }
                 else if (selectTrap && hit.transform.gameObject.layer == 8)
@@ -311,7 +337,7 @@ public class CharacterControler : MonoBehaviour
                                 isMoving = true;
                                 actionPointIndex++;
                                 ResetAllPreview();
-                                Run(true);
+                                WalkTactical(true);
                             }
                         }
                         else if(selectTrap && hitAll.transform.gameObject.layer == 8)
@@ -398,7 +424,7 @@ public class CharacterControler : MonoBehaviour
         if (dist <= 0.5f)
         {
             isMoving = false;
-            Run(false);
+            WalkTactical(false);
             if (StillYourTurn())
             {
                 cantMove = false;
@@ -637,7 +663,7 @@ public class CharacterControler : MonoBehaviour
     public void DontMove()
     {
         nav.isStopped = true;
-        Run(false);
+        WalkTactical(false);
     }
 
     public Vector3 RandomPositionAroundPlayer()
@@ -650,12 +676,15 @@ public class CharacterControler : MonoBehaviour
         RaycastHit hitBlock;
         if (Physics.Raycast(hit.position, Vector3.down, out hitBlock, blockMask))
         {
-            finalPosition = hitBlock.transform.position;
+            //Debug.Log("good");
+            //Debug.Log(hitBlock.transform.gameObject);
+            Vector3 posFinal = new Vector3(hitBlock.transform.position.x, hitBlock.transform.position.y + 1, hitBlock.transform.position.z);
+            finalPosition = posFinal;
             return finalPosition;
         }
         else
         {
-            
+            Debug.Log("fuck");
             finalPosition = hit.position;
             return finalPosition;
         }
@@ -683,20 +712,37 @@ public class CharacterControler : MonoBehaviour
         anim.SetBool("Run", b);
     }
 
-    public void CrouchIdle(bool b)
+    public void WalkTactical(bool b)
     {
-        anim.SetBool("CrouchIdle", b);
+        anim.SetBool("crouchWalk", b);
     }
 
-    public void Shoot(bool b)
+    public void CoverIdle(bool b)
     {
-        anim.SetBool("Shoot", b);
+        anim.SetBool("coverIdle", b);
+    }
+
+    public void CoverCrouchIdle(bool b)
+    {
+        anim.SetBool("coverCrouchIdle", b);
+    }
+
+    public void TacticalAnim(bool b)
+    {
+        anim.SetBool("tactical", b);
+    }
+
+    public void Shoot()
+    {
+        anim.SetTrigger("fire");
     }
 
     public void Death()
     {
         anim.SetTrigger("death");
     }
+
+
 
 
     #endregion
@@ -732,10 +778,17 @@ public class CharacterControler : MonoBehaviour
         Transform npc;
         npc = fov._actualTarget;
         transform.LookAt(npc);
-        Shoot(true);
+        
         yield return new WaitForSeconds(time);
-        Shoot(false);
+        Shoot();
         npc.GetComponent<NPCcontroller>().GetKill(false);
+        for (int i = 0; i < npc.GetComponent<NPCcontroller>().allyNPC.ToArray().Length; i++)
+        {
+            NPCcontroller npcAlly = npc.GetComponent<NPCcontroller>().allyNPC.ToArray()[i];
+            npcAlly.alertedPos = transform.position;
+            npcAlly.playerSpotted = true;
+            npcAlly.GetAlerted();
+        }
         yield return new WaitForSeconds(time);
         
         actionPointIndex++;

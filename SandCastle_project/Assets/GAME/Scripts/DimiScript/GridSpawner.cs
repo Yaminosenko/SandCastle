@@ -23,7 +23,7 @@ public class GridSpawner : MonoBehaviour
         {
             for (int z = 0; z < worldHeight; z++)
             {
-               Vector3 test = new Vector3(x * multiply, 0, z * multiply);
+                Vector3 test = new Vector3(x * multiply, 0, z * multiply);
 
 
                 GameObject block = Instantiate(blockPrefab, Vector3.zero, blockPrefab.transform.rotation) as GameObject;

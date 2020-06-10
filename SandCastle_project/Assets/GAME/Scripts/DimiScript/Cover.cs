@@ -57,7 +57,7 @@ public class Cover : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider col)
+    private void OnTriggerStay(Collider col)
     {
         if(col.gameObject.layer == 11 && col.GetComponent<CharacterControler>() != null)
         {
@@ -71,6 +71,7 @@ public class Cover : MonoBehaviour
         else if (col.gameObject.layer == 12 && col.GetComponent<NPCcontroller>() != null)
         {
             col.GetComponent<NPCcontroller>().isOnCover = true;
+            //Debug.Log("in");
         }
     }
 
@@ -84,6 +85,7 @@ public class Cover : MonoBehaviour
         else if (col.gameObject.layer == 12 && col.GetComponent<NPCcontroller>() != null)
         {
             col.GetComponent<NPCcontroller>().isOnCover = false;
+           // Debug.Log("out");
         }
     }
 }
