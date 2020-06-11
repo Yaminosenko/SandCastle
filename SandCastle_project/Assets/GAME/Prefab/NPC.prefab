@@ -247,6 +247,7 @@ MonoBehaviour:
   deadAlly: []
   offsetCam: {fileID: 4875875576965515871}
   allyNPC: []
+  isCover: 0
   pos: {x: 0, y: 0, z: 0}
   distractPos: {x: 0, y: 0, z: 0}
   alertedPos: {x: 0, y: 0, z: 0}
@@ -276,6 +277,8 @@ MonoBehaviour:
   camScriptInst: {fileID: 0}
   camShoulder: {fileID: 3575698755927005625, guid: 06eb120f8b47bbc46ac78074997b5eda,
     type: 3}
+  isOnCover: 0
+  fov: {fileID: 0}
 --- !u!114 &5478412904192090675
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -302,9 +305,11 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 1536
-  _isActive: 1
+  _isActive: 0
   visibleTargets: []
   playerFOV: 0
+  isDetector: 0
+  detectorScript: {fileID: 0}
   _CamPos: {fileID: 0}
   meshResolution: 1
   edgeResolveIterations: 0

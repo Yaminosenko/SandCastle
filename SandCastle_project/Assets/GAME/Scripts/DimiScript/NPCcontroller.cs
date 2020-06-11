@@ -600,7 +600,8 @@ public class NPCcontroller : MonoBehaviour
                     pos = hitFirst.transform.position;
                     MovementTactical();
                     oneAction = true;
-                    randomPosTrigger = true;
+                    //randomPosTrigger = true;
+
                     distracted = false;
                     Debug.Log("toShort");
                     return;

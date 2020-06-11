@@ -14,7 +14,7 @@ public class GridSpawner : MonoBehaviour
     public LayerMask layerMask;
     public CharacterControler chara;
     public int nbrOfBlocks;
-
+    public Transform testTrans;
     //public float spawnSpeed = 0.2f;
 
     void Start()
@@ -23,37 +23,40 @@ public class GridSpawner : MonoBehaviour
         {
             for (int z = 0; z < worldHeight; z++)
             {
-                Vector3 test = new Vector3(x * multiply, 0, z * multiply);
+                testTrans.localPosition = new Vector3(x * multiply, 0, z * multiply);
 
 
-                GameObject block = Instantiate(blockPrefab, Vector3.zero, blockPrefab.transform.rotation) as GameObject;
-                block.transform.parent = transform;
-                block.GetComponent<Block>().angleSloap = angleSlop;
-                block.GetComponent<Block>().player = chara;
-                block.transform.localPosition = new Vector3(x * multiply, 0, z * multiply);
+                //GameObject block = Instantiate(blockPrefab, Vector3.zero, blockPrefab.transform.rotation) as GameObject;
+                //block.transform.parent = transform;
+                //block.GetComponent<Block>().angleSloap = angleSlop;
+                //block.GetComponent<Block>().player = chara;
+                //block.transform.localPosition = new Vector3(x * multiply, 0, z * multiply);
 
 
                 RaycastHit hit;
-                if (Physics.Raycast(block.transform.position, block.transform.TransformDirection(Vector3.down), out hit, Mathf.Infinity, layerMask))
+                if (Physics.Raycast(testTrans.transform.position, testTrans.transform.TransformDirection(Vector3.down), out hit, Mathf.Infinity, layerMask))
                 {
                     if (hit.collider.gameObject.layer == 9)
                     {
+                        GameObject block = Instantiate(blockPrefab, Vector3.zero, blockPrefab.transform.rotation) as GameObject;
+                        block.transform.parent = transform;
+                        block.GetComponent<Block>().angleSloap = angleSlop;
+                        block.GetComponent<Block>().player = chara;
+                        block.transform.localPosition = new Vector3(x * multiply, 0, z * multiply);
                         block.GetComponent<Block>().positionY = hit.point.y;
                         nbrOfBlocks++;
+                        if (hit.collider.gameObject.tag == "Stair")
+                        {
+                            block.GetComponent<Block>().isStair = true;
+                            block.GetComponent<Block>().stairScript = hit.collider.GetComponentInChildren<NavMeshLink>();
+                        }
                     }
-                    else
-                        Destroy(block);
-                    if (hit.collider.gameObject.tag == "Stair")
-                    {
-                        block.GetComponent<Block>().isStair = true;
-                        block.GetComponent<Block>().stairScript = hit.collider.GetComponentInChildren<NavMeshLink>();
-
-                    }
+                    
                 }
-                else
-                {
-                    Destroy(block);
-                }
+                //else
+                //{
+                //    Destroy(block);
+                //}
             }
         }
     }
