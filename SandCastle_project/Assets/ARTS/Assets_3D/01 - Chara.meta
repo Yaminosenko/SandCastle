@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD:SandCastle_project/Assets/ARTS/Textures_Rock_Sand.meta
+guid: 85f49cbc25bab6e4d9dbddf5dc2c642d
+=======
 guid: edee50af98a3ec343a68604f577d26b1
+>>>>>>> 9e032ac30b65adc169a9578d72275b29573168c1:SandCastle_project/Assets/ARTS/Assets_3D/01 - Chara.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
