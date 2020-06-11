@@ -134,8 +134,8 @@ public class CharacterControler : MonoBehaviour
                         DeviceChoice();
                     else if (selectInvisiblity)
                         Invisibility();
-                    else if (selectTrap)
-                        TrapSetUp();
+                    //else if (selectTrap)
+                        //TrapSetUp();
 
                     if (Input.GetKeyDown(KeyCode.Alpha1) && !occuped)
                     {
@@ -315,7 +315,9 @@ public class CharacterControler : MonoBehaviour
                         GameObject trap = Instantiate(trapToInst, pos, Quaternion.identity);
                         trap.transform.position = pos;
                         trap.GetComponent<TrapScript>().player = this;
-                        StartCoroutine(TrapEnable(1));
+                        trap.GetComponentInChildren<MeshRenderer>().enabled = false;
+                        StartCoroutine(TrapEnable(1, trap.GetComponentInChildren<MeshRenderer>(), trap.GetComponent<TrapScript>()));
+                        //Debug.Log(AnimationLength("Trap"));
                     }
                 }
                 else if(hit.transform.gameObject.layer == 13)
@@ -350,7 +352,9 @@ public class CharacterControler : MonoBehaviour
                                 GameObject trap = Instantiate(trapToInst, pos, Quaternion.identity);
                                 trap.transform.position = pos;
                                 trap.GetComponent<TrapScript>().player = this;
-                                StartCoroutine(TrapEnable(1));
+                                trap.GetComponentInChildren<MeshRenderer>().enabled = false;
+                                StartCoroutine(TrapEnable(1, trap.GetComponentInChildren<MeshRenderer>(), trap.GetComponent<TrapScript>()));
+                                //Debug.Log(AnimationLength("Trap"));
                             }
                         }
                     }
@@ -534,6 +538,7 @@ public class CharacterControler : MonoBehaviour
         Debug.Log(selectDeviceScript);
             selectDeviceScript.SecuSound();
             selectDeviceScript.ResetPreview();
+            Hack();
             actionPointIndex++;
             if (StillYourTurn())
             {
@@ -590,10 +595,6 @@ public class CharacterControler : MonoBehaviour
         //mesh.material = /*new Material(0,0,0)*/
     }
 
-    private void TrapSetUp()
-    {
-
-    }
 
     #endregion
 
@@ -701,11 +702,13 @@ public class CharacterControler : MonoBehaviour
         float time = 0;
         RuntimeAnimatorController ac = anim.runtimeAnimatorController;
 
+        //for (int i = 0; i < ac.animationClips.Length; i++)
+        //    if (ac.animationClips[i].name == name)
+        //        time = ac.animationClips[i].length;
         for (int i = 0; i < ac.animationClips.Length; i++)
-            if (ac.animationClips[i].name == name)
-                time = ac.animationClips[i].length;
-
-        //Debug.Log(time);
+        {
+            Debug.Log(ac.animationClips[i].name);
+        }
         return time;
     }
 
@@ -734,6 +737,11 @@ public class CharacterControler : MonoBehaviour
         anim.SetBool("tactical", b);
     }
 
+    public void Ladder(bool b)
+    {
+        anim.SetBool("ladder", b);
+    }
+
     public void Shoot()
     {
         anim.SetTrigger("fire");
@@ -744,8 +752,15 @@ public class CharacterControler : MonoBehaviour
         anim.SetTrigger("death");
     }
 
+    public void Hack()
+    {
+        anim.SetTrigger("hack");
+    }
 
-
+    public void TrapAnim()
+    {
+        anim.SetTrigger("trap");
+    }
 
     #endregion
 
@@ -816,9 +831,12 @@ public class CharacterControler : MonoBehaviour
         }
     }
 
-    IEnumerator TrapEnable(float time)
+    IEnumerator TrapEnable(float time, MeshRenderer mesh, TrapScript trap)
     {
+        TrapAnim();
         yield return new WaitForSeconds(time);
+        mesh.enabled = true;
+        trap.active = true;
         actionPointIndex++;
         if (StillYourTurn())
         {
