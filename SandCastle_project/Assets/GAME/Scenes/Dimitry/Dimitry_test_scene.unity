@@ -1219,6 +1219,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5478412904192090675, guid: 72e5342fe17fa2e4e9f8fd5a3c733654,
+        type: 3}
+      propertyPath: _isActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8294151680752949951, guid: 72e5342fe17fa2e4e9f8fd5a3c733654,
         type: 3}
       propertyPath: PatrolPath.Array.size
@@ -1922,6 +1927,16 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1134453153}
+    - target: {fileID: 5478412904192090675, guid: 72e5342fe17fa2e4e9f8fd5a3c733654,
+        type: 3}
+      propertyPath: iSeeYou
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5478412904192090675, guid: 72e5342fe17fa2e4e9f8fd5a3c733654,
+        type: 3}
+      propertyPath: _isActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8294151680752949951, guid: 72e5342fe17fa2e4e9f8fd5a3c733654,
         type: 3}
       propertyPath: allyNPC.Array.size
