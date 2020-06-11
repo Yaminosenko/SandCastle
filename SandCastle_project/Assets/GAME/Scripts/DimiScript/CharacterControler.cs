@@ -29,8 +29,9 @@ public class CharacterControler : MonoBehaviour
     public float speedPlayer = 4;
     public bool isOnCombat;
     public List<Device> deviceList = new List<Device>();
-    public int Water;
+    public float Water;
     public int Trap;
+    public float waterWasteOnAction = 10f;
 
     [Header("TacticalMode")]
     public bool TacticalMode = false;
@@ -57,7 +58,7 @@ public class CharacterControler : MonoBehaviour
     private Vector3 vel;
     private Rigidbody rb;
     private Vector3 velocity;
-    private NavMeshAgent nav;
+    public  NavMeshAgent nav;
     private int indexRangeMovement;
     private int actionPointIndex;
     private Vector3 secuPathPreview;
@@ -72,6 +73,7 @@ public class CharacterControler : MonoBehaviour
     private Device selectDeviceScript;
     private bool selectInvisiblity;
     public bool selectTrap;
+    private float baseTacticalSpeed;
 
 
     #endregion 
@@ -83,6 +85,8 @@ public class CharacterControler : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         nav = GetComponent<NavMeshAgent>();
         fov = GetComponent<FieldOfView>();
+        InvokeRepeating("WaterFreeWaste", 1f, 0.1f);
+        baseTacticalSpeed = nav.speed;
         if(system != null)
             system.player = gameObject.GetComponent<CharacterControler>();
     }
@@ -93,6 +97,8 @@ public class CharacterControler : MonoBehaviour
         {
             SimpleMove();
             FinalMove();
+
+            
         }
         else
         {
@@ -120,7 +126,7 @@ public class CharacterControler : MonoBehaviour
                     Movement();
                 else
                 {
-                    if (Input.GetKeyDown(KeyCode.O))
+                    if (Input.GetKeyDown(KeyCode.L))
                         ShootKill();
                 }
                 if (!SettingPathBool)
@@ -175,7 +181,7 @@ public class CharacterControler : MonoBehaviour
                         pathWaypoint.Clear();
                     }
 
-                    if (Input.GetKeyDown(KeyCode.Alpha4) && !occuped)
+                    if (Input.GetKeyDown(KeyCode.Alpha4) && !occuped && Trap != 0)
                     {
                         occuped = true;
                         selectTrap = true;
@@ -276,6 +282,12 @@ public class CharacterControler : MonoBehaviour
 
         velocity = Vector3.zero;
     }
+
+    private void WaterFreeWaste()
+    {
+        if(!TacticalMode)
+            Water -= 0.05f;
+    }
     #endregion
 
     #region Tactical Movement Methode
@@ -303,6 +315,7 @@ public class CharacterControler : MonoBehaviour
                         cantMove = true;
                         isMoving = true;
                         actionPointIndex++;
+                        WaterWaste(waterWasteOnAction);
                         ResetAllPreview();
                         WalkTactical(true);
                     }
@@ -314,9 +327,11 @@ public class CharacterControler : MonoBehaviour
                         pos = new Vector3(hit.collider.transform.position.x, hit.collider.transform.position.y, hit.collider.transform.position.z);
                         GameObject trap = Instantiate(trapToInst, pos, Quaternion.identity);
                         trap.transform.position = pos;
+                        WaterWaste(waterWasteOnAction);
                         trap.GetComponent<TrapScript>().player = this;
                         trap.GetComponentInChildren<MeshRenderer>().enabled = false;
                         StartCoroutine(TrapEnable(1, trap.GetComponentInChildren<MeshRenderer>(), trap.GetComponent<TrapScript>()));
+                        Trap--;
                         //Debug.Log(AnimationLength("Trap"));
                     }
                 }
@@ -340,6 +355,7 @@ public class CharacterControler : MonoBehaviour
                                 cantMove = true;
                                 isMoving = true;
                                 actionPointIndex++;
+                                WaterWaste(waterWasteOnAction);
                                 ResetAllPreview();
                                 WalkTactical(true);
                             }
@@ -352,8 +368,10 @@ public class CharacterControler : MonoBehaviour
                                 GameObject trap = Instantiate(trapToInst, pos, Quaternion.identity);
                                 trap.transform.position = pos;
                                 trap.GetComponent<TrapScript>().player = this;
+                                WaterWaste(waterWasteOnAction);
                                 trap.GetComponentInChildren<MeshRenderer>().enabled = false;
                                 StartCoroutine(TrapEnable(1, trap.GetComponentInChildren<MeshRenderer>(), trap.GetComponent<TrapScript>()));
+                                Trap--;
                                 //Debug.Log(AnimationLength("Trap"));
                             }
                         }
@@ -426,6 +444,18 @@ public class CharacterControler : MonoBehaviour
     {
         Vector3 newPos = new Vector3(pos.x, transform.position.y - 0.5f, pos.z);
         float dist = Vector3.Distance(transform.position, newPos);
+
+        //if(nav.isOnOffMeshLink)
+        //{
+        //    Debug.Log("navLink");
+        //    nav.speed = 1;
+        //    Ladder(true);
+        //}
+        //else if(isMoving)
+        //{
+        //    nav.speed = baseTacticalSpeed;
+        //    Ladder(false);
+        //}
            // Debug.Log(dist);
         if (dist <= 0.5f)
         {
@@ -535,7 +565,8 @@ public class CharacterControler : MonoBehaviour
         selectDeviceScript.PreviewRangeDevice();
         if (Input.GetKeyDown(KeyCode.L))
         {
-        Debug.Log(selectDeviceScript);
+            Debug.Log(selectDeviceScript);
+            WaterWaste(waterWasteOnAction);
             selectDeviceScript.SecuSound();
             selectDeviceScript.ResetPreview();
             Hack();
@@ -586,6 +617,7 @@ public class CharacterControler : MonoBehaviour
         targetPlayer = true;
         if (Input.GetKeyDown(KeyCode.L))
         {
+            WaterWaste(waterWasteOnAction);
             isInvisble = true;
             system.cdInvisibilty = true;
             StartCoroutine(getInvisible(1));
@@ -656,9 +688,9 @@ public class CharacterControler : MonoBehaviour
 
     private void ShootKill()
     {
-        
         if (fov._actualTarget != null)
         {
+            WaterWaste(waterWasteOnAction);
             StartCoroutine(KillNPC(1.5f));
         }
     }
@@ -691,6 +723,11 @@ public class CharacterControler : MonoBehaviour
             finalPosition = hit.position;
             return finalPosition;
         }
+    }
+
+    private void WaterWaste(float percents)
+    {
+        Water -= percents;
     }
 
     #endregion

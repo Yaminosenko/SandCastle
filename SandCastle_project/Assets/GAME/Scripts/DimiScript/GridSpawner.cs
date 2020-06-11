@@ -49,6 +49,7 @@ public class GridSpawner : MonoBehaviour
                         {
                             block.GetComponent<Block>().isStair = true;
                             block.GetComponent<Block>().stairScript = hit.collider.GetComponentInChildren<NavMeshLink>();
+
                         }
                     }
                     

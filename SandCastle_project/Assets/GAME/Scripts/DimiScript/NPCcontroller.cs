@@ -314,7 +314,6 @@ public class NPCcontroller : MonoBehaviour
             walkRunMethods(false);
             fov.viewMeshFilter.gameObject.SetActive(false);
             fov._isActive = false;
-            //fov.dead = true;
             nav.enabled = false;
             GetComponent<Collider>().isTrigger = true;
             Death();

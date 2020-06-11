@@ -7,26 +7,34 @@ public class StairBlock : MonoBehaviour
 
     public Transform targetStair;
     public LayerMask layerMask;
+    public Transform stair;
+    public float angle;
  
     void Start()
     {
-        //navLink = GetComponent<NavMeshLink>();
-        //navLink.startPoint = transform.position;
-        //targetStair = GetComponentInChildren<Transform>();
-        RaycastHit hit;
-        if(Physics.Raycast(targetStair.position, targetStair.TransformDirection(Vector3.down), out hit, 2, layerMask))
-        {
-            if (hit.transform.gameObject.layer == 9)
-            {
-
-            }
-                //navLink.endPoint = hit.point;
-        }
+        //Vector3 pos = new Vector3(transform.position.x, transform.position.y + 1, transform.position.z);
+        //RaycastHit hit;
+        //if(Physics.Raycast(pos, targetStair.TransformDirection(Vector3.forward), out hit, 2, layerMask))
+        //{
+            
+        //}
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    //private void OnTriggerEnter(Collider col)
+    //{
+    //    if (col.gameObject.layer == 11)
+    //    {
+    //        //CharacterControler player = col.gameObject.GetComponent<CharacterControler>();
+    //        //Debug.Log(col.gameObject + " " + player);
+    //        //player.transform.rotation = Quaternion.LookRotation(stair.position);
+    //        //player.nav.isStopped = true;
+    //        //player.WalkTactical(false);
+    //        //player.Ladder(true);
+    //        //player.nav.speed = 1;
+    //        //player.nav.isOnOffMeshLink;
+
+    //    }
+    //}
+
+    //IEnumerator
 }

@@ -294,6 +294,8 @@ MonoBehaviour:
   speedPlayer: 5
   isOnCombat: 0
   deviceList: []
+  Water: 100
+  Trap: 2
   TacticalMode: 0
   invisibilityDuration: 2
   pos: {x: 0, y: 0, z: 0}
@@ -314,6 +316,7 @@ MonoBehaviour:
   selectDevice: 0
   targetPlayer: 0
   isInvisble: 0
+  nav: {fileID: 0}
   selectTrap: 0
 --- !u!54 &5146668735904368489
 Rigidbody:
@@ -382,6 +385,8 @@ MonoBehaviour:
   _isActive: 0
   visibleTargets: []
   playerFOV: 0
+  isDetector: 0
+  detectorScript: {fileID: 0}
   _CamPos: {fileID: 0}
   meshResolution: 5
   edgeResolveIterations: 0
