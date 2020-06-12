@@ -561,7 +561,7 @@ public class CharacterControler : MonoBehaviour
 
     #endregion
 
-    #region Other Tactical Methods
+    #region Other Methods
 
     private bool StillYourTurn()
     {
@@ -661,6 +661,15 @@ public class CharacterControler : MonoBehaviour
         Water -= percents;
     }
 
+    private void PassTurn()
+    {
+        actionPointIndex = actionPoint;
+        if (StillYourTurn())
+        {
+
+        }
+    }
+
     public void ChangeMode()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -750,6 +759,11 @@ public class CharacterControler : MonoBehaviour
             pathPreviewLine.positionCount = 0;
             pathWaypoint.Clear();
         }
+
+        //if (Input.GetKeyDown(KeyCode.O))
+        //{
+        //    PassTurn();
+        //}
     }
 
     #endregion
