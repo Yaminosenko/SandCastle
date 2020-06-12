@@ -30,7 +30,7 @@ public class SytemTurn : MonoBehaviour
         NPCcontroller[] npcTab = actualEnnemy.ToArray();
         npcTurn = null;
         indexNbrTurn++;
-        if(indexNbrTurn == nbrTurnMax)
+        if (indexNbrTurn == nbrTurnMax)
         {
             cam.target = player.transform;
             StartCoroutine(waitEndTurnNPC());
@@ -48,18 +48,7 @@ public class SytemTurn : MonoBehaviour
                     else
                     {
                         indexNbrTurn++;
-                        deadIndex++;
-                        if(deadIndex == nbrTurnMax)
-                        {
-                            player.ChangeMode();
-                        }
-                        if (indexNbrTurn == nbrTurnMax)
-                        {
-                            cam.target = player.transform;
-                            StartCoroutine(waitEndTurnNPC());
-                            indexNbrTurn = 0;
-                            return;
-                        }
+                        AutoFreeMode();
                     }
                 }
             }
@@ -110,6 +99,35 @@ public class SytemTurn : MonoBehaviour
     {
         yield return new WaitForSeconds(time);
         NextTurn();
+    }
+
+
+    private void AutoFreeMode()
+    {
+        deadIndex++;
+        Debug.Log(deadIndex + " " + nbrTurnMax);
+        if (deadIndex == nbrTurnMax)
+        {
+            player.isOnCombat = false;
+            player.ChangeModePublic();
+            deadIndex = 0;
+            indexNbrTurn = 0;
+            if (cdInvisibilty)
+            {
+                coolDownInv++;
+                if (coolDownInv == coolDownInvisibility)
+                    cdInvisibilty = false;
+
+                if (coolDownInv == player.invisibilityDuration)
+                    player.isInvisble = false;
+            }
+            cam.turnPlayer = true;
+            player.turnPlayer = true;
+            player.cantMove = false;
+            //cantMove = false;
+            player.SettingPathBool = false;
+            return;
+        }
     }
 
     IEnumerator waitEndTurnNPC()

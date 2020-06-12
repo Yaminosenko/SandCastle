@@ -15,6 +15,7 @@ public class TriggerRef : MonoBehaviour
     private List<NPCcontroller> npclist = new List<NPCcontroller>();
     private List<Device> deviceList = new List<Device>();
     private CharacterControler player;
+    public bool npcStillHere = true;
 
 
     private void OnEnable()

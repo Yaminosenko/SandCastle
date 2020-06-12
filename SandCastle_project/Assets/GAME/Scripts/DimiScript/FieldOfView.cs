@@ -146,9 +146,12 @@ public class FieldOfView : MonoBehaviour {
                     RaycastHit hit;
                     if (Vector3.Angle(t.forward, dirToTarget) < viewAngle / 2)
                     {
+                        
                         float dstToTarget = Vector3.Distance(t.position, targetPos);
                         if (!Physics.Raycast(t.position, dirToTarget, out hit, dstToTarget, obstacleMask))
                         {
+                            
+
                             if (dstToTarget < 3 && !playerFOV && !isDetector)
                             {
                                 AddNPCTarget(target);
@@ -161,14 +164,18 @@ public class FieldOfView : MonoBehaviour {
                             if (!isDetector)
                             {
                                 if (!playerFOV)
+                                {
                                     if (!player.isInvisble)
                                         AddNPCTarget(target);
-                                    else if (!target.transform.GetComponent<NPCcontroller>().dead)
-                                        visibleTargets.Add(target);
+                                }
+                                else if (!target.transform.GetComponent<NPCcontroller>().dead)
+                                    visibleTargets.Add(target);
+
                             }
                         }
                         else if (Physics.Raycast(t.position, dirToTarget, out hit, dstToTarget, obstacleMask))
                         {
+                       
                             if (hit.transform.gameObject.tag == "Obs1" && target.gameObject.layer == 11)
                             {
                                 //visibleTargets.Add(target);
@@ -183,6 +190,7 @@ public class FieldOfView : MonoBehaviour {
                         }
                         else
                         {
+                         
                             Debug.DrawRay(t.position, dirToTarget * hit.distance, Color.blue, Mathf.Infinity);
                         }
                     }

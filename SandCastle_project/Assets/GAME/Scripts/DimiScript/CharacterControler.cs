@@ -85,6 +85,7 @@ public class CharacterControler : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         nav = GetComponent<NavMeshAgent>();
         fov = GetComponent<FieldOfView>();
+        system = system = GameObject.Find("SystemTurn").GetComponent<SytemTurn>();
         InvokeRepeating("WaterFreeWaste", 1f, 0.1f);
         baseTacticalSpeed = nav.speed;
         if(system != null)
@@ -97,8 +98,6 @@ public class CharacterControler : MonoBehaviour
         {
             SimpleMove();
             FinalMove();
-
-            
         }
         else
         {
@@ -121,6 +120,7 @@ public class CharacterControler : MonoBehaviour
 
             if (turnPlayer)
             {
+                
                 skin.rotation = transform.rotation;
                 if(!isAiming)
                     Movement();
@@ -240,7 +240,8 @@ public class CharacterControler : MonoBehaviour
 
                     if (Input.GetMouseButtonDown(1) && hit.transform.GetComponent<Block>().pathIndex != 0)
                     {
-                        pos = new Vector3(hit.collider.transform.position.x, hit.collider.transform.position.y + transform.position.y, hit.collider.transform.position.z);
+                        pos = new Vector3(hit.collider.transform.position.x, hit.collider.transform.position.y + 0.5f, hit.collider.transform.position.z);
+
                         camControl.target = transform;
                         nav.SetDestination(pos);
                         cantMove = true;
@@ -280,7 +281,7 @@ public class CharacterControler : MonoBehaviour
 
                             if (Input.GetMouseButtonDown(1) && hitAll.transform.GetComponent<Block>().pathIndex != 0 )
                             {
-                                pos = new Vector3(hitAll.collider.transform.position.x, hitAll.collider.transform.position.y + transform.position.y, hitAll.collider.transform.position.z);
+                                pos = new Vector3(hitAll.collider.transform.position.x, hitAll.collider.transform.position.y + 0.5f, hitAll.collider.transform.position.z);
                                 nav.SetDestination(pos);
                                 camControl.target = transform; 
                                 cantMove = true;
@@ -670,12 +671,28 @@ public class CharacterControler : MonoBehaviour
         }
     }
 
-    public void ChangeMode()
+    public void ChangeModePublic()
+    {
+        Debug.Log("free");
+        TacticalAnim(false);
+        TacticalMode = false;
+        Run(false);
+        WalkTactical(false);
+        ResetAllPreview();
+        SettingPathBool = false;
+        fov._isActive = false;
+        nav.ResetPath();
+        camControl.ChangeMode();
+        //StartCoroutine(changeCamMode(1f, false));
+    }
+
+    private  void ChangeMode()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (TacticalMode && !isOnCombat)
             {
+
                 TacticalAnim(false);
                 TacticalMode = false;
                 Run(false);
@@ -687,14 +704,14 @@ public class CharacterControler : MonoBehaviour
                 camControl.ChangeMode();
                 //StartCoroutine(changeCamMode(1f, false));
             }
-            else
+            else if(!TacticalMode)
             {
                 RaycastHit hit;
                 if(Physics.Raycast(transform.position, Vector3.down, out hit, blockMask))
                 {
                     if(hit.transform.gameObject.layer == 8)
                     {
-                        Debug.Log(hit.transform.gameObject);
+                        Debug.Log("tactic");
                         Run(false);
                         WalkTactical(false);
                         TacticalAnim(true);

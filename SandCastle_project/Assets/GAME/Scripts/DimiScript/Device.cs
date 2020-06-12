@@ -52,7 +52,7 @@ public class Device : MonoBehaviour
         Vector3 pos = new Vector3(transform.position.x + 0.5f, transform.position.y, transform.position.z + 0.5f);
         Collider[] npcToDistract = Physics.OverlapSphere(pos, radiusRange, npcMask);
 
-        Debug.Log(npcToDistract.Length);
+
         for (int i = 0; i < npcToDistract.Length; i++)
         {
             NPCcontroller npc = npcToDistract[i].GetComponent<NPCcontroller>();
@@ -65,6 +65,7 @@ public class Device : MonoBehaviour
             NavMesh.SamplePosition(originGround, out hit, 30, 1);
             Vector3 targetPosToFollow = hit.position;
             targetPosToFollow.y = targetPosToFollow.y + 0.5f;
+            Debug.Log(targetPosToFollow);
             npc.distractPos = targetPosToFollow;
             npc.HeardSomething();
         }
