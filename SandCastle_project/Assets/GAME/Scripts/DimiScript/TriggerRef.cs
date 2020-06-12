@@ -5,7 +5,7 @@ using UnityEngine;
 public class TriggerRef : MonoBehaviour
 {
     public bool isRefresh;
-    private SytemTurn system;
+    public SytemTurn system;
 
     public List<NPCcontroller> npcArea = new List<NPCcontroller>();
     public List<Device> deviceArea = new List<Device>();
@@ -14,6 +14,7 @@ public class TriggerRef : MonoBehaviour
 
     private List<NPCcontroller> npclist = new List<NPCcontroller>();
     private List<Device> deviceList = new List<Device>();
+    private CharacterControler player;
 
 
     private void OnEnable()
@@ -26,7 +27,9 @@ public class TriggerRef : MonoBehaviour
     {
         if(col.transform.gameObject.layer == 11)
         {
-            CharacterControler player = col.GetComponent<CharacterControler>();
+            player = col.GetComponent<CharacterControler>();
+            player.isOnCombat = true;
+            
 
             for (int i = 0; i < player.deviceList.ToArray().Length; i++)
             {
@@ -70,22 +73,29 @@ public class TriggerRef : MonoBehaviour
         }
     }
 
-
-    public void OnTriggerExit(Collider col)
+    private void OnTriggerExit(Collider col)
     {
-        if (col.transform.gameObject.layer == 11 && isRefresh)
+        if(col.transform.gameObject.layer == 11)
         {
-            npcArea.Clear();
-            deviceArea.Clear();
-            for (int i = 0; i < deviceList.ToArray().Length; i++)
-            {
-                deviceArea.Add(deviceList.ToArray()[i]);
-            }
-
-            for (int i = 0; i < npclist.ToArray().Length; i++)
-            {
-                npcArea.Add(npclist.ToArray()[i]);
-            }
+            player.isOnCombat = false;
         }
     }
+
+    //public void OnTriggerExit(Collider col)
+    //{
+    //    if (col.transform.gameObject.layer == 11 && isRefresh)
+    //    {
+    //        npcArea.Clear();
+    //        deviceArea.Clear();
+    //        for (int i = 0; i < deviceList.ToArray().Length; i++)
+    //        {
+    //            deviceArea.Add(deviceList.ToArray()[i]);
+    //        }
+
+    //        for (int i = 0; i < npclist.ToArray().Length; i++)
+    //        {
+    //            npcArea.Add(npclist.ToArray()[i]);
+    //        }
+    //    }
+    //}
 }

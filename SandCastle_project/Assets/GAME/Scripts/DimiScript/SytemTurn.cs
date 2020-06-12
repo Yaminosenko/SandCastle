@@ -15,6 +15,7 @@ public class SytemTurn : MonoBehaviour
     private int nbrTurnMax;
     [SerializeField]private int indexNbrTurn;
     private int coolDownInv;
+    private int deadIndex;
 
 
     private void Start()
@@ -47,6 +48,11 @@ public class SytemTurn : MonoBehaviour
                     else
                     {
                         indexNbrTurn++;
+                        deadIndex++;
+                        if(deadIndex == nbrTurnMax)
+                        {
+                            player.ChangeMode();
+                        }
                         if (indexNbrTurn == nbrTurnMax)
                         {
                             cam.target = player.transform;

@@ -141,82 +141,13 @@ public class CharacterControler : MonoBehaviour
                     else if (selectInvisiblity)
                         Invisibility();
                     //else if (selectTrap)
-                        //TrapSetUp();
-
-                    if (Input.GetKeyDown(KeyCode.Alpha1) && !occuped)
-                    {
-                        if(fov.visibleTargets.ToArray().Length != 0)
-                        {
-                            Aim();
-                            occuped = true;
-                        }
-                    }
-
-                    if (Input.GetKeyDown(KeyCode.Escape) && occuped)
-                    {
-                        UnAim();
-                        selectDevice = false;
-                        selectInvisiblity = false;
-                        selectTrap = false;
-                        occuped = false;
-                        camControl.target = transform;
-                        if (selectDeviceScript != null)
-                            selectDeviceScript.ResetPreview();
-                        StartCoroutine(CamTargetPlayer());
-                    }
-
-                    if (Input.GetKeyDown(KeyCode.Alpha2) && !occuped)
-                    {
-                        selectDevice = true;
-                        occuped = true;
-                        pathPreviewLine.positionCount = 0;
-                        pathWaypoint.Clear();
-                    }
-
-                    if(Input.GetKeyDown(KeyCode.Alpha3) && !occuped && !system.cdInvisibilty)
-                    {
-                        occuped = true;
-                        selectInvisiblity = true;
-                        pathPreviewLine.positionCount = 0;
-                        pathWaypoint.Clear();
-                    }
-
-                    if (Input.GetKeyDown(KeyCode.Alpha4) && !occuped && Trap != 0)
-                    {
-                        occuped = true;
-                        selectTrap = true;
-                        StartCoroutine(CamTargetPlayer());
-                        pathPreviewLine.positionCount = 0;
-                        pathWaypoint.Clear();
-                    }
+                    //TrapSetUp();
+                    UpdateInpute();
                 }
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && !isOnCombat)
-        {
-            if (TacticalMode)
-            {
-                TacticalAnim(false);
-                TacticalMode = false;
-                Run(false);
-                WalkTactical(false);
-                ResetAllPreview();
-                SettingPathBool = false;
-                fov._isActive = false;
-                nav.ResetPath();
-                //StartCoroutine(changeCamMode(1f, false));
-            }
-            else
-            {
-                Run(false);
-                WalkTactical(false);
-                TacticalAnim(true);
-                fov._isActive = true;
-                TacticalMode = true;
-                //sStartCoroutine(changeCamMode(1f, true));
-            }
-        }
+        ChangeMode();
     }
 
     #endregion
@@ -728,6 +659,97 @@ public class CharacterControler : MonoBehaviour
     private void WaterWaste(float percents)
     {
         Water -= percents;
+    }
+
+    public void ChangeMode()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (TacticalMode && !isOnCombat)
+            {
+                TacticalAnim(false);
+                TacticalMode = false;
+                Run(false);
+                WalkTactical(false);
+                ResetAllPreview();
+                SettingPathBool = false;
+                fov._isActive = false;
+                nav.ResetPath();
+                camControl.ChangeMode();
+                //StartCoroutine(changeCamMode(1f, false));
+            }
+            else
+            {
+                RaycastHit hit;
+                if(Physics.Raycast(transform.position, Vector3.down, out hit, blockMask))
+                {
+                    if(hit.transform.gameObject.layer == 8)
+                    {
+                        Debug.Log(hit.transform.gameObject);
+                        Run(false);
+                        WalkTactical(false);
+                        TacticalAnim(true);
+                        fov._isActive = true;
+                        TacticalMode = true;
+                        camControl.ChangeMode();
+                    }
+                }
+                //sStartCoroutine(changeCamMode(1f, true));
+            }
+        }
+    }
+
+    private void UpdateInpute()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1) && !occuped)
+        {
+            if (fov.visibleTargets.ToArray().Length != 0)
+            {
+                Aim();
+                occuped = true;
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape) && occuped)
+        {
+            UnAim();
+            selectDevice = false;
+            selectInvisiblity = false;
+            selectTrap = false;
+            occuped = false;
+            camControl.target = transform;
+            if (selectDeviceScript != null)
+                selectDeviceScript.ResetPreview();
+            StartCoroutine(CamTargetPlayer());
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha2) && !occuped)
+        {
+            if(deviceList.ToArray().Length != 0)
+            {
+                selectDevice = true;
+                occuped = true;
+                pathPreviewLine.positionCount = 0;
+                pathWaypoint.Clear();
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha3) && !occuped && !system.cdInvisibilty)
+        {
+            occuped = true;
+            selectInvisiblity = true;
+            pathPreviewLine.positionCount = 0;
+            pathWaypoint.Clear();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha4) && !occuped && Trap != 0)
+        {
+            occuped = true;
+            selectTrap = true;
+            StartCoroutine(CamTargetPlayer());
+            pathPreviewLine.positionCount = 0;
+            pathWaypoint.Clear();
+        }
     }
 
     #endregion

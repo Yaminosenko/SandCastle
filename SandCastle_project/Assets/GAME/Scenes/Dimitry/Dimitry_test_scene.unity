@@ -1768,7 +1768,7 @@ PrefabInstance:
     - target: {fileID: 832849504852499604, guid: d7b7194919229c54babcfb8cd24a3db3,
         type: 3}
       propertyPath: deviceList.Array.size
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 832849504852499604, guid: d7b7194919229c54babcfb8cd24a3db3,
         type: 3}
@@ -1957,7 +1957,7 @@ PrefabInstance:
     - target: {fileID: 5478412904192090675, guid: 72e5342fe17fa2e4e9f8fd5a3c733654,
         type: 3}
       propertyPath: _isActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8294151680752949951, guid: 72e5342fe17fa2e4e9f8fd5a3c733654,
         type: 3}
@@ -2282,9 +2282,39 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5098237018104219482, guid: 01b5763018526de42ab636d9aa71804a,
         type: 3}
+      propertyPath: deviceArea.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5098237018104219482, guid: 01b5763018526de42ab636d9aa71804a,
+        type: 3}
+      propertyPath: detectorArea.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5098237018104219482, guid: 01b5763018526de42ab636d9aa71804a,
+        type: 3}
       propertyPath: isRefresh
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5098237018104219482, guid: 01b5763018526de42ab636d9aa71804a,
+        type: 3}
+      propertyPath: npcArea.Array.data[1]
+      value: 
+      objectReference: {fileID: 1617060218}
+    - target: {fileID: 5098237018104219482, guid: 01b5763018526de42ab636d9aa71804a,
+        type: 3}
+      propertyPath: npcArea.Array.data[0]
+      value: 
+      objectReference: {fileID: 213382621}
+    - target: {fileID: 5098237018104219482, guid: 01b5763018526de42ab636d9aa71804a,
+        type: 3}
+      propertyPath: deviceArea.Array.data[0]
+      value: 
+      objectReference: {fileID: 624976759}
+    - target: {fileID: 5098237018104219482, guid: 01b5763018526de42ab636d9aa71804a,
+        type: 3}
+      propertyPath: deviceArea.Array.data[1]
+      value: 
+      objectReference: {fileID: 1406169145}
     - target: {fileID: 6851861902815091079, guid: 01b5763018526de42ab636d9aa71804a,
         type: 3}
       propertyPath: m_Name
@@ -2293,7 +2323,7 @@ PrefabInstance:
     - target: {fileID: 6851861902815091079, guid: 01b5763018526de42ab636d9aa71804a,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9046141188228622826, guid: 01b5763018526de42ab636d9aa71804a,
         type: 3}
@@ -2633,14 +2663,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 8703160410327847632, guid: 339b2e61e20b3a9429d09d5deafaf819,
         type: 3}
+      propertyPath: actualEnnemy.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8703160410327847632, guid: 339b2e61e20b3a9429d09d5deafaf819,
+        type: 3}
       propertyPath: actualEnnemy.Array.data[0]
       value: 
-      objectReference: {fileID: 213382621}
+      objectReference: {fileID: 1617060218}
     - target: {fileID: 8703160410327847632, guid: 339b2e61e20b3a9429d09d5deafaf819,
         type: 3}
       propertyPath: actualEnnemy.Array.data[1]
       value: 
-      objectReference: {fileID: 1617060218}
+      objectReference: {fileID: 213382621}
     - target: {fileID: 8703160410327847633, guid: 339b2e61e20b3a9429d09d5deafaf819,
         type: 3}
       propertyPath: m_Name
@@ -2719,6 +2754,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: GridSpawn
+      objectReference: {fileID: 0}
+    - target: {fileID: 8735170480763440577, guid: 4cc04973c61193048858c2cfefdc372f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8735170480763440583, guid: 4cc04973c61193048858c2cfefdc372f,
         type: 3}

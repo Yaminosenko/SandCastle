@@ -85,8 +85,8 @@ public class CameraController : MonoBehaviour
             UpdateCam();
         }
 
-        if(!playerScript.isOnCombat && turnPlayer)
-            ChangeMode();
+        //if(!playerScript.isOnCombat && turnPlayer)
+        //    ChangeMode();
     }
     #endregion
 
@@ -224,10 +224,9 @@ public class CameraController : MonoBehaviour
         transform.position = Vector3.Lerp(transform.position, followDist, returnSpeed * Time.deltaTime);
     }
 
-    private void ChangeMode()
+    public void ChangeMode()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
+        
             if (tacticalEnable)
             {
                 tacticalEnable = false;
@@ -238,7 +237,7 @@ public class CameraController : MonoBehaviour
                 tacticalEnable = true;
                 StartCoroutine(changeCamMode(1f, true));
             }
-        }
+        
 
         if (changeModeCD)
         {

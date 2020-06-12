@@ -43,8 +43,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e9b4f9d4ddb98b41810ea2f612af264, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actualEnnemy:
-  - {fileID: 0}
-  - {fileID: 0}
+  actualEnnemy: []
   player: {fileID: 0}
   cam: {fileID: 0}
+  cdInvisibilty: 0
+  coolDownInvisibility: 4
+  indexNbrTurn: 0
