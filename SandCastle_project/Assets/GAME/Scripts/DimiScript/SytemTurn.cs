@@ -49,16 +49,22 @@ public class SytemTurn : MonoBehaviour
                     else
                     {
                         indexNbrTurn++;
-                        AutoFreeMode();
+                        if (indexNbrTurn == nbrTurnMax)
+                        {
+                            cam.target = player.transform;
+                            StartCoroutine(waitEndTurnNPC());
+                            indexNbrTurn = 0;
+                            return;
+                        }
                     }
                 }
-                else if (indexNbrTurn == nbrTurnMax)
-                {
-                    cam.target = player.transform;
-                    StartCoroutine(waitEndTurnNPC());
-                    indexNbrTurn = 0;
-                    return;
-                }
+                //else if (indexNbrTurn == nbrTurnMax)
+                //{
+                //    cam.target = player.transform;
+                //    StartCoroutine(waitEndTurnNPC());
+                //    indexNbrTurn = 0;
+                //    return;
+                //}
             }
             npcTurn.system = GetComponent<SytemTurn>();
             npcTurn.Walk(false);
@@ -103,39 +109,49 @@ public class SytemTurn : MonoBehaviour
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 
-    public IEnumerator NPCgetKill(float time)
-    {
-        yield return new WaitForSeconds(time);
-        NextTurn();
-    }
-
-
     private void AutoFreeMode()
     {
         deadIndex++;
         Debug.Log(deadIndex + " " + nbrTurnMax);
-        if (deadIndex == nbrTurnMax)
-        {
-            player.isOnCombat = false;
-            player.ChangeModePublic();
-            deadIndex = 0;
-            indexNbrTurn = 0;
-            if (cdInvisibilty)
-            {
-                coolDownInv++;
-                if (coolDownInv == coolDownInvisibility)
-                    cdInvisibilty = false;
+        //if (deadIndex == nbrTurnMax)
+        //{
+        //    player.isOnCombat = false;
+        //    player.ChangeModePublic();
+        //    deadIndex = 0;
+        //    indexNbrTurn = 0;
+        //    if (cdInvisibilty)
+        //    {
+        //        coolDownInv++;
+        //        if (coolDownInv == coolDownInvisibility)
+        //            cdInvisibilty = false;
 
-                if (coolDownInv == player.invisibilityDuration)
-                    player.isInvisble = false;
-            }
-            cam.turnPlayer = true;
-            player.turnPlayer = true;
-            player.cantMove = false;
-            //cantMove = false;
-            player.SettingPathBool = false;
-            return;
-        }
+        //        if (coolDownInv == player.invisibilityDuration)
+        //            player.isInvisble = false;
+        //    }
+        //    cam.turnPlayer = true;
+        //    player.turnPlayer = true;
+        //    player.cantMove = false;
+        //    //cantMove = false;
+        //    player.SettingPathBool = false;
+        //    return;
+        //}
+    }
+
+    public void RefreshSystem()
+    {
+        nbrTurnMax = 0;
+        indexNbrTurn = 0;
+        cam.target = player.transform;
+        player.turnPlayer = true;
+        player.cantMove = false;
+        //cantMove = false;
+        player.SettingPathBool = false;
+    }
+
+    public IEnumerator NPCgetKill(float time)
+    {
+        yield return new WaitForSeconds(time);
+        NextTurn();
     }
 
     IEnumerator waitEndTurnNPC()

@@ -644,16 +644,24 @@ public class CharacterControler : MonoBehaviour
         RaycastHit hitBlock;
         if (Physics.Raycast(hitTest, Vector3.down, out hitBlock, blockMask))
         {
-            Vector3 posFinal = new Vector3(hitBlock.transform.position.x, hitBlock.transform.position.y + 1, hitBlock.transform.position.z);
-            finalPosition = posFinal;
-            //Debug.Log(hitBlock.transform);
-            return finalPosition;
+            if(hitBlock.transform.gameObject.GetComponent<Block>() != null)
+            {
+                Vector3 posFinal = new Vector3(hitBlock.transform.position.x, hitBlock.transform.position.y + 1, hitBlock.transform.position.z);
+                finalPosition = posFinal;
+                Debug.Log(hitBlock.transform);
+                return finalPosition;
+            }
+            else
+            {
+                Debug.Log("fuck");
+                //finalPosition = RandomPositionAroundPlayer();
+                return RandomPositionAroundPlayer();
+            }
         }
         else
         {
-            Debug.Log("fuck");
-            //finalPosition = hit.position;
-            return RandomPositionAroundPlayer();
+            Debug.Log("oh hell no");
+            return Vector3.zero;
         }
     }
 
@@ -702,6 +710,7 @@ public class CharacterControler : MonoBehaviour
                 fov._isActive = false;
                 nav.ResetPath();
                 camControl.ChangeMode();
+                system.RefreshSystem();
                 //StartCoroutine(changeCamMode(1f, false));
             }
             else if(!TacticalMode)
@@ -711,7 +720,6 @@ public class CharacterControler : MonoBehaviour
                 {
                     if(hit.transform.gameObject.layer == 8)
                     {
-
                         Run(false);
                         WalkTactical(false);
                         TacticalAnim(true);
