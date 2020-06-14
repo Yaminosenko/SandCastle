@@ -62,7 +62,7 @@ public class Device : MonoBehaviour
             Vector3 originGround = pos;
             //originGround.y = originGround.y + 0.5f;
             originGround += randomDirection;
-            NavMesh.SamplePosition(originGround, out hit, 30, 1);
+            NavMesh.SamplePosition(originGround, out hit, 1, 1);
             Vector3 targetPosToFollow = hit.position;
             targetPosToFollow.y = targetPosToFollow.y + 0.5f;
             Debug.Log(targetPosToFollow);

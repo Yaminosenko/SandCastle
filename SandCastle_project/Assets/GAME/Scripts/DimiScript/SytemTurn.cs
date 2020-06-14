@@ -12,8 +12,8 @@ public class SytemTurn : MonoBehaviour
     public int coolDownInvisibility = 4;
 
     private NPCcontroller npcTurn;
-    private int nbrTurnMax;
-    [SerializeField]private int indexNbrTurn;
+    [SerializeField] private int nbrTurnMax;
+    [SerializeField] private int indexNbrTurn;
     private int coolDownInv;
     private int deadIndex;
 
@@ -27,6 +27,7 @@ public class SytemTurn : MonoBehaviour
 
     public void NextTurn()
     {
+        Debug.Log("nextTurn");
         NPCcontroller[] npcTab = actualEnnemy.ToArray();
         npcTurn = null;
         indexNbrTurn++;
@@ -50,6 +51,13 @@ public class SytemTurn : MonoBehaviour
                         indexNbrTurn++;
                         AutoFreeMode();
                     }
+                }
+                else if (indexNbrTurn == nbrTurnMax)
+                {
+                    cam.target = player.transform;
+                    StartCoroutine(waitEndTurnNPC());
+                    indexNbrTurn = 0;
+                    return;
                 }
             }
             npcTurn.system = GetComponent<SytemTurn>();

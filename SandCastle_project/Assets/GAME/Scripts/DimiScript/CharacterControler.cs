@@ -635,25 +635,25 @@ public class CharacterControler : MonoBehaviour
 
     public Vector3 RandomPositionAroundPlayer()
     {
-        Vector3 randomDirection = Random.insideUnitSphere * unitsRangeMovement;
+        Vector3 randomDirection = Random.insideUnitSphere * 3;
         randomDirection += transform.position;
         NavMeshHit hit;
         Vector3 finalPosition = Vector3.zero;
-        NavMesh.SamplePosition(randomDirection, out hit, unitsRangeMovement, 1);
+        NavMesh.SamplePosition(randomDirection, out hit, 3, 1);
+        Vector3 hitTest = new Vector3(hit.position.x, hit.position.y + 0.5f, hit.position.z);
         RaycastHit hitBlock;
-        if (Physics.Raycast(hit.position, Vector3.down, out hitBlock, blockMask))
+        if (Physics.Raycast(hitTest, Vector3.down, out hitBlock, blockMask))
         {
-            //Debug.Log("good");
-            //Debug.Log(hitBlock.transform.gameObject);
             Vector3 posFinal = new Vector3(hitBlock.transform.position.x, hitBlock.transform.position.y + 1, hitBlock.transform.position.z);
             finalPosition = posFinal;
+            //Debug.Log(hitBlock.transform);
             return finalPosition;
         }
         else
         {
             Debug.Log("fuck");
-            finalPosition = hit.position;
-            return finalPosition;
+            //finalPosition = hit.position;
+            return RandomPositionAroundPlayer();
         }
     }
 
@@ -711,7 +711,7 @@ public class CharacterControler : MonoBehaviour
                 {
                     if(hit.transform.gameObject.layer == 8)
                     {
-                        Debug.Log("tactic");
+
                         Run(false);
                         WalkTactical(false);
                         TacticalAnim(true);
