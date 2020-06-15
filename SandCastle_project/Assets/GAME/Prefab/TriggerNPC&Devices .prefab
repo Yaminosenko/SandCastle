@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 9046141188228622826}
   - component: {fileID: 1925690727496650802}
   - component: {fileID: 5098237018104219482}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: 'TriggerNPC&Devices '
   m_TagString: Untagged
   m_Icon: {fileID: 0}

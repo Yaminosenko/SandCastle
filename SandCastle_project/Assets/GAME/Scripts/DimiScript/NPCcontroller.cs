@@ -89,6 +89,8 @@ public class NPCcontroller : MonoBehaviour
     private int indexRandom;
     private int indexAlert;
     private Camera cam;
+    private bool stop;
+    private bool toShort;
 
     #endregion
 
@@ -181,7 +183,9 @@ public class NPCcontroller : MonoBehaviour
         //Run(false);
 
         if (targetPosition != null)
+        {
             nav.SetDestination(targetPosition);
+        }
     }
 
     private void Patrol()
@@ -310,6 +314,7 @@ public class NPCcontroller : MonoBehaviour
         {
             dead = true;
             nav.SetDestination(transform.position);
+            ResetVariables();
             nav.isStopped = true;
             walkRunMethods(false);
             fov.viewMeshFilter.gameObject.SetActive(false);
@@ -387,7 +392,7 @@ public class NPCcontroller : MonoBehaviour
             }
             else if (alerted && !oneAction)
             {
-                Debug.Log("alerted");
+               // Debug.Log("alerted");
                 AlertTactical(alertedPos);
             }
             else if (distracted && !oneAction)
@@ -414,24 +419,22 @@ public class NPCcontroller : MonoBehaviour
 
     private void MovementTactical()
     {
-        nav.isStopped = false;
-        nav.SetDestination(pos);
-        //cantMove = true;
-        isMoving = true;
+        if (!stop)
+        {
+            nav.isStopped = false;
+            //Debug.Log(pos);
+            nav.SetDestination(pos);
+            //cantMove = true;
+            isMoving = true;
 
-        //if (distracted)
-        //    nav.speed = runSpeed;
-        //else
-        //    nav.speed = walkSpeed;
-
-        walkRunMethods(true);
-
+            walkRunMethods(true);
+        }
     }
 
     private void PatrolTactial()
     {
         Vector3 TargetPoint = PatrolPath[indexPatrol].position;
-
+ 
         RaycastHit hit;
         if(Physics.Raycast(TargetPoint, Vector3.down, out hit, blockMask))
         {
@@ -453,6 +456,13 @@ public class NPCcontroller : MonoBehaviour
         {
             if (indexAction == 1)
             {
+                if (toShort)
+                {
+                    alerted = false;
+                    distracted = false;
+                    toShort = false;
+                }
+                Debug.Log("NPCReachDestination");
                 walkRunMethods(false);
                 WalkAlert(false);
                 oneAction = true;
@@ -528,7 +538,7 @@ public class NPCcontroller : MonoBehaviour
         if (!SettingPathBool)
         {
             RaycastHit hit;
-            Vector3 transPos = new Vector3(transform.position.x, 1, transform.position.z);
+            Vector3 transPos = new Vector3(transform.position.x, transform.position.y + 1, transform.position.z);
             if (Physics.Raycast(transPos, transform.TransformDirection(Vector3.down), out hit, Mathf.Infinity, blockMask))
             {
                 Debug.DrawRay(transPos, transform.TransformDirection(Vector3.down) * hit.distance, Color.yellow, Mathf.Infinity);
@@ -586,7 +596,7 @@ public class NPCcontroller : MonoBehaviour
         {
             Vector3 finalPos = Vector3.zero;
             Vector3 offset = destination;
-            float lastClosestDistance = Vector3.Distance(transform.position, destination);
+            float lastClosestDistance = Vector3.Distance(transform.position, Vector3.positiveInfinity);
             int indexLength = 100;
             NavMeshPath path = new NavMeshPath();
             nav.CalculatePath(destination, path);
@@ -601,7 +611,7 @@ public class NPCcontroller : MonoBehaviour
                     oneAction = true;
                     //randomPosTrigger = true;
 
-                    distracted = false;
+                    toShort = true;
                     Debug.Log("toShort");
                     return;
                 }
@@ -634,7 +644,7 @@ public class NPCcontroller : MonoBehaviour
                     finalPos = maxBlock[i].transform.position;
                 }
             }
-
+            Debug.Log(pos);
             pos = finalPos;
             MovementTactical();
             oneAction = true;
@@ -646,7 +656,9 @@ public class NPCcontroller : MonoBehaviour
         if (SettingPathBool)
         {
             Cover[] cover = coverList.ToArray();
-            //Debug.Log(position);
+            position = new Vector3(position.x, position.y + 0.5f, position.z);
+            Debug.Log(position);
+            //Debug.Log(coverList.ToArray().Length);
             List<GameObject> selectCoverList = new List<GameObject>();
             Vector3 finalPos = Vector3.zero;
             float lastClosestDistance = Vector3.Distance(transform.position, Vector3.positiveInfinity);
@@ -665,13 +677,13 @@ public class NPCcontroller : MonoBehaviour
             if (Physics.Raycast(position, Vector3.down, out hitFirst, blockMask))
             {
                 //Debug.Log(hitFirst.transform.position);
-                //Debug.Log(hitFirst.transform.gameObject);
+                Debug.Log(hitFirst.transform.gameObject);
                 Debug.DrawRay(position, Vector3.down*1000, Color.blue, Mathf.Infinity);
                 if (hitFirst.transform.GetComponent<Block>().pathIndex != 0)
                 {
-                    randomPosTrigger = true;
-                    alerted = false;
-
+                    //randomPosTrigger = true;
+                    toShort = true;
+                    Debug.Log("toShortAlerted");
                     if(hitFirst.transform.GetComponent<Block>().pathIndex <= unitsRangeMovement / 2 && playerSpotted)
                         playerNear = true;
                 }
@@ -688,9 +700,9 @@ public class NPCcontroller : MonoBehaviour
                     finalPos = selectCover[i].transform.position;
                 }
             }
-            pos = new Vector3(finalPos.x,0.1f,finalPos.z);
+            pos = new Vector3(finalPos.x,finalPos.y + 0.3f,finalPos.z);
             //Debug.Log(pos);
-            //Debug.Log(finalPos);
+            Debug.Log(finalPos);
             indexAlert++;
             MovementTactical();
             oneAction = true;
@@ -815,6 +827,10 @@ public class NPCcontroller : MonoBehaviour
     public void KillPlayerTactical(Transform target)
     {
         int random = Random.Range(0, 1);
+        nav.isStopped = true;
+        stop = true;
+        //Debug.Log("kill");
+        walkRunMethods(false);
         //Debug.Log(random);
         if(random == 0)
             InstanciateCamera(target);
@@ -879,7 +895,6 @@ public class NPCcontroller : MonoBehaviour
 
     #endregion
 
-
     #region Coroutine
 
     IEnumerator StopMove(float timeToWait)
@@ -939,6 +954,7 @@ public class NPCcontroller : MonoBehaviour
     IEnumerator waitBeforeChangeTurn(float time)
     {
         oneAction = true;
+        Debug.Log("END TURN");
         yield return new WaitForSeconds(time);
         system.NextTurn();
         ResetVariables();
@@ -947,7 +963,7 @@ public class NPCcontroller : MonoBehaviour
     public IEnumerator SeeCorpsTactical()
     {
         nav.isStopped = true;
-        Walk(false);
+        walkRunMethods(false);
         yield return new WaitForSeconds(2);
         GetClosestCover();
     }

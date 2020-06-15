@@ -41,6 +41,8 @@ public class CameraController : MonoBehaviour
     public float keyBoardZoomSpeed = 25;
     public float minY;
     public float maxY;
+    [SerializeField] private float ymin;
+    [SerializeField] private float ymax;
 
 
 
@@ -164,7 +166,7 @@ public class CameraController : MonoBehaviour
         pos.z = Mathf.Clamp(pos.z, -LimiteZ, LimiteZ);
 
         pos.y = y;
-        pos.y = Mathf.Clamp(pos.y, minY, maxY);
+        pos.y = Mathf.Clamp(pos.y, ymin, ymax);
         transform.position = pos;
     }
 
@@ -226,18 +228,21 @@ public class CameraController : MonoBehaviour
 
     public void ChangeMode()
     {
-        
-            if (tacticalEnable)
-            {
-                tacticalEnable = false;
-                StartCoroutine(changeCamMode(1f, false));
-            }
-            else
-            {
-                tacticalEnable = true;
-                StartCoroutine(changeCamMode(1f, true));
-            }
-        
+        if (tacticalEnable)
+        {
+           
+            tacticalEnable = false;
+            StartCoroutine(changeCamMode(1f, false));
+        }
+        else
+        {
+            ymin = player.transform.position.y + minY;
+            ymax = player.transform.position.y + maxY;
+            tacticalEnable = true;
+            StartCoroutine(changeCamMode(1f, true));
+        }
+
+
 
         if (changeModeCD)
         {

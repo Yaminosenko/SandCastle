@@ -85,6 +85,7 @@ public class CharacterControler : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         nav = GetComponent<NavMeshAgent>();
         fov = GetComponent<FieldOfView>();
+        system = system = GameObject.Find("SystemTurn").GetComponent<SytemTurn>();
         InvokeRepeating("WaterFreeWaste", 1f, 0.1f);
         baseTacticalSpeed = nav.speed;
         if(system != null)
@@ -97,8 +98,6 @@ public class CharacterControler : MonoBehaviour
         {
             SimpleMove();
             FinalMove();
-
-            
         }
         else
         {
@@ -121,6 +120,7 @@ public class CharacterControler : MonoBehaviour
 
             if (turnPlayer)
             {
+                
                 skin.rotation = transform.rotation;
                 if(!isAiming)
                     Movement();
@@ -240,7 +240,8 @@ public class CharacterControler : MonoBehaviour
 
                     if (Input.GetMouseButtonDown(1) && hit.transform.GetComponent<Block>().pathIndex != 0)
                     {
-                        pos = new Vector3(hit.collider.transform.position.x, hit.collider.transform.position.y + transform.position.y, hit.collider.transform.position.z);
+                        pos = new Vector3(hit.collider.transform.position.x, hit.collider.transform.position.y + 0.5f, hit.collider.transform.position.z);
+
                         camControl.target = transform;
                         nav.SetDestination(pos);
                         cantMove = true;
@@ -280,7 +281,7 @@ public class CharacterControler : MonoBehaviour
 
                             if (Input.GetMouseButtonDown(1) && hitAll.transform.GetComponent<Block>().pathIndex != 0 )
                             {
-                                pos = new Vector3(hitAll.collider.transform.position.x, hitAll.collider.transform.position.y + transform.position.y, hitAll.collider.transform.position.z);
+                                pos = new Vector3(hitAll.collider.transform.position.x, hitAll.collider.transform.position.y + 0.5f, hitAll.collider.transform.position.z);
                                 nav.SetDestination(pos);
                                 camControl.target = transform; 
                                 cantMove = true;
@@ -561,7 +562,7 @@ public class CharacterControler : MonoBehaviour
 
     #endregion
 
-    #region Other Tactical Methods
+    #region Other Methods
 
     private bool StillYourTurn()
     {
@@ -634,25 +635,33 @@ public class CharacterControler : MonoBehaviour
 
     public Vector3 RandomPositionAroundPlayer()
     {
-        Vector3 randomDirection = Random.insideUnitSphere * unitsRangeMovement;
+        Vector3 randomDirection = Random.insideUnitSphere * 3;
         randomDirection += transform.position;
         NavMeshHit hit;
         Vector3 finalPosition = Vector3.zero;
-        NavMesh.SamplePosition(randomDirection, out hit, unitsRangeMovement, 1);
+        NavMesh.SamplePosition(randomDirection, out hit, 3, 1);
+        Vector3 hitTest = new Vector3(hit.position.x, hit.position.y + 0.5f, hit.position.z);
         RaycastHit hitBlock;
-        if (Physics.Raycast(hit.position, Vector3.down, out hitBlock, blockMask))
+        if (Physics.Raycast(hitTest, Vector3.down, out hitBlock, blockMask))
         {
-            //Debug.Log("good");
-            //Debug.Log(hitBlock.transform.gameObject);
-            Vector3 posFinal = new Vector3(hitBlock.transform.position.x, hitBlock.transform.position.y + 1, hitBlock.transform.position.z);
-            finalPosition = posFinal;
-            return finalPosition;
+            if(hitBlock.transform.gameObject.GetComponent<Block>() != null)
+            {
+                Vector3 posFinal = new Vector3(hitBlock.transform.position.x, hitBlock.transform.position.y + 1, hitBlock.transform.position.z);
+                finalPosition = posFinal;
+                Debug.Log(hitBlock.transform);
+                return finalPosition;
+            }
+            else
+            {
+                Debug.Log("fuck");
+                //finalPosition = RandomPositionAroundPlayer();
+                return RandomPositionAroundPlayer();
+            }
         }
         else
         {
-            Debug.Log("fuck");
-            finalPosition = hit.position;
-            return finalPosition;
+            Debug.Log("oh hell no");
+            return Vector3.zero;
         }
     }
 
@@ -661,12 +670,37 @@ public class CharacterControler : MonoBehaviour
         Water -= percents;
     }
 
-    public void ChangeMode()
+    private void PassTurn()
+    {
+        actionPointIndex = actionPoint;
+        if (StillYourTurn())
+        {
+
+        }
+    }
+
+    public void ChangeModePublic()
+    {
+        Debug.Log("free");
+        TacticalAnim(false);
+        TacticalMode = false;
+        Run(false);
+        WalkTactical(false);
+        ResetAllPreview();
+        SettingPathBool = false;
+        fov._isActive = false;
+        nav.ResetPath();
+        camControl.ChangeMode();
+        //StartCoroutine(changeCamMode(1f, false));
+    }
+
+    private  void ChangeMode()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (TacticalMode && !isOnCombat)
             {
+
                 TacticalAnim(false);
                 TacticalMode = false;
                 Run(false);
@@ -676,16 +710,16 @@ public class CharacterControler : MonoBehaviour
                 fov._isActive = false;
                 nav.ResetPath();
                 camControl.ChangeMode();
+                system.RefreshSystem();
                 //StartCoroutine(changeCamMode(1f, false));
             }
-            else
+            else if(!TacticalMode)
             {
                 RaycastHit hit;
                 if(Physics.Raycast(transform.position, Vector3.down, out hit, blockMask))
                 {
                     if(hit.transform.gameObject.layer == 8)
                     {
-                        Debug.Log(hit.transform.gameObject);
                         Run(false);
                         WalkTactical(false);
                         TacticalAnim(true);
@@ -750,6 +784,11 @@ public class CharacterControler : MonoBehaviour
             pathPreviewLine.positionCount = 0;
             pathWaypoint.Clear();
         }
+
+        //if (Input.GetKeyDown(KeyCode.O))
+        //{
+        //    PassTurn();
+        //}
     }
 
     #endregion
