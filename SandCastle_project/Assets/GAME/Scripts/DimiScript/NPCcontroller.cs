@@ -31,6 +31,9 @@ public class NPCcontroller : MonoBehaviour
     public Transform offsetCam;
     public List<NPCcontroller> allyNPC = new List<NPCcontroller>();
     public int isCover;
+    public GameObject muzzleFlash;
+    public GameObject projectile;
+    public Transform offsetShoot;
 
 
     [Header("Tactical")]
@@ -844,6 +847,14 @@ public class NPCcontroller : MonoBehaviour
         StartCoroutine(KillPlayerAnim());
     }
 
+    private void Projectile(Transform dest)
+    {
+        Vector3 desstTest = new Vector3(dest.position.x, dest.position.y, dest.position.z);
+        GameObject projo = Instantiate(projectile, offsetShoot.position, Quaternion.identity);
+        projo.GetComponent<ProjectileScript>().destination = desstTest;
+        Debug.Log(offsetShoot.position);
+    }
+
     #endregion
 
     #region Animation
@@ -984,6 +995,10 @@ public class NPCcontroller : MonoBehaviour
     {
         yield return new WaitForSeconds(1);
         Fire();
+        yield return new WaitForSeconds(0.3f);
+
+        Projectile(playerScript.transform);
+        yield return new WaitForSeconds(0.3f);
         playerScript.Death();
         yield return new WaitForSeconds(3);
         system.Restart();
