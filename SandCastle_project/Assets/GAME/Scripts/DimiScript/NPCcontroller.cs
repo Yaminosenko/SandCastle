@@ -604,16 +604,19 @@ public class NPCcontroller : MonoBehaviour
             RaycastHit hitFirst;
             if (Physics.Raycast(destination, Vector3.down, out hitFirst, blockMask))
             {
-                if (hitFirst.transform.GetComponent<Block>().pathIndex != 0)
+                if(hitFirst.transform.GetComponent<Block>() != null)
                 {
-                    pos = hitFirst.transform.position;
-                    MovementTactical();
-                    oneAction = true;
-                    //randomPosTrigger = true;
+                    if (hitFirst.transform.GetComponent<Block>().pathIndex != 0)
+                    {
+                        pos = hitFirst.transform.position;
+                        MovementTactical();
+                        oneAction = true;
+                        //randomPosTrigger = true;
 
-                    toShort = true;
-                    Debug.Log("toShort");
-                    return;
+                        toShort = true;
+                        Debug.Log("toShort");
+                        return;
+                    }
                 }
             }
 
@@ -679,13 +682,16 @@ public class NPCcontroller : MonoBehaviour
                 //Debug.Log(hitFirst.transform.position);
                 Debug.Log(hitFirst.transform.gameObject);
                 Debug.DrawRay(position, Vector3.down*1000, Color.blue, Mathf.Infinity);
-                if (hitFirst.transform.GetComponent<Block>().pathIndex != 0)
+                if(hitFirst.transform.GetComponent<Block>() != null)
                 {
-                    //randomPosTrigger = true;
-                    toShort = true;
-                    Debug.Log("toShortAlerted");
-                    if(hitFirst.transform.GetComponent<Block>().pathIndex <= unitsRangeMovement / 2 && playerSpotted)
-                        playerNear = true;
+                    if (hitFirst.transform.GetComponent<Block>().pathIndex != 0)
+                    {
+                        //randomPosTrigger = true;
+                        toShort = true;
+                        Debug.Log("toShortAlerted");
+                        if (hitFirst.transform.GetComponent<Block>().pathIndex <= unitsRangeMovement / 2 && playerSpotted)
+                            playerNear = true;
+                    }
                 }
             }
 

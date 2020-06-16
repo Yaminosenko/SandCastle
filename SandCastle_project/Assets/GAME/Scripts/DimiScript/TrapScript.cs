@@ -7,7 +7,7 @@ public class TrapScript : MonoBehaviour
     public LayerMask npcMask;
     public CharacterControler player;
     public bool active;
-  
+    public GameObject megumin;
 
     private void OnTriggerEnter(Collider col)
     {
@@ -31,8 +31,12 @@ public class TrapScript : MonoBehaviour
     }
 
 
+
+
     IEnumerator NPCgetKill(float time, NPCcontroller npc)
     {
+        yield return new WaitForSeconds(0.5f);
+        megumin.SetActive(true);
         yield return new WaitForSeconds(time);
         npc.ResetVariables();
         npc.system.NextTurn();

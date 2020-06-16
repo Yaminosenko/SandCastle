@@ -24,6 +24,10 @@ public class CharacterControler : MonoBehaviour
     public CameraShoulderMouv camScriptInst;
     public CameraController camControl;
     public GameObject trapToInst;
+    public GameObject muzzleFlash;
+    public GameObject projectile;
+    public GameObject impact;
+    public Transform offsetShoot;
 
     [Header("FreeMode")]
     public float speedPlayer = 4;
@@ -52,6 +56,7 @@ public class CharacterControler : MonoBehaviour
     public bool selectDevice;
     public bool targetPlayer;
     public bool isInvisble;
+    public UitacticalButtonScript UI;
 
     //private
     private Vector3 move;
@@ -86,6 +91,7 @@ public class CharacterControler : MonoBehaviour
         nav = GetComponent<NavMeshAgent>();
         fov = GetComponent<FieldOfView>();
         system = system = GameObject.Find("SystemTurn").GetComponent<SytemTurn>();
+        UI = GameObject.Find("UI_Tactical").GetComponent<UitacticalButtonScript>();
         InvokeRepeating("WaterFreeWaste", 1f, 0.1f);
         baseTacticalSpeed = nav.speed;
         if(system != null)
@@ -93,6 +99,7 @@ public class CharacterControler : MonoBehaviour
     }
     private void Update()
     {
+        UpdateWater();
         skin.position = transform.position;
         if (!TacticalMode)
         {
@@ -522,6 +529,7 @@ public class CharacterControler : MonoBehaviour
 
     private void Aim()
     {
+        UI.Shot();
         pathPreviewLine.positionCount = 0;
         pathWaypoint.Clear();
         isAiming = true;
@@ -558,14 +566,13 @@ public class CharacterControler : MonoBehaviour
         //MeshRenderer mesh = transform.GetComponent<MeshRenderer>();
         //mesh.material = /*new Material(0,0,0)*/
     }
-
-
     #endregion
 
     #region Other Methods
 
     private bool StillYourTurn()
     {
+        UI.Refresh();
         if (actionPointIndex == actionPoint)
         {
             ResetAllPreview();
@@ -624,6 +631,8 @@ public class CharacterControler : MonoBehaviour
         {
             WaterWaste(waterWasteOnAction);
             StartCoroutine(KillNPC(1.5f));
+
+
         }
     }
 
@@ -670,7 +679,7 @@ public class CharacterControler : MonoBehaviour
         Water -= percents;
     }
 
-    private void PassTurn()
+    public void PassTurn()
     {
         actionPointIndex = actionPoint;
         if (StillYourTurn())
@@ -694,13 +703,26 @@ public class CharacterControler : MonoBehaviour
         //StartCoroutine(changeCamMode(1f, false));
     }
 
+    public void UpdateWater() // changement de la barre de vie de l'unit
+    {
+        float ratio = (float)Water / (float)100;
+
+
+        Mathf.Clamp01(ratio);
+
+        Vector3 newScale = UI.water.transform.localScale;
+        newScale.x = ratio;
+        UI.water.transform.localScale = newScale;
+
+    }
+
     private  void ChangeMode()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (TacticalMode && !isOnCombat)
             {
-
+                UI.Tactical(false);
                 TacticalAnim(false);
                 TacticalMode = false;
                 Run(false);
@@ -720,6 +742,7 @@ public class CharacterControler : MonoBehaviour
                 {
                     if(hit.transform.gameObject.layer == 8)
                     {
+                        UI.Tactical(true);
                         Run(false);
                         WalkTactical(false);
                         TacticalAnim(true);
@@ -746,6 +769,7 @@ public class CharacterControler : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Escape) && occuped)
         {
+            UI.Refresh();
             UnAim();
             selectDevice = false;
             selectInvisiblity = false;
@@ -757,10 +781,11 @@ public class CharacterControler : MonoBehaviour
             StartCoroutine(CamTargetPlayer());
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha2) && !occuped)
+        if (Input.GetKeyDown(KeyCode.Alpha4) && !occuped)
         {
             if(deviceList.ToArray().Length != 0)
             {
+                UI.Hack();
                 selectDevice = true;
                 occuped = true;
                 pathPreviewLine.positionCount = 0;
@@ -770,14 +795,16 @@ public class CharacterControler : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha3) && !occuped && !system.cdInvisibilty)
         {
+            UI.Invisible();
             occuped = true;
             selectInvisiblity = true;
             pathPreviewLine.positionCount = 0;
             pathWaypoint.Clear();
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha4) && !occuped && Trap != 0)
+        if (Input.GetKeyDown(KeyCode.Alpha2) && !occuped && Trap != 0)
         {
+            UI.Trap();
             occuped = true;
             selectTrap = true;
             StartCoroutine(CamTargetPlayer());
@@ -791,6 +818,15 @@ public class CharacterControler : MonoBehaviour
         //}
     }
 
+    private void Projectile(Transform dest)
+    {
+        Vector3 desstTest = new Vector3(dest.position.x, dest.position.y + 1.25f, dest.position.z);
+        GameObject projo = Instantiate(projectile, offsetShoot.position, Quaternion.identity);
+        projo.GetComponent<ProjectileScript>().destination = desstTest;
+        Debug.Log(offsetShoot.position);
+
+        
+    }
     #endregion
 
     #region Animations
@@ -896,6 +932,7 @@ public class CharacterControler : MonoBehaviour
         
         yield return new WaitForSeconds(time);
         Shoot();
+
         npc.GetComponent<NPCcontroller>().GetKill(false);
         for (int i = 0; i < npc.GetComponent<NPCcontroller>().allyNPC.ToArray().Length; i++)
         {
@@ -904,7 +941,12 @@ public class CharacterControler : MonoBehaviour
             npcAlly.playerSpotted = true;
             npcAlly.GetAlerted();
         }
-        yield return new WaitForSeconds(time);
+        yield return new WaitForSeconds(0.3f);
+        Projectile(npc);
+        muzzleFlash.SetActive(true);
+        yield return new WaitForSeconds(0.2f);
+        muzzleFlash.SetActive(false);
+        yield return new WaitForSeconds(2.867f);
         
         actionPointIndex++;
         if (StillYourTurn())

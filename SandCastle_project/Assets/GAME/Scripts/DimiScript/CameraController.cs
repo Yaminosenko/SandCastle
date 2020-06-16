@@ -212,8 +212,6 @@ public class CameraController : MonoBehaviour
                         transform.RotateAround(offsetRotate.position, Vector3.up, angleRotate * Time.deltaTime);
 
                 }
-
-
             }
 
         }
