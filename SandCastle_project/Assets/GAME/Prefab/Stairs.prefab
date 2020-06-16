@@ -91,6 +91,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   offset: {fileID: 0}
+  mirror: 0
 --- !u!114 &7982864229347368091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -170,6 +171,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   offset: {fileID: 0}
+  mirror: 0
 --- !u!1 &7982864230454724981
 GameObject:
   m_ObjectHideFlags: 0
@@ -228,3 +230,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   offset: {fileID: 7982864229709062814}
+  mirror: 1

@@ -249,14 +249,14 @@ public class CharacterControler : MonoBehaviour
         
         if (Input.GetAxis("Vertical")> 0.1f)
         {
-            Vector3 vel = new Vector3(0, Input.GetAxis("Vertical"), 0);
+            Vector3 vel = new Vector3(0, Input.GetAxis("Vertical"), 0) * speedPlayer / 2;
             transform.position += vel * Time.deltaTime;
             Ladder(true);
             LadderMirror(false);
         }
         else if(Input.GetAxis("Vertical") < -0.1f)
         {
-            Vector3 vel = new Vector3(0, Input.GetAxis("Vertical"), 0);
+            Vector3 vel = new Vector3(0, Input.GetAxis("Vertical"), 0) * speedPlayer / 2;
             transform.position += vel * Time.deltaTime;
             Ladder(false);
             LadderMirror(true);
