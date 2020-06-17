@@ -37,7 +37,9 @@ public class TrapScript : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         megumin.SetActive(true);
+        GetComponent<AudioSource>().Play();
         yield return new WaitForSeconds(time);
+        npc.system.speakSourceSystem.Play();
         npc.ResetVariables();
         npc.system.NextTurn();
         Destroy(gameObject);

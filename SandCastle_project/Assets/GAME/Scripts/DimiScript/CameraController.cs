@@ -99,11 +99,13 @@ public class CameraController : MonoBehaviour
         float mouseX = sensibilityRotateValue * Input.GetAxis("Mouse X");
         transform.RotateAround(target.position, Vector3.up, mouseX * Time.deltaTime);
 
-
-        Vector3 e = transform.eulerAngles;
-        e.x = 0;
-        target.eulerAngles = e;
-        //player.eulerAngles = e;
+        if (!playerScript.ladderBool)
+        {
+            Vector3 e = transform.eulerAngles;
+            e.x = 0;
+            target.eulerAngles = e;
+            //player.eulerAngles = e;
+        }
     }
 
     void FollowTarget()

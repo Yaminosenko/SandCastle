@@ -16,6 +16,7 @@ public class SytemTurn : MonoBehaviour
     [SerializeField] private int indexNbrTurn;
     private int coolDownInv;
     private int deadIndex;
+    public AudioClip[] ambianceSound;
     public AudioSource ambianceSource;
     public AudioSource speakSourceSystem;
 
@@ -79,6 +80,13 @@ public class SytemTurn : MonoBehaviour
 
     public void EndPlayerTurn()
     {
+        if(actualEnnemy.ToArray().Length == 0)
+        {
+            cam.target = player.transform;
+            StartCoroutine(waitEndTurnNPC());
+            indexNbrTurn = 0;
+            return;
+        }
         NPCcontroller[] npcTab = actualEnnemy.ToArray();
         npcTurn = npcTab[0];
         nbrTurnMax = actualEnnemy.ToArray().Length;

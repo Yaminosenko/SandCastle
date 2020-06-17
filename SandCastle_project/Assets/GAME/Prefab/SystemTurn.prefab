@@ -179,6 +179,9 @@ MonoBehaviour:
   coolDownInvisibility: 4
   nbrTurnMax: 0
   indexNbrTurn: 0
+  ambianceSound:
+  - {fileID: 8300000, guid: 5cb48c6f6b695304793c3367ed0b1755, type: 3}
+  - {fileID: 8300000, guid: 3b50d7a352423d843b7e84371edaa5e2, type: 3}
   ambianceSource: {fileID: 7643501472727255438}
   speakSourceSystem: {fileID: 5606525284564941024}
 --- !u!82 &7643501472727255438
@@ -191,9 +194,9 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 3b50d7a352423d843b7e84371edaa5e2, type: 3}
-  m_PlayOnAwake: 0
-  m_Volume: 1
+  m_audioClip: {fileID: 8300000, guid: 5cb48c6f6b695304793c3367ed0b1755, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 0.2
   m_Pitch: 1
   Loop: 0
   Mute: 0

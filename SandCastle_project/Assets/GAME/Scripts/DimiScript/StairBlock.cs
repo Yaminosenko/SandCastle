@@ -7,6 +7,7 @@ public class StairBlock : MonoBehaviour
 
     public Transform offset;
     public bool mirror;
+    public float angle = 0;
     
  
     void Start()
@@ -32,7 +33,7 @@ public class StairBlock : MonoBehaviour
                     player.Ladder(true);
                 else
                     player.LadderMirror(true);
-
+                player.transform.rotation = Quaternion.Euler(player.transform.rotation.x, angle, player.transform.rotation.z);
                 player.nav.enabled = false;
                 player.ladderTp = offset;
                 player.ladderTarget = new Vector3(player.transform.position.x, offset.position.y, player.transform.position.z);

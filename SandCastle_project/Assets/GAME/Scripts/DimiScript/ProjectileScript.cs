@@ -25,7 +25,7 @@ public class ProjectileScript : MonoBehaviour
             transform.Translate(0, 0, 100 * Time.deltaTime, Space.Self);
 
             float dist = Vector3.Distance(transform.position, destination);
-            if (dist <= 0.5f)
+            if (dist <= 1f)
             {
 
                 reach = true;

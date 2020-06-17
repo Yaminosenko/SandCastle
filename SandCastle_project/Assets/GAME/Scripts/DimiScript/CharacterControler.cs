@@ -265,7 +265,7 @@ public class CharacterControler : MonoBehaviour
 
     private void LadderMovement()
     {
-        
+        skin.rotation = transform.rotation;
         if (Input.GetAxis("Vertical")> 0.1f)
         {
             Vector3 vel = new Vector3(0, Input.GetAxis("Vertical"), 0) * speedPlayer / 2;
@@ -782,6 +782,7 @@ public class CharacterControler : MonoBehaviour
     {
         if(UI != null)
         {
+           
             float ratio = (float)Water / (float)100;
 
 
@@ -811,6 +812,8 @@ public class CharacterControler : MonoBehaviour
                 nav.ResetPath();
                 camControl.ChangeMode();
                 system.RefreshSystem();
+                system.ambianceSource.clip = system.ambianceSound[0];
+                system.ambianceSource.Play();
                 timeBetwwenSteps = 0.45f;
                 //StartCoroutine(changeCamMode(1f, false));
             }
@@ -830,6 +833,7 @@ public class CharacterControler : MonoBehaviour
                         camControl.ChangeMode();
                         isMoving = false;
                         timeBetwwenSteps = 0.6f;
+                        system.ambianceSource.clip = system.ambianceSound[1];
                         system.ambianceSource.Play();
                     }
                 }
@@ -912,6 +916,8 @@ public class CharacterControler : MonoBehaviour
 
     public void RefreshMat()
     {
+        actionAudioScource.clip = invisibleSound;
+        actionAudioScource.Play();
         for (int i = 0; i < skinMesh.Length; i++)
         {
             for (int s = 0; s < skinMesh[i].materials.Length; s++)
@@ -1156,12 +1162,14 @@ public class CharacterControler : MonoBehaviour
             //StartCoroutine(CamTargetPlayer());
         }
     }
+
     IEnumerator HackSound()
     {
         yield return new WaitForSeconds(3.3f);
         actionAudioScource.clip = hackSound;
         actionAudioScource.Play();
     }
+
     IEnumerator CooldownStep()
     {
         yield return new WaitForSeconds(timeBetwwenSteps);
