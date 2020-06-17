@@ -8,6 +8,7 @@ public class LaRandomerie : MonoBehaviour
     public AudioClip[] SandFS;
     public AudioSource lasource; 
     public bool soundsGood = true;
+    public float timeBetwwenSteps = 0.6f;
     // Start is called before the first frame update
     void Start()
     {
@@ -39,7 +40,7 @@ public class LaRandomerie : MonoBehaviour
 
     IEnumerator CooldownStep()
     {
-        yield return new WaitForSeconds(0.6f);
+        yield return new WaitForSeconds(timeBetwwenSteps);
         
            soundsGood = true;
         

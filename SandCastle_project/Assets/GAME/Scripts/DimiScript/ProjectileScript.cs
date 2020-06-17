@@ -15,7 +15,7 @@ public class ProjectileScript : MonoBehaviour
     private void Start()
     {
         transform.LookAt(destination);
-        Debug.Log(destination);
+
     }
 
     private void Update()

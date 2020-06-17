@@ -16,6 +16,10 @@ public class SytemTurn : MonoBehaviour
     [SerializeField] private int indexNbrTurn;
     private int coolDownInv;
     private int deadIndex;
+    public AudioSource ambianceSource;
+    public AudioSource speakSourceSystem;
+
+
 
 
     private void Start()
