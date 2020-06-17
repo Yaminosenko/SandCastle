@@ -5,36 +5,48 @@ using UnityEngine.AI;
 public class StairBlock : MonoBehaviour
 {
 
-    public Transform targetStair;
-    public LayerMask layerMask;
-    public Transform stair;
-    public float angle;
+    public Transform offset;
+    public bool mirror;
+    
  
     void Start()
     {
-        //Vector3 pos = new Vector3(transform.position.x, transform.position.y + 1, transform.position.z);
-        //RaycastHit hit;
-        //if(Physics.Raycast(pos, targetStair.TransformDirection(Vector3.forward), out hit, 2, layerMask))
+        //int a = Random.RandomRange(0, 5);
+        //for (int i = 0; i < .Lenght; i++)
         //{
-            
+        //    if(a == i)
+        //    {
+
+        //    }
         //}
     }
 
-    //private void OnTriggerEnter(Collider col)
-    //{
-    //    if (col.gameObject.layer == 11)
-    //    {
-    //        //CharacterControler player = col.gameObject.GetComponent<CharacterControler>();
-    //        //Debug.Log(col.gameObject + " " + player);
-    //        //player.transform.rotation = Quaternion.LookRotation(stair.position);
-    //        //player.nav.isStopped = true;
-    //        //player.WalkTactical(false);
-    //        //player.Ladder(true);
-    //        //player.nav.speed = 1;
-    //        //player.nav.isOnOffMeshLink;
+    private void OnTriggerEnter(Collider col)
+    {
+        if (col.gameObject.layer == 11)
+        {
+            CharacterControler player = col.gameObject.GetComponent<CharacterControler>();
+            if(player.ladderBool != true)
+            {
+                if (mirror)
+                    player.Ladder(true);
+                else
+                    player.LadderMirror(true);
 
-    //    }
-    //}
+                player.nav.enabled = false;
+                player.ladderTp = offset;
+                player.ladderTarget = new Vector3(player.transform.position.x, offset.position.y, player.transform.position.z);
+                player.ladderBool = true;
+            }
+            else
+            {
+                player.nav.enabled = true;
+                player.ladderBool = false;
+                player.Ladder(false);
+                player.LadderMirror(false);
+            }
+        }
+    }
 
     //IEnumerator
 }

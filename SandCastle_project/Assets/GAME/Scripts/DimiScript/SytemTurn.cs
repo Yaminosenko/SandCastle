@@ -164,7 +164,10 @@ public class SytemTurn : MonoBehaviour
                 cdInvisibilty = false;
 
             if (coolDownInv == player.invisibilityDuration)
+            {
                 player.isInvisble = false;
+                player.RefreshMat();
+            }
         }
         cam.turnPlayer = true;
         player.turnPlayer = true;

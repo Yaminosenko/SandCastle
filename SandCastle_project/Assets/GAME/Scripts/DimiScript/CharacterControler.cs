@@ -10,6 +10,7 @@ public class CharacterControler : MonoBehaviour
 {
     #region Variables 
 
+    
     [Header("Reference")]
     public Transform skin;
     public Camera cam;
@@ -28,6 +29,7 @@ public class CharacterControler : MonoBehaviour
     public GameObject projectile;
     public GameObject impact;
     public Transform offsetShoot;
+    public SkinnedMeshRenderer[] skinMesh;
 
     [Header("FreeMode")]
     public float speedPlayer = 4;
@@ -36,6 +38,9 @@ public class CharacterControler : MonoBehaviour
     public float Water;
     public int Trap;
     public float waterWasteOnAction = 10f;
+    public bool ladderBool;
+    public Vector3 ladderTarget;
+    public Transform ladderTp;
 
     [Header("TacticalMode")]
     public bool TacticalMode = false;
@@ -44,7 +49,7 @@ public class CharacterControler : MonoBehaviour
     public int unitsRangeMovement = 3;
     public LayerMask blockMask = 8;
     public Material testMat;
-    public Material defaultMat;
+    
     public int actionPoint = 2;
     public bool turnPlayer = true;
     public bool cantMove = false;
@@ -57,6 +62,7 @@ public class CharacterControler : MonoBehaviour
     public bool targetPlayer;
     public bool isInvisble;
     public UitacticalButtonScript UI;
+    public Material invisibleMat;
 
     //private
     private Vector3 move;
@@ -70,7 +76,7 @@ public class CharacterControler : MonoBehaviour
     private List<Block> blockList = new List<Block>();
     private List<Vector3> pathWaypoint = new List<Vector3>();
     private bool statick;
-    private FieldOfView fov;
+    public FieldOfView fov;
     private bool isAiming;
     private bool occuped;
     private int deviceIndex;
@@ -79,6 +85,8 @@ public class CharacterControler : MonoBehaviour
     private bool selectInvisiblity;
     public bool selectTrap;
     private float baseTacticalSpeed;
+    private List<Material> defaultMat = new List<Material>();
+
 
 
     #endregion 
@@ -96,6 +104,15 @@ public class CharacterControler : MonoBehaviour
         baseTacticalSpeed = nav.speed;
         if(system != null)
             system.player = gameObject.GetComponent<CharacterControler>();
+
+
+        for (int i = 0; i < skinMesh.Length; i++)
+        {
+            for (int s = 0; s < skinMesh[i].materials.Length; s++)
+            {
+                defaultMat.Add(skinMesh[i].materials[s]);
+            }
+        }
     }
     private void Update()
     {
@@ -103,8 +120,15 @@ public class CharacterControler : MonoBehaviour
         skin.position = transform.position;
         if (!TacticalMode)
         {
-            SimpleMove();
-            FinalMove();
+            if (!ladderBool)
+            {
+                SimpleMove();
+                FinalMove();
+            }
+            else
+            {
+                LadderMovement();
+            }
         }
         else
         {
@@ -206,7 +230,6 @@ public class CharacterControler : MonoBehaviour
 
     private void FinalMove()
     {
-
         Vector3 vel = new Vector3(velocity.x, velocity.y, velocity.z) * speedPlayer;
         vel = transform.TransformDirection(vel);
         transform.position += vel * Time.deltaTime;
@@ -219,6 +242,38 @@ public class CharacterControler : MonoBehaviour
        
 
         velocity = Vector3.zero;
+    }
+
+    private void LadderMovement()
+    {
+        
+        if (Input.GetAxis("Vertical")> 0.1f)
+        {
+            Vector3 vel = new Vector3(0, Input.GetAxis("Vertical"), 0);
+            transform.position += vel * Time.deltaTime;
+            Ladder(true);
+            LadderMirror(false);
+        }
+        else if(Input.GetAxis("Vertical") < -0.1f)
+        {
+            Vector3 vel = new Vector3(0, Input.GetAxis("Vertical"), 0);
+            transform.position += vel * Time.deltaTime;
+            Ladder(false);
+            LadderMirror(true);
+        }
+
+        if(ladderTarget != null)
+        {
+            float dist = Vector3.Distance(transform.position, ladderTarget);
+            if(dist <= 0.5f)
+            {
+                Vector3 posFinal = new Vector3(ladderTp.position.x, ladderTp.position.y + 0.5f, ladderTp.position.z);
+                transform.position = posFinal;
+                //ladderBool = false;
+                nav.enabled = true;
+            }
+        }
+
     }
 
     private void WaterFreeWaste()
@@ -560,11 +615,8 @@ public class CharacterControler : MonoBehaviour
             WaterWaste(waterWasteOnAction);
             isInvisble = true;
             system.cdInvisibilty = true;
-            StartCoroutine(getInvisible(1));
+            StartCoroutine(getInvisible(3.3f));
         }
-        
-        //MeshRenderer mesh = transform.GetComponent<MeshRenderer>();
-        //mesh.material = /*new Material(0,0,0)*/
     }
     #endregion
 
@@ -705,14 +757,17 @@ public class CharacterControler : MonoBehaviour
 
     public void UpdateWater() // changement de la barre de vie de l'unit
     {
-        float ratio = (float)Water / (float)100;
+        if(UI != null)
+        {
+            float ratio = (float)Water / (float)100;
 
 
-        Mathf.Clamp01(ratio);
+            Mathf.Clamp01(ratio);
 
-        Vector3 newScale = UI.water.transform.localScale;
-        newScale.x = ratio;
-        UI.water.transform.localScale = newScale;
+            Vector3 newScale = UI.water.transform.localScale;
+            newScale.x = ratio;
+            UI.water.transform.localScale = newScale;
+        }
 
     }
 
@@ -827,6 +882,21 @@ public class CharacterControler : MonoBehaviour
 
         
     }
+
+    public void RefreshMat()
+    {
+        for (int i = 0; i < skinMesh.Length; i++)
+        {
+            for (int s = 0; s < skinMesh[i].materials.Length; s++)
+            {
+
+                Material[] mats = skinMesh[i].materials;
+                mats[s] = defaultMat[s];
+                skinMesh[i].materials = mats;
+                //skinMesh[i].materials[s] = invisibleMat;
+            }
+        }
+    }
     #endregion
 
     #region Animations
@@ -874,6 +944,11 @@ public class CharacterControler : MonoBehaviour
     public void Ladder(bool b)
     {
         anim.SetBool("ladder", b);
+    }
+
+    public void LadderMirror(bool b)
+    {
+        anim.SetBool("ladderMirror", b);
     }
 
     public void Shoot()
@@ -957,8 +1032,19 @@ public class CharacterControler : MonoBehaviour
 
     IEnumerator getInvisible(float time)
     {
+        Hack();
         yield return new WaitForSeconds(time);
+        for (int i = 0; i < skinMesh.Length; i++)
+        {
+            for (int s = 0; s < skinMesh[i].materials.Length; s++)
+            {
 
+                Material[] mats = skinMesh[i].materials;
+                mats[s] = invisibleMat;
+                skinMesh[i].materials = mats;
+                //skinMesh[i].materials[s] = invisibleMat;
+            }
+        }
         actionPointIndex++;
         if (StillYourTurn())
         {

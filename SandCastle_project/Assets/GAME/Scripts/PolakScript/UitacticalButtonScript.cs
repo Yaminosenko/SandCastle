@@ -24,6 +24,7 @@ public class UitacticalButtonScript : MonoBehaviour
     public TextMeshProUGUI targetNumber;
     public CharacterControler player;
     private CameraController cam;
+    
 
 
     // Start is called before the first frame update
@@ -32,6 +33,8 @@ public class UitacticalButtonScript : MonoBehaviour
         Refresh();
         player = GameObject.Find("Character").GetComponentInChildren<CharacterControler>();
         cam = Camera.main.GetComponent<CameraController>();
+
+        
     }
 
     // Update is called once per frame
@@ -39,6 +42,9 @@ public class UitacticalButtonScript : MonoBehaviour
     {
         string trapCount = player.Trap.ToString();
         trapNumber.SetText(trapCount);
+
+        string targetCount = player.fov.visibleTargets.ToArray().Length.ToString();
+        targetNumber.SetText(targetCount);
     }
 
     public void Shot()

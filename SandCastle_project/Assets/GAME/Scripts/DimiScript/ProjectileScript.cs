@@ -20,18 +20,22 @@ public class ProjectileScript : MonoBehaviour
 
     private void Update()
     {
-        if(!reach)
+        if (!reach)
+        {
             transform.Translate(0, 0, 100 * Time.deltaTime, Space.Self);
 
-        float dist = Vector3.Distance(transform.position, destination);
-        if(dist <= 0.5f)
-        {
+            float dist = Vector3.Distance(transform.position, destination);
+            if (dist <= 0.5f)
+            {
 
-            reach = true;
-            StartCoroutine(ImpactDelay());
-            //Debug.Log("touché");
-            //Destroy(gameObject);
+                reach = true;
+                StartCoroutine(ImpactDelay());
+                //Debug.Log("touché");
+                //Destroy(gameObject);
+            }
         }
+
+        
     }
 
     IEnumerator ImpactDelay()
@@ -41,7 +45,7 @@ public class ProjectileScript : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         //instanciat.SetActive(false);
         Destroy(gameObject);
-        Destroy(instanciat);
+        //Destroy(instanciat);
     }
     
 
