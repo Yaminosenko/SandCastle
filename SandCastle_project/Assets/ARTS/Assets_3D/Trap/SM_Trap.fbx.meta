@@ -8,7 +8,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: TX_Trap
-    second: {fileID: 2100000, guid: 2651eb79ee126c145b9d47fcf8fc760a, type: 2}
+    second: {fileID: 2100000, guid: 307861e6e1b20c54e934ab4fc9970ba8, type: 2}
   materials:
     materialImportMode: 1
     materialName: 0

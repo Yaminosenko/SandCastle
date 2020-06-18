@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 7688266248371836972}
   - component: {fileID: 7688266248371836973}
   - component: {fileID: 7688266248371836946}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Water_9
-  m_TagString: Untagged
+  m_TagString: Obs2
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 8
@@ -394,6 +394,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: D_Mark1
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: a68a432545246364e81661d87f5b626b,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a68a432545246364e81661d87f5b626b, type: 3}
 --- !u!4 &5535638930003470796 stripped
@@ -464,10 +469,20 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -1504981713932161579, guid: 1ec689065dad12748b6a3c5d9cc0e256,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: b11d0c86cc3e99a4ba15c80b85123ed4, type: 2}
     - target: {fileID: -927199367670048503, guid: 1ec689065dad12748b6a3c5d9cc0e256,
         type: 3}
       propertyPath: m_Name
       value: SM_Barrel_6M (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 1ec689065dad12748b6a3c5d9cc0e256,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1ec689065dad12748b6a3c5d9cc0e256, type: 3}

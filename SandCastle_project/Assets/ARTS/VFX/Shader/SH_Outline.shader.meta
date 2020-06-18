@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: 3d65f5924562b4245af85e60c6d392dd
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _plane_divided_DefaultMaterial_AlbedoTransparency: {fileID: 2800000, guid: 4d47284c93aa7644ea70a9d5d80eebb4,
+      type: 3}
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

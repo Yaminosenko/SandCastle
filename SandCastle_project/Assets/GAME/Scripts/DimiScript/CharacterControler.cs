@@ -123,6 +123,8 @@ public class CharacterControler : MonoBehaviour
         Cursor.visible = false;
 
 
+
+
         for (int i = 0; i < skinMesh.Length; i++)
         {
             for (int s = 0; s < skinMesh[i].materials.Length; s++)
@@ -274,14 +276,14 @@ public class CharacterControler : MonoBehaviour
         skin.rotation = transform.rotation;
         if (Input.GetAxis("Vertical")> 0.1f)
         {
-            Vector3 vel = new Vector3(0, Input.GetAxis("Vertical"), 0) * speedPlayer / 2;
+            Vector3 vel = new Vector3(0, Input.GetAxis("Vertical"), 0);
             transform.position += vel * Time.deltaTime;
             Ladder(true);
             LadderMirror(false);
         }
         else if(Input.GetAxis("Vertical") < -0.1f)
         {
-            Vector3 vel = new Vector3(0, Input.GetAxis("Vertical"), 0) * speedPlayer / 2;
+            Vector3 vel = new Vector3(0, Input.GetAxis("Vertical"), 0) ;
             transform.position += vel * Time.deltaTime;
             Ladder(false);
             LadderMirror(true);
@@ -304,7 +306,7 @@ public class CharacterControler : MonoBehaviour
     private void WaterFreeWaste()
     {
         if(!TacticalMode)
-            Water -= 0.05f;
+            Water -= 0.025f;
 
         if(Water <= 0)
         {
@@ -692,7 +694,7 @@ public class CharacterControler : MonoBehaviour
         limits.Clear();
     }
 
-    private void InstanciateCamera()
+    public void InstanciateCamera()
     {
 
         GameObject _currentCam = (GameObject)Instantiate(camShoulder, cam.transform.position, cam.transform.rotation) as GameObject;

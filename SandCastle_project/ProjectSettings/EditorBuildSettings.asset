@@ -6,9 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/GAME/Scenes/Dimitry/Dimitry_test_scene.unity
-    guid: 20ea008b98cc7da4e9c1d6409782a101
-  - enabled: 1
     path: Assets/GAME/Scenes/Gautier/Block_01.unity
     guid: 61dfba8e6585ac1439f0793407222d57
   m_configObjects: {}

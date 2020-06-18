@@ -24,7 +24,9 @@ public class UitacticalButtonScript : MonoBehaviour
     public TextMeshProUGUI targetNumber;
     public CharacterControler player;
     private CameraController cam;
-    
+    public GameObject[] video;
+    public Image blackScreen;
+
 
 
     // Start is called before the first frame update
