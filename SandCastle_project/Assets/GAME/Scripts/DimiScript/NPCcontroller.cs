@@ -46,7 +46,7 @@ public class NPCcontroller : MonoBehaviour
     public bool alerted;
     public bool distracted;
     public bool deviceRepair;
-    //public int indexTurn;
+    public Vector3 testFinalPos;
 
     [Header("Other")]
     public float cooldownShootMax = 0.2f;
@@ -71,6 +71,7 @@ public class NPCcontroller : MonoBehaviour
     public AudioSource shotSource;
     public AudioSource speakSource;
     public AudioClip[] ambianceSpeakClip;
+    public Device deviceActual;
     
 
 
@@ -468,7 +469,7 @@ public class NPCcontroller : MonoBehaviour
         float dist = Vector3.Distance(transform.position, newPos);
 
         // Debug.Log(dist);
-        if (dist <= 0.5f)
+        if (dist <=1.5f)
         {
             if (indexAction == 1)
             {
@@ -484,7 +485,9 @@ public class NPCcontroller : MonoBehaviour
                     indexDeviceRepair++;
                     if(indexDeviceRepair == 2)
                     {
-
+                        Material[] mats = deviceActual.mesh.materials;
+                        mats[1] = deviceActual.blue;
+                        deviceActual.mesh.materials = mats;
                         deviceRepair = false;
                         indexDeviceRepair = 0;
                     }
@@ -656,7 +659,11 @@ public class NPCcontroller : MonoBehaviour
                 RaycastHit hit;
                 if (Physics.Raycast(corners, Vector3.down, out hit, blockMask))
                 {
-                    if (hit.transform.GetComponent<Block>().pathIndex != 0)
+                    if(hit.transform.gameObject.layer != 8)
+                    {
+                        indexLength = i;
+                    }
+                    else if (hit.transform.GetComponent<Block>().pathIndex != 0)
                     {
                         indexLength = i;
                     }
@@ -679,6 +686,7 @@ public class NPCcontroller : MonoBehaviour
             }
             Debug.Log(pos);
             pos = finalPos;
+            testFinalPos = finalPos;
             MovementTactical();
             oneAction = true;
         }
@@ -739,6 +747,7 @@ public class NPCcontroller : MonoBehaviour
             pos = new Vector3(finalPos.x,finalPos.y + 0.3f,finalPos.z);
             //Debug.Log(pos);
             Debug.Log(finalPos);
+            testFinalPos = finalPos;
             indexAlert++;
             MovementTactical();
             oneAction = true;
@@ -1032,6 +1041,7 @@ public class NPCcontroller : MonoBehaviour
         Projectile(playerScript.transform);
         yield return new WaitForSeconds(0.3f);
         playerScript.Death();
+        playerScript.dead = true;
         yield return new WaitForSeconds(3);
         system.Restart();
     }

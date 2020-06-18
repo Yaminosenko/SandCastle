@@ -16,6 +16,9 @@ public class Device : MonoBehaviour
     private CharacterControler player;
     private bool activate;
     public Image preview;
+    public MeshRenderer mesh;
+    public Material blue;
+    public Material red;
 
     private void OnEnable()
     {
@@ -51,12 +54,16 @@ public class Device : MonoBehaviour
     {
         Vector3 pos = new Vector3(transform.position.x + 0.5f, transform.position.y, transform.position.z + 0.5f);
         Collider[] npcToDistract = Physics.OverlapSphere(pos, radiusRange, npcMask);
-
+        mesh.materials[1] = red;
 
         for (int i = 0; i < npcToDistract.Length; i++)
         {
             NPCcontroller npc = npcToDistract[i].GetComponent<NPCcontroller>();
-            //npc.deviceScource = GetComponent<AudioSource>();
+
+            Material[] mats = mesh.materials;
+            mats[1] = red;
+            mesh.materials = mats;
+            npc.deviceActual = this;
             
             StartCoroutine(cooldownBeforeEnd());
             //npc.distractPos = transform.position;

@@ -156,10 +156,10 @@ public class FieldOfView : MonoBehaviour {
                             {
                                 AddNPCTarget(target);
                             }
-                            else if (isDetector)
-                            {
-                                DetectorAlert();
-                            }
+                            //else if (isDetector)
+                            //{
+                            //    DetectorAlert();
+                            //}
 
                             if (!isDetector)
                             {
@@ -224,8 +224,11 @@ public class FieldOfView : MonoBehaviour {
             {
                 for (int i = 0; i < npc.allyNPC.ToArray().Length; i++)
                 {
-                    npc.allyNPC.ToArray()[i].alertedPos = player.RandomPositionAroundPlayer();
-                    npc.allyNPC.ToArray()[i].GetAlerted();
+                    if (!npc.allyNPC.ToArray()[i].alerted)
+                    {
+                        npc.allyNPC.ToArray()[i].alertedPos = player.RandomPositionAroundPlayer();
+                        npc.allyNPC.ToArray()[i].GetAlerted();
+                    }
                 }
                 //npc.alerted = true;
                 npc.deadAlly.Add(target.GetComponent<NPCcontroller>());
@@ -249,8 +252,11 @@ public class FieldOfView : MonoBehaviour {
             {
                 for (int i = 0; i < npc.allyNPC.ToArray().Length; i++)
                 {
-                    npc.allyNPC.ToArray()[i].alertedPos = player.RandomPositionAroundPlayer();
-                    npc.allyNPC.ToArray()[i].GetAlerted();
+                    if (!npc.allyNPC.ToArray()[i].alerted)
+                    {
+                        npc.allyNPC.ToArray()[i].alertedPos = player.RandomPositionAroundPlayer();
+                        npc.allyNPC.ToArray()[i].GetAlerted();
+                    }
                 }
                 StartCoroutine(npc.SeeCorpsTactical());
                 npc.deadAlly.Add(target.GetComponent<NPCcontroller>());

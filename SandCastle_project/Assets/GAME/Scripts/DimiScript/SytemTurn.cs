@@ -21,7 +21,7 @@ public class SytemTurn : MonoBehaviour
     public AudioSource speakSourceSystem;
 
 
-
+    public NPCcontroller[] allNPC;
 
     private void Start()
     {
@@ -147,6 +147,15 @@ public class SytemTurn : MonoBehaviour
         //    player.SettingPathBool = false;
         //    return;
         //}
+    }
+
+
+    public void NPCChangeFovViewRadius(int value)
+    {
+        for (int i = 0; i < allNPC.Length; i++)
+        {
+            allNPC[i].fov.viewRadius = value;
+        }
     }
 
     public void RefreshSystem()

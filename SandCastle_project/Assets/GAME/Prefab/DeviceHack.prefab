@@ -152,6 +152,9 @@ MonoBehaviour:
     m_Bits: 4096
   isHack: 0
   preview: {fileID: 5449412658482990678}
+  mesh: {fileID: 6767460613694266455}
+  blue: {fileID: 2100000, guid: 7ee1ee4c795141f498eeb8e0d69785dd, type: 2}
+  red: {fileID: 2100000, guid: b8d97dfb18fe53d4facfea62a88d46ea, type: 2}
 --- !u!82 &7545656064297658205
 AudioSource:
   m_ObjectHideFlags: 0
@@ -504,6 +507,12 @@ PrefabInstance:
 --- !u!4 &8326406148160051864 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4216859302048453862, guid: b3e5ce16bccc1ea4c8e330894e043cdc,
+    type: 3}
+  m_PrefabInstance: {fileID: 3960883472333861250}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &6767460613694266455 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -1504981713932161579, guid: b3e5ce16bccc1ea4c8e330894e043cdc,
     type: 3}
   m_PrefabInstance: {fileID: 3960883472333861250}
   m_PrefabAsset: {fileID: 0}

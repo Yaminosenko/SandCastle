@@ -30,6 +30,7 @@ public class CharacterControler : MonoBehaviour
     public GameObject impact;
     public Transform offsetShoot;
     public SkinnedMeshRenderer[] skinMesh;
+    public bool dead;
     
 
     [Header("Sound")]
@@ -118,6 +119,8 @@ public class CharacterControler : MonoBehaviour
         baseTacticalSpeed = nav.speed;
         if(system != null)
             system.player = gameObject.GetComponent<CharacterControler>();
+
+        Cursor.visible = false;
 
 
         for (int i = 0; i < skinMesh.Length; i++)
@@ -249,9 +252,12 @@ public class CharacterControler : MonoBehaviour
 
     private void FinalMove()
     {
-        Vector3 vel = new Vector3(velocity.x, velocity.y, velocity.z) * speedPlayer;
-        vel = transform.TransformDirection(vel);
-        transform.position += vel * Time.deltaTime;
+        if (!dead)
+        {
+            Vector3 vel = new Vector3(velocity.x, velocity.y, velocity.z) * speedPlayer;
+            vel = transform.TransformDirection(vel);
+            transform.position += vel * Time.deltaTime;
+        }
 
 
         Quaternion _rotation = Quaternion.LookRotation(move);
@@ -763,9 +769,9 @@ public class CharacterControler : MonoBehaviour
         else if(Water > 0 && 100 - Water <= percents)
         {
             Water -= 100 - Water;
-            DeathByWater();
+            
         }
-        else
+        else 
         {
             DeathByWater();
         }
@@ -818,6 +824,7 @@ public class CharacterControler : MonoBehaviour
         {
             if (TacticalMode && !isOnCombat)
             {
+                Cursor.visible = false;
                 UI.Tactical(false);
                 TacticalAnim(false);
                 TacticalMode = false;
@@ -835,7 +842,7 @@ public class CharacterControler : MonoBehaviour
                 {
                     for (int i = 0; i < system.actualEnnemy.ToArray().Length; i++)
                     {
-                        system.actualEnnemy.ToArray()[i].fov.viewRadius = 15;
+                        system.NPCChangeFovViewRadius(10);
                     }
                 }
                 timeBetwwenSteps = 0.45f;
@@ -848,6 +855,7 @@ public class CharacterControler : MonoBehaviour
                 {
                     if(hit.transform.gameObject.layer == 8 || hit.transform.gameObject.layer == 13)
                     {
+                        Cursor.visible = true;
                         UI.Tactical(true);
                         Run(false);
                         WalkTactical(false);
@@ -863,7 +871,7 @@ public class CharacterControler : MonoBehaviour
                         {
                             for (int i = 0; i < system.actualEnnemy.ToArray().Length; i++)
                             {
-                                system.actualEnnemy.ToArray()[i].fov.viewRadius = 5;
+                                system.NPCChangeFovViewRadius(5);
                             }
                         }
                     }
@@ -928,10 +936,10 @@ public class CharacterControler : MonoBehaviour
             pathWaypoint.Clear();
         }
 
-        //if (Input.GetKeyDown(KeyCode.O))
-        //{
-        //    PassTurn();
-        //}
+        if (Input.GetKeyDown(KeyCode.P) && !occuped)
+        {
+            PassTurn();
+        }
     }
 
     private void Projectile(Transform dest)
@@ -1005,6 +1013,7 @@ public class CharacterControler : MonoBehaviour
     private void DeathByWater()
     {
         Death();
+        dead = true;
         StartCoroutine(WaterDeath());
     }
     #endregion
@@ -1069,6 +1078,7 @@ public class CharacterControler : MonoBehaviour
     public void Death()
     {
         anim.SetTrigger("death");
+        nav.isStopped = true;
     }
 
     public void Hack()
