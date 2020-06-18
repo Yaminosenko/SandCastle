@@ -173,7 +173,7 @@ public class CharacterControler : MonoBehaviour
                     Movement();
                 else
                 {
-                    if (Input.GetKeyDown(KeyCode.L))
+                    if (Input.GetKeyDown(KeyCode.Return))
                         ShootKill();
                 }
                 if (!SettingPathBool)
@@ -299,6 +299,11 @@ public class CharacterControler : MonoBehaviour
     {
         if(!TacticalMode)
             Water -= 0.05f;
+
+        if(Water <= 0)
+        {
+            DeathByWater();
+        }
     }
 
    
@@ -577,7 +582,7 @@ public class CharacterControler : MonoBehaviour
         }
 
         selectDeviceScript.PreviewRangeDevice();
-        if (Input.GetKeyDown(KeyCode.L))
+        if (Input.GetKeyDown(KeyCode.Return))
         {
             
             Debug.Log(selectDeviceScript);
@@ -632,7 +637,7 @@ public class CharacterControler : MonoBehaviour
     {
         camControl.target = transform;
         targetPlayer = true;
-        if (Input.GetKeyDown(KeyCode.L))
+        if (Input.GetKeyDown(KeyCode.Return))
         {
             
             WaterWaste(waterWasteOnAction);
@@ -751,7 +756,19 @@ public class CharacterControler : MonoBehaviour
 
     private void WaterWaste(float percents)
     {
-        Water -= percents;
+        if (Water > 0 && 100 - Water > percents)
+        {
+            Water -= percents;
+        }
+        else if(Water > 0 && 100 - Water <= percents)
+        {
+            Water -= 100 - Water;
+            DeathByWater();
+        }
+        else
+        {
+            DeathByWater();
+        }
     }
 
     public void PassTurn()
@@ -814,6 +831,13 @@ public class CharacterControler : MonoBehaviour
                 system.RefreshSystem();
                 system.ambianceSource.clip = system.ambianceSound[0];
                 system.ambianceSource.Play();
+                if (system.actualEnnemy.ToArray().Length != 0)
+                {
+                    for (int i = 0; i < system.actualEnnemy.ToArray().Length; i++)
+                    {
+                        system.actualEnnemy.ToArray()[i].fov.viewRadius = 15;
+                    }
+                }
                 timeBetwwenSteps = 0.45f;
                 //StartCoroutine(changeCamMode(1f, false));
             }
@@ -822,7 +846,7 @@ public class CharacterControler : MonoBehaviour
                 RaycastHit hit;
                 if(Physics.Raycast(transform.position, Vector3.down, out hit, blockMask))
                 {
-                    if(hit.transform.gameObject.layer == 8)
+                    if(hit.transform.gameObject.layer == 8 || hit.transform.gameObject.layer == 13)
                     {
                         UI.Tactical(true);
                         Run(false);
@@ -835,9 +859,15 @@ public class CharacterControler : MonoBehaviour
                         timeBetwwenSteps = 0.6f;
                         system.ambianceSource.clip = system.ambianceSound[1];
                         system.ambianceSource.Play();
+                        if (system.actualEnnemy.ToArray().Length != 0)
+                        {
+                            for (int i = 0; i < system.actualEnnemy.ToArray().Length; i++)
+                            {
+                                system.actualEnnemy.ToArray()[i].fov.viewRadius = 5;
+                            }
+                        }
                     }
                 }
-                //sStartCoroutine(changeCamMode(1f, true));
             }
         }
     }
@@ -970,6 +1000,12 @@ public class CharacterControler : MonoBehaviour
                 platformWalk = false;
             }
         }
+    }
+
+    private void DeathByWater()
+    {
+        Death();
+        StartCoroutine(WaterDeath());
     }
     #endregion
 
@@ -1173,9 +1209,13 @@ public class CharacterControler : MonoBehaviour
     IEnumerator CooldownStep()
     {
         yield return new WaitForSeconds(timeBetwwenSteps);
-
         soundsGood = true;
+    }
 
+    IEnumerator WaterDeath()
+    {
+        yield return new WaitForSeconds(2.867f);
+        system.Restart();
     }
     #endregion
 

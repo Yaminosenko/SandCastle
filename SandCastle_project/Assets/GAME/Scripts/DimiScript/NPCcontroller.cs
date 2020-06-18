@@ -101,7 +101,7 @@ public class NPCcontroller : MonoBehaviour
     private bool stop;
     private bool toShort;
     private int indexDeviceRepair;
-    
+    private bool shootOnce;
 
     #endregion
 
@@ -186,14 +186,17 @@ public class NPCcontroller : MonoBehaviour
 
     private void Movement()
     {
-        walkRunMethods(true);
-        nav.speed = walkSpeed;
-        nav.isStopped = false;
-        //Run(false);
-
-        if (targetPosition != null)
+        if (!stop)
         {
-            nav.SetDestination(targetPosition);
+            walkRunMethods(true);
+            nav.speed = walkSpeed;
+            nav.isStopped = false;
+            //Run(false);
+
+            if (targetPosition != null)
+            {
+                nav.SetDestination(targetPosition);
+            }
         }
     }
 
@@ -346,7 +349,12 @@ public class NPCcontroller : MonoBehaviour
 
     public void KillPlayer()
     {
-        Debug.Log("oui");
+        if (!shootOnce)
+        {
+            KillPlayerTactical(playerScript.transform);
+            Camera.main.GetComponent<CameraController>().tacticalEnable = true;
+            shootOnce = true;
+        }
     }
 
     #endregion
@@ -856,13 +864,13 @@ public class NPCcontroller : MonoBehaviour
 
     public void KillPlayerTactical(Transform target)
     {
-        int random = Random.Range(0, 1);
+        //int random = Random.Range(0, 1);
         nav.isStopped = true;
         stop = true;
         //Debug.Log("kill");
         walkRunMethods(false);
         //Debug.Log(random);
-        if(random == 0)
+        //if(random == 0)
             InstanciateCamera(target);
         system.KillPlayerSystem(this);
         StartCoroutine(KillPlayerAnim());
