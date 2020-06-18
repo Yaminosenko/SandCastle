@@ -31,6 +31,9 @@ public class NPCcontroller : MonoBehaviour
     public Transform offsetCam;
     public List<NPCcontroller> allyNPC = new List<NPCcontroller>();
     public int isCover;
+    public GameObject muzzleFlash;
+    public GameObject projectile;
+    public Transform offsetShoot;
 
 
     [Header("Tactical")]
@@ -42,6 +45,7 @@ public class NPCcontroller : MonoBehaviour
     public bool yourTurn;
     public bool alerted;
     public bool distracted;
+    public bool deviceRepair;
     //public int indexTurn;
 
     [Header("Other")]
@@ -64,6 +68,11 @@ public class NPCcontroller : MonoBehaviour
     public CameraShoulderMouv camScriptInst;
     public GameObject camShoulder;
     public bool isOnCover;
+    public AudioSource shotSource;
+    public AudioSource speakSource;
+    public AudioClip[] ambianceSpeakClip;
+    
+
 
     private Vector3 sentinelPosition;
     private int indexPatrol = 0;
@@ -91,6 +100,8 @@ public class NPCcontroller : MonoBehaviour
     private Camera cam;
     private bool stop;
     private bool toShort;
+    private int indexDeviceRepair;
+    
 
     #endregion
 
@@ -117,8 +128,6 @@ public class NPCcontroller : MonoBehaviour
     {
         if (!dead)
         {
-            
-
             if(playerScript != null)
                 FreeMode = !playerScript.TacticalMode;
 
@@ -348,7 +357,6 @@ public class NPCcontroller : MonoBehaviour
     {
         if (yourTurn && !dead)
         {
-            
             if (distracted || alerted || randomPosTrigger)
             {
                 if (isOnCover)
@@ -390,17 +398,17 @@ public class NPCcontroller : MonoBehaviour
                 Debug.Log("random");
                 RandomPositionTactical();
             }
-            else if (alerted && !oneAction)
+            else if (alerted && !oneAction &&  !deviceRepair)
             {
                // Debug.Log("alerted");
                 AlertTactical(alertedPos);
             }
-            else if (distracted && !oneAction)
+            else if (distracted && !oneAction && !deviceRepair)
             {
                 Debug.Log("distract");
                 DistractTactical(distractPos);
             }
-            else if (isPatroling && !oneAction)
+            else if (isPatroling && !oneAction && !deviceRepair)
             {
                 Debug.Log("patrol");
                 PatrolTactial();
@@ -461,6 +469,17 @@ public class NPCcontroller : MonoBehaviour
                     alerted = false;
                     distracted = false;
                     toShort = false;
+                }
+
+                if (deviceRepair)
+                {
+                    indexDeviceRepair++;
+                    if(indexDeviceRepair == 2)
+                    {
+
+                        deviceRepair = false;
+                        indexDeviceRepair = 0;
+                    }
                 }
                 Debug.Log("NPCReachDestination");
                 walkRunMethods(false);
@@ -609,8 +628,11 @@ public class NPCcontroller : MonoBehaviour
                     if (hitFirst.transform.GetComponent<Block>().pathIndex != 0)
                     {
                         pos = hitFirst.transform.position;
+                        pos = new Vector3(hitFirst.transform.position.x, hitFirst.transform.position.y + 0.5f, hitFirst.transform.position.z);
                         MovementTactical();
+                        Debug.Log(pos);
                         oneAction = true;
+                        deviceRepair = true;
                         //randomPosTrigger = true;
 
                         toShort = true;
@@ -686,7 +708,7 @@ public class NPCcontroller : MonoBehaviour
                 {
                     if (hitFirst.transform.GetComponent<Block>().pathIndex != 0)
                     {
-                        //randomPosTrigger = true;
+                        //deviceRepair = true;
                         toShort = true;
                         Debug.Log("toShortAlerted");
                         if (hitFirst.transform.GetComponent<Block>().pathIndex <= unitsRangeMovement / 2 && playerSpotted)
@@ -749,6 +771,7 @@ public class NPCcontroller : MonoBehaviour
             //Debug.Log(finalPos);
             MovementTactical();
             alerted = true;
+            system.speakSourceSystem.Play();
             oneAction = true;
         }
     }
@@ -804,6 +827,7 @@ public class NPCcontroller : MonoBehaviour
 
     public void GetAlerted()
     {
+        
         randomPosTrigger = false;
         alerted = true;
         indexAlert = 0;
@@ -842,6 +866,14 @@ public class NPCcontroller : MonoBehaviour
             InstanciateCamera(target);
         system.KillPlayerSystem(this);
         StartCoroutine(KillPlayerAnim());
+    }
+
+    private void Projectile(Transform dest)
+    {
+        Vector3 desstTest = new Vector3(dest.position.x, dest.position.y, dest.position.z);
+        GameObject projo = Instantiate(projectile, offsetShoot.position, Quaternion.identity);
+        projo.GetComponent<ProjectileScript>().destination = desstTest;
+
     }
 
     #endregion
@@ -982,8 +1014,15 @@ public class NPCcontroller : MonoBehaviour
 
     public IEnumerator KillPlayerAnim()
     {
+        speakSource.clip = ambianceSpeakClip[1];
+        speakSource.Play();
         yield return new WaitForSeconds(1);
         Fire();
+        shotSource.Play();
+        yield return new WaitForSeconds(0.3f);
+
+        Projectile(playerScript.transform);
+        yield return new WaitForSeconds(0.3f);
         playerScript.Death();
         yield return new WaitForSeconds(3);
         system.Restart();

@@ -16,6 +16,11 @@ public class SytemTurn : MonoBehaviour
     [SerializeField] private int indexNbrTurn;
     private int coolDownInv;
     private int deadIndex;
+    public AudioClip[] ambianceSound;
+    public AudioSource ambianceSource;
+    public AudioSource speakSourceSystem;
+
+
 
 
     private void Start()
@@ -75,6 +80,13 @@ public class SytemTurn : MonoBehaviour
 
     public void EndPlayerTurn()
     {
+        if(actualEnnemy.ToArray().Length == 0)
+        {
+            cam.target = player.transform;
+            StartCoroutine(waitEndTurnNPC());
+            indexNbrTurn = 0;
+            return;
+        }
         NPCcontroller[] npcTab = actualEnnemy.ToArray();
         npcTurn = npcTab[0];
         nbrTurnMax = actualEnnemy.ToArray().Length;
@@ -106,7 +118,7 @@ public class SytemTurn : MonoBehaviour
 
     public void Restart()
     {
-        SceneManager.LoadScene(0, LoadSceneMode.Single);
+        SceneManager.LoadScene(1, LoadSceneMode.Single);
     }
 
     private void AutoFreeMode()
@@ -164,7 +176,10 @@ public class SytemTurn : MonoBehaviour
                 cdInvisibilty = false;
 
             if (coolDownInv == player.invisibilityDuration)
+            {
                 player.isInvisble = false;
+                player.RefreshMat();
+            }
         }
         cam.turnPlayer = true;
         player.turnPlayer = true;

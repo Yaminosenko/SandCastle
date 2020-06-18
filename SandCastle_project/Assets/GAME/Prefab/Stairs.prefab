@@ -9,7 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7982864228622220386}
-  m_Layer: 0
+  - component: {fileID: 28930751469525527}
+  m_Layer: 2
   m_Name: Stairs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31,6 +32,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &28930751469525527
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7982864228622220387}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7982864229347368088
 GameObject:
   m_ObjectHideFlags: 0
@@ -76,11 +90,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fec7e807a0b7c1e4dbc77bef1a173999, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetStair: {fileID: 7982864230454724980}
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 512
-  angle: 0
+  offset: {fileID: 0}
+  mirror: 0
 --- !u!114 &7982864229347368091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,11 +170,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fec7e807a0b7c1e4dbc77bef1a173999, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetStair: {fileID: 7982864230454724980}
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 512
-  angle: 0
+  offset: {fileID: 0}
+  mirror: 0
 --- !u!1 &7982864230454724981
 GameObject:
   m_ObjectHideFlags: 0
@@ -173,7 +181,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7982864230454724980}
-  m_Layer: 0
+  - component: {fileID: 6279658142324893693}
+  - component: {fileID: 98153343230141406}
+  m_Layer: 2
   m_Name: Offset
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -194,3 +204,30 @@ Transform:
   m_Father: {fileID: 7982864229347368090}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &6279658142324893693
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7982864230454724981}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &98153343230141406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7982864230454724981}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fec7e807a0b7c1e4dbc77bef1a173999, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offset: {fileID: 7982864229709062814}
+  mirror: 1

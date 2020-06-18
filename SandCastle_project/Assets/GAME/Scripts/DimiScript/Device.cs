@@ -56,13 +56,16 @@ public class Device : MonoBehaviour
         for (int i = 0; i < npcToDistract.Length; i++)
         {
             NPCcontroller npc = npcToDistract[i].GetComponent<NPCcontroller>();
+            //npc.deviceScource = GetComponent<AudioSource>();
+            
+            StartCoroutine(cooldownBeforeEnd());
             //npc.distractPos = transform.position;
             NavMeshHit hit;
             Vector3 randomDirection = Random.insideUnitSphere * 2;
             Vector3 originGround = pos;
             //originGround.y = originGround.y + 0.5f;
             originGround += randomDirection;
-            NavMesh.SamplePosition(originGround, out hit, 1, 1);
+            NavMesh.SamplePosition(originGround, out hit, 2, 1);
             Vector3 targetPosToFollow = hit.position;
             targetPosToFollow.y = targetPosToFollow.y + 0.5f;
             Debug.Log(targetPosToFollow);
@@ -100,6 +103,14 @@ public class Device : MonoBehaviour
         //Debug.Log(activate);
         yield return new WaitForSeconds(time);
         activate = false;
+    }
+
+    IEnumerator cooldownBeforeEnd()
+    {
+        yield return new WaitForSeconds(3.3f);
+        GetComponent<AudioSource>().Play();
+        yield return new WaitForSeconds(3f);
+        GetComponent<AudioSource>().Stop();
     }
 
     #region Handles 
